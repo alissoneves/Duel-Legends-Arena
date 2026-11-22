@@ -6,7 +6,8 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '1.7';
+const VERSION = '1.8';
+const MIN_VER = 2.1;   // 110 lendas: versões antigas sorteiam diferente
 const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
 const QUICK = ['Oi!', 'Boa sorte!', 'Pronto!', 'Bora!', 'GG!', 'Revanche?', 'Valeu!'];
@@ -462,6 +463,7 @@ function goRoom(r) {
 
 // ---------- mensagens ----------
 function handle(c, m) {
+  if (['quickmatch', 'rankqueue', 'create', 'join', 'joincode', 'challenge'].includes(m.t) && (c.ver || 0) < MIN_VER) { send(c, { t: 'error', msg: 'Jogo desatualizado: recarregue a página para jogar online.' }); return; }
   switch (m.t) {
     case 'hello':
       c.name = String(m.name || 'Jogador').replace(/[^\p{L}\p{N} _.-]/gu, '').slice(0, 16) || 'Jogador';
@@ -529,7 +531,6 @@ function handle(c, m) {
       quickQueue = quickQueue.filter(q => q !== c);
       rankQueue = rankQueue.filter(q => q.c !== c && !q.c.closed);
       if (!c.player) { send(c, { t: 'error', msg: 'Atualize o jogo para jogar a ranqueada.' }); return; }
-      if (c.ver < 1.7) { send(c, { t: 'error', msg: 'Atualize o jogo para jogar a ranqueada.' }); return; }
       if (!c.player.login) { send(c, { t: 'error', msg: 'Crie uma conta para jogar a ranqueada.' }); return; }
       c.mmr = c.player.rank.mmr;
       // rival de nível mais próximo; quem espera há mais tempo aceita diferença maior
