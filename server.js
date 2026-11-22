@@ -6,7 +6,8 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '1.5';
+const VERSION = '1.6';
+const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
 const QUICK = ['Oi!', 'Boa sorte!', 'Pronto!', 'Bora!', 'GG!', 'Revanche?', 'Valeu!'];
 const PREP_TIME = 30000;
@@ -345,8 +346,9 @@ function roomState(r) {
 function teamOf(r, slot) { return r.mode === 'ffa' ? slot : slot % 2; }
 function broadcastRoom(r, obj, except) { for (const s of r.slots) if (s && s !== except) send(s, obj); }
 function pushRoom(r) { broadcastRoom(r, roomState(r)); }
+function listMsg() { return { t: 'rooms', rooms: [...rooms.values()].filter(r => !r.quick).map(roomInfo), online: clients.size }; }
 function pushList() {
-  const list = { t: 'rooms', rooms: [...rooms.values()].filter(r => !r.quick).map(roomInfo) };
+  const list = listMsg();
   for (const c of clients.values()) if (!c.room) send(c, list);
 }
 // código de convite da sala (5 letras sem caracteres confusos); quem tem o código entra sem senha
@@ -375,7 +377,7 @@ function leaveRoom(c) {
   r.slots[c.slot] = null; delete r.ready[c.id]; c.room = null; c.slot = -1;
   const left = r.slots.filter(s => s);
   if (!left.length) { rooms.delete(r.id); pushList(); return; }
-  if (r.status !== 'lobby') { broadcastRoom(r, { t: 'aborted', msg: c.id === r.host ? 'O dono da sala saiu. Partida encerrada.' : `${c.name} saiu da partida.` }); r.status = 'lobby'; r.ready = {}; r.prep = null; }
+  if (r.status !== 'lobby') { broadcastRoom(r, { t: 'aborted', msg: c.id === r.host ? 'O dono da sala saiu. Partida encerrada.' : `${c.name} saiu da partida.` }); r.status = 'lobby'; r.ready = {}; r.prep = null; clearTimeout(r.rpickTimer); r.rpick = null; }
   if (r.quick) { for (const s of left) { s.room = null; s.slot = -1; send(s, { t: 'left' }); } rooms.delete(r.id); pushList(); return; }
   if (r.host === c.id) r.host = left[0].id;
   pushRoom(r); pushList();
@@ -396,8 +398,16 @@ function startRoom(r) {
       matches.set(M.id, M);
     }
   }
-  r.prep = { ready: {}, timer: setTimeout(() => goRoom(r), PREP_TIME + 9000) };
+  if (r.ranked) { r.rpick = {}; r.rpickTimer = setTimeout(() => rpickDone(r), RPICK_TIME); }
+  r.prep = { ready: {}, timer: setTimeout(() => goRoom(r), PREP_TIME + 9000 + (r.ranked ? RPICK_TIME : 0)) };
   pushList();
+}
+// ranqueada: cada um escolhe 1 de 3 lendas; as escolhas só aparecem quando os dois escolheram
+function rpickDone(r) {
+  if (!r.rpick || r.rpick.done) return;
+  clearTimeout(r.rpickTimer);
+  const picks = {}; r.slots.forEach((s, i) => { picks[i] = r.rpick[i] == null ? 0 : r.rpick[i]; });
+  r.rpick = { done: true }; broadcastRoom(r, { t: 'rpick', picks });
 }
 function goRoom(r) {
   if (!r.prep || r.status === 'fight') return;
@@ -413,6 +423,7 @@ function handle(c, m) {
       c.name = String(m.name || 'Jogador').replace(/[^\p{L}\p{N} _.-]/gu, '').slice(0, 16) || 'Jogador';
       c.badName = badName(c.name);
       if (c.badName) { c.name = 'Jogador' + (1000 + (c.id * 7919) % 9000); send(c, { t: 'error', msg: 'Esse nome não é permitido. Escolha outro.' }); }
+      c.ver = parseFloat(m.ver) || 0;
       c.icon = /^[a-z0-9_]{1,24}$/i.test(String(m.icon || '')) ? String(m.icon) : '';
       c.title = String(m.title || '').replace(/[^\p{L}\p{N} _.-]/gu, '').slice(0, 28);
       send(c, { t: 'welcome', id: c.id, ver: VERSION, quick: QUICK, now: Date.now() });
@@ -421,7 +432,7 @@ function handle(c, m) {
       if (c.room) pushRoom(c.room);
       pushList();
       break;
-    case 'list': send(c, { t: 'rooms', rooms: [...rooms.values()].filter(r => !r.quick).map(roomInfo) }); break;
+    case 'list': send(c, listMsg()); break;
     case 'create': { const r = createRoom(c, m.name, m.mode, m.pass); joinRoom(c, r, 0); break; }
     case 'join': {
       const r = rooms.get(m.id);
@@ -442,7 +453,7 @@ function handle(c, m) {
       joinRoom(c, r);
       break;
     }
-    case 'leave': leaveRoom(c); send(c, { t: 'rooms', rooms: [...rooms.values()].filter(r => !r.quick).map(roomInfo) }); break;
+    case 'leave': leaveRoom(c); send(c, listMsg()); break;
     case 'slot': {  // trocar de lugar (e de equipe)
       const r = c.room; if (!r || r.status !== 'lobby') return;
       const to = m.slot | 0; if (to < 0 || to >= r.max || r.slots[to]) return;
@@ -474,6 +485,7 @@ function handle(c, m) {
       quickQueue = quickQueue.filter(q => q !== c);
       rankQueue = rankQueue.filter(q => q.c !== c && !q.c.closed);
       if (!c.player) { send(c, { t: 'error', msg: 'Atualize o jogo para jogar a ranqueada.' }); return; }
+      if (c.ver < 1.7) { send(c, { t: 'error', msg: 'Atualize o jogo para jogar a ranqueada.' }); return; }
       if (!c.player.login) { send(c, { t: 'error', msg: 'Crie uma conta para jogar a ranqueada.' }); return; }
       c.mmr = c.player.rank.mmr;
       // rival de nível mais próximo; quem espera há mais tempo aceita diferença maior
@@ -489,6 +501,12 @@ function handle(c, m) {
       break;
     }
     case 'unqueue': quickQueue = quickQueue.filter(q => q !== c); rankQueue = rankQueue.filter(q => q.c !== c); break;
+    case 'rpick': {
+      const r = c.room; if (!r || !r.rpick || r.rpick.done) return;
+      r.rpick[c.slot] = Math.max(0, Math.min(2, m.i | 0));
+      if (r.slots.every((s, i) => !s || r.rpick[i] != null)) rpickDone(r);
+      break;
+    }
     case 'prepready': {
       const r = c.room; if (!r || !r.prep) return;
       r.prep.ready[c.id] = true; r.gears[c.slot] = m.gear || {}; r.cos[c.slot] = m.cos || {};
