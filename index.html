@@ -593,7 +593,7 @@ function askNick(first,then){askText(first?'BEM-VINDO!':'SEU NOME',NET.canRename
   else if(first&&!save.nick){save.nick='Jogador'+Math.floor(Math.random()*900+100);persist();}
   if(then)then();},{max:16,ph:'Ex.: Alisson',check:v=>cleanNick(v).length<3?'Use pelo menos 3 letras ou números.':badName(v)?'Esse nome não é permitido. Escolha outro.':null});}
 function ident(){if(!save.ident||!save.ident.pid){const h=n=>{const a=new Uint8Array(n);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach((v,i)=>a[i]=Math.random()*256|0);return [...a].map(v=>v.toString(16).padStart(2,'0')).join('');};save.ident={pid:h(12),key:h(16)};persist();}return save.ident;}
-function helloMsg(name){const I=ident();return {t:'hello',name,ver:'1.7',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
+function helloMsg(name){const I=ident();return {t:'hello',name,ver:'1.8',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
 let LB={list:[],total:0,me:null,page:0,loading:false,err:''};
 let ACC={msg:'',err:'',busy:false};
 const USER_OK=v=>!/^[a-z0-9_.]{3,16}$/.test(v.toLowerCase())?'Use 3 a 16 letras, números, _ ou ponto (sem espaço).':badName(v)?'Esse usuário não é permitido.':null;
@@ -625,9 +625,11 @@ function netMsg(m){switch(m.t){
  case 'error':NET.err=m.msg;NET.errT=performance.now();sfx('beep');break;
  case 'info':NET.err=m.msg;NET.errT=performance.now();sfx('go');break;
  case 'queued':NET.queued=true;NET.qT=performance.now();state='queue';break;
- case 'start':netBeginDraw(m);break;
+ case 'start':NET.chal=null;NET.chalTo=null;netBeginDraw(m);break;
  case 'prep':NET.prepReady=m.ready;break;
  case 'rpick':if(pick&&pick.choosing&&NET.ropts){const me=NET.mySlot,fs=NET.order.filter(i=>i!==me);pick.me=NET.ropts[me][m.picks[me]|0];pick.foes=fs.map(i=>NET.ropts[i][m.picks[i]|0]);pick.foe=pick.foes[0];pick.foe2=pick.foes[1];pick.choosing=false;drawT=1.65;revealed=[true,false,false];sfx('reveal');}break;
+ case 'challenge':NET.chal={from:m.from,t:performance.now()};sfx('reveal');break;
+ case 'chalsent':NET.chalTo=m.to;NET.err=`Desafio enviado para ${m.to}. Esperando resposta…`;NET.errT=performance.now();break;
  case 'go':NET.go=m;netStartMatch();break;
  case 'inp':NET.inputs[m.s]=m.i;break;
  case 'snap':if(NET.role==='client'&&G&&G.net)netApplySnap(m.s);break;
@@ -733,7 +735,8 @@ function renderOnline(){onlineHeader('ONLINE');
   btn('ranked',180,64,120,40,'RANQUEADA','#ff8a3d','#0b0c14',7);text(rankLabel(save.rank),240,116,8,rankCol(save.rank),'center',null,PS);text('1x1 valendo elo',240,127,7,'#8a8fb8','center',null,PS);
   btn('lobby',308,64,120,40,'SALAS','#4fd1ff','#0b0c14',8);text('Até 10 pessoas, com senha',368,116,8,'#c9cbe6','center',null,PS);
   btn(save.nick&&!NET.canRename?'icons':'netnick',52,150,116,18,save.nick&&!NET.canRename?'MEU ÍCONE':'ESCOLHER NOME','#2e3358','#ffffff',6);btn('account',182,150,116,18,save.user?'CONTA: '+save.user.slice(0,8):'CRIAR CONTA','#7a5af0','#ffffff',6);btn('netsrv',312,150,116,18,'SERVIDOR','#2e3358','#ffffff',6);
-  text('Itens valem online com o mesmo teto dos modos normais. Chat só com mensagens prontas.',W/2,196,8,'#8a8fb8','center',null,PS);}
+  const RV=(save.rivals||[]).slice(0,3);if(RV.length){text('ÚLTIMOS RIVAIS · toque para desafiar',W/2,184,6,'#ffd23f','center');RV.forEach((r,i)=>{const x=W/2-RV.length*64+i*128+4;btn('rival:'+i,x,190,120,18,r.n.slice(0,14),r.w?'#1c3a26':'#3a1c22','#ffffff',6);});}
+  else text('Itens valem online com o mesmo teto dos modos normais. Chat só com mensagens prontas.',W/2,196,8,'#8a8fb8','center',null,PS);}
  btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);renderModal();}
 function renderQueue(){onlineHeader(NET.rankQ?'RANQUEADA':'PARTIDA RÁPIDA');if(NET.rankQ)text(`${rankLabel(save.rank)} · procurando rival do seu nível`,W/2,80,9,rankCol(save.rank),'center',null,PS);text('Procurando outro jogador'+'.'.repeat(1+Math.floor(time*2)%3),W/2,110,11,'#ffffff','center',null,PS);if(NET.online)text(`${NET.online} ${NET.online===1?'pessoa':'pessoas'} online agora`,W/2,126,9,'#46d160','center',null,PS);
  if(!NET.rankQ&&NET.qT){const left=Math.ceil(QBOT_WAIT-(performance.now()-NET.qT)/1000);if(left<=0){NET.qT=0;netSend({t:'unqueue'});NET.queued=false;newPick('1x1');pick.qbot=true;NET.err='Ninguém apareceu. Treine contra um bot enquanto isso!';NET.errT=performance.now();return;}text(`Sem rival em ${left}s, você luta contra um bot`,W/2,232,8,'#c9cbe6','center',null,PS);}drawSprite('saci',W/2,170,2,Math.sin(time*3)>0?1:-1);btn('unqueue',W/2-50,200,100,18,'CANCELAR','#2e3358','#ffffff',6);}
@@ -988,6 +991,11 @@ function onButton(id){sfx('beep');
  if(id.startsWith('mclaim:')){const m=missToday().list[+id.slice(7)];if(m&&m.p>=m.n&&!m.cl){m.cl=true;save.gd+=m.gd;save.po+=m.po;stx().miss++;achToast(achCheck());MS.msg=`+${m.gd} GD e +${m.po} Pó Mágico!`;persist();sfx('go');}return;}
  if(id==='wkspin'){if(!canSpin())return;const L=CHARS[Math.floor(Math.random()*CHARS.length)];save.wkHero={w:weekIdx(),id:L.id};weekState().spun=true;save.useFixed=true;MS.spinT=performance.now();MS.spinId=L.id;MS.done=false;MS.msg=`${L.name} é sua lenda fixa até domingo 23h59!`;persist();return;}
  if(id==='usefix'){save.useFixed=save.useFixed===false;persist();return;}
+ if(id==='streak'){state='streak';SK.spinT=0;SK.msg='';return;}if(id==='skclaim'){streakClaim();return;}
+ if(id.startsWith('goal:')){const a=id.slice(5);if(a==='streak'){state='streak';SK.spinT=0;SK.msg='';}else if(a==='missions'){state='missions';MS.msg='';MS.spinT=0;}else if(a==='online')onButton('online');else state='modes';return;}
+ if(id==='chalok'){if(NET.chal)challenge(NET.chal.from);NET.chal=null;return;}if(id==='chalno'){NET.chal=null;return;}
+ if(id==='rematch'){const o=oppHuman();if(o){challenge(o);}return;}
+ if(id.startsWith('rival:')){const r=(save.rivals||[])[+id.slice(6)];if(r)challenge(r.n);return;}
  if(id==='weekinfo'){const L=weekLegend();modal={title:'LENDA DA SEMANA: '+L.name.toUpperCase(),lines:[`Sai 3x mais no sorteio contra bots e na partida rápida.`,`Vencendo com ${L.name}: +${Math.round(WEEK_BONUS*100)}% de Duel Gold.`,'Troca toda segunda-feira. Termina em '+weekLeft()+'.'],btns:[['mod:x','OK','#ffd23f']]};return;}
  if(id==='account'){ACC.back='online';state='account';ACC.msg='';ACC.err='';if(NET.status!=='on')netConnect();return;}
  if(id==='accreg'){accRegister();return;}
@@ -1079,7 +1087,7 @@ function onButton(id){sfx('beep');
 }
 let prevState='title',bagBack='title',revealed=[false,false,false],lastMode='1x1',howPage=0,howNext='title';const DIFFN=['Fácil','Normal','Difícil'],DIFFM=[0.72,1,1.3];
 function drawUnique(used){let c;do{c=CHARS[Math.floor(Math.random()*CHARS.length)];}while(used.has(c.id));used.add(c.id);return c;}
-function newPick(mode,ranked){const used=new Set();const fx=!ranked&&save.useFixed!==false?wkHeroActive():null;const me=fx||weightedPick();used.add(me.id);const arena=ARENAS[Math.floor(Math.random()*ARENAS.length)];arena.bg=arena.bg||buildArena(arena);
+function newPick(mode,ranked){const used=new Set();const fx=!ranked&&save.useFixed!==false?fixedHero():null;const me=fx||weightedPick();used.add(me.id);const arena=ARENAS[Math.floor(Math.random()*ARENAS.length)];arena.bg=arena.bg||buildArena(arena);
  const allies=[],foes=[];if(mode==='ffa'){for(let i=0;i<5;i++)foes.push(drawUnique(used));}else{const n=MODES[mode].n;for(let i=1;i<n;i++)allies.push(drawUnique(used));for(let i=0;i<n;i++)foes.push(drawUnique(used));}
  pick={me,allies,foes,foe:foes[0],ally:allies[0],foe2:foes[1],arena,mode,ranked:!!ranked,fixed:!!fx};lastMode=ranked?'ranked':mode;state='draw';drawT=0;revealed=[false,false,false];}
 function isMulti(){return pick&&pick.mode&&pick.mode!=='1x1';}
@@ -1457,14 +1465,15 @@ function finishResult(){const win=G.winner.team===G.p.team,id=G.p.def.id;const b
  let rk=null;if(pick.ranked&&!G.tour){if(pick.online&&NET.status==='on'){rk={pending:true,d:0};NET.rkPending=rk;netSend({t:'rres',win});}else rk=rankedResult(win);}
  const mode=G.tour?'Torneio · '+ROUNDS[T.r]:pick.ranked?'Ranqueada':pick.online?'Online · '+MODES[pick.mode||'1x1'].lab:MODES[pick.mode||'1x1'].lab;const opp=G.ffa?(G.all.length-1)+' rivais':isMulti()?pick.foes.map(c=>c.name).join(', '):pick.foe.name;
  save.hist=save.hist||[];save.hist.unshift({m:mode,c:id,o:opp,w:win,t:Date.now(),g:gain,r:rk&&!rk.placement?rk.d:null});if(save.hist.length>30)save.hist.length=30;persist();
- const kos=(G.p.stats&&G.p.stats.kos)||0;let gdW=(win?(G.ffa?70:50):20)+kos*5+(pick.ranked&&win?10:0);let wkB=0;if(win&&id===weekLegend().id){wkB=Math.round(gdW*WEEK_BONUS);gdW+=wkB;}let poW=(pick.ranked&&win)?1:(Math.random()<(win?0.6:0.2)?1:0);
+ const kos=(G.p.stats&&G.p.stats.kos)||0;let gdW=(win?(G.ffa?70:50):20)+kos*5+(pick.ranked&&win?10:0);let wkB=0;if(win&&id===weekLegend().id){wkB=Math.round(gdW*WEEK_BONUS);gdW+=wkB;}let fwB=0;if(win&&!pick.tut&&save.fwd!==dayIdx()){fwB=gdW;gdW+=fwB;save.fwd=dayIdx();}
+ if(pick.online&&NET.start){const hs=(NET.start.slots||[]).filter(x=>x&&!x.bot&&x.pid!==NET.id).map(x=>x.name).filter(Boolean);if(hs.length)rivalAdd(hs.slice(0,3),win);}let poW=(pick.ranked&&win)?1:(Math.random()<(win?0.6:0.2)?1:0);
  let reward=null;const gb=gemOf(before),ga=gemOf(before+gain);if(ga>gb){const KB=Object.keys(BASES);const it=newItem(KB[Math.floor(Math.random()*KB.length)],gemReward(ga));save.inv.push(it);reward=it;poW+=ga*2;}
  save.gd+=gdW;save.po+=poW;const lvB=passLevel();save.pass.xp+=100+(win?50:0);const passUp=passLevel()>lvB;save.shop.n=(save.shop.n||0)+1;if(save.shop.n>=3)shopRoll();persist();
  const st=G.p.stats||{};{const S=stx();S.kos+=st.kos||0;S.spec+=st.specials||0;S.perf+=st.perfect||0;S.dodge+=st.dodges||0;if(pick.online)S.online++;if(win){if(G.ffa)S.ffa++;S.winsBy[id]=(S.winsBy[id]||0)+1;S.elWins[G.p.def.el]=1;for(const f of (G.ffa?G.all.filter(f=>f!==G.p):isMulti()?pick.foes:[pick.foe]))if(f){const fid=(f.def&&f.def.id)||f.id;S.winsVs[fid]=(S.winsVs[fid]||0)+1;}}}const mDone=G.tour?0:missTrack({win,el:G.p.def.el,spec:st.specials||0,perf:st.perfect||0,dodge:st.dodges||0,ko:st.kos||0,online:!!pick.online,ffa:!!G.ffa,team:!G.ffa&&isMulti()});
  if(!pick.tut){const mk=G.tour?'bots_1x1':pick.ranked?'ranked':pick.online?(isMulti()?(G.ffa?'ffa':'equipe'):'online_1x1'):(G.ffa?'ffa':isMulti()?'equipe':'bots_1x1');save.statQ=(save.statQ||[]).slice(-59);save.statQ.push({c:G.p.def.name,m:mk,w:win});if(NET.status==='on'&&NET.ready){netSend({t:'stat',list:save.statQ});save.statQ=[];}}
  let tutB=0;if(pick.tut&&!save.tutDone){save.tutDone=true;if(win){tutB=100;save.gd+=100;}persist();}
  const achNew=achCheck();achToast(achNew);
- G.res={win,gain,before,after:before+gain,gemUp:ga>gb,rk,gdW,wkB,poW,mDone,achNew,tutB,reward,passUp,passXp:100+(win?50:0)};sfx(win?'win':'beep');}
+ G.res={win,gain,before,after:before+gain,gemUp:ga>gb,rk,gdW,wkB,fwB,poW,mDone,achNew,tutB,reward,passUp,passXp:100+(win?50:0)};sfx(win?'win':'beep');}
 
 // ---------- SORTEIO ----------
 function updateDraw(dt){if(pick&&pick.choosing){drawT=0;return;}if(pick&&isMulti()){const n=1+(pick.allies||[]).length+(pick.foes||[]).length;if(!pick.gridN)pick.gridN=0;while(pick.gridN<n&&drawT>gridAt(pick.gridN)){pick.gridN++;sfx(pick.gridN===n?'reveal':'shoot');}}drawT+=dt;if(drawT>1.6&&!revealed[0]){revealed[0]=true;sfx('reveal');}if(drawT>3.0&&!revealed[1]){revealed[1]=true;sfx('reveal');}if(drawT>4.3&&!revealed[2]){revealed[2]=true;sfx('reveal');}}
@@ -1527,7 +1536,7 @@ function renderAlbum(){const bg=ARENAS[6];bg.bg=bg.bg||buildArena(bg);ctx.drawIm
 
 // ---------- RENDER ----------
 function render(){buttons=[];ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0b0c14';ctx.fillRect(0,0,W,H);
- if(state==='title')renderTitle();else if(state==='draw')renderDraw();else if(state==='bracket')renderBracket();else if(state==='album')renderAlbum();else if(state==='modes')renderModes();else if(state==='howto')renderHowto();else if(state==='shop')renderShop();else if(state==='bag')renderBag();else if(state==='box')renderBox();else if(state==='pass')renderPass();else if(state==='online')renderOnline();else if(state==='lobby')renderLobby();else if(state==='room')renderRoom();else if(state==='queue')renderQueue();else if(state==='prep')renderPrep();else if(state==='options')renderOptions();else if(state==='rankLobby')renderRankLobby();else if(state==='leader')renderLeader();else if(state==='account')renderAccount();else if(state==='missions')renderMissions();else if(state==='borders')renderBorders();else if(state==='ach')renderAch();else if(state==='icons')renderIcons();else if(state==='profile')renderProfile();else{renderGame();if(G&&G.flashT>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(0.55,G.flashT*3)})`;ctx.fillRect(0,0,W,H);G.flashT-=1/60;}if(state==='countdown')renderCountdown();if(state==='result')renderResult();if(paused)renderPause();if(G&&G.tut&&(state==='fight'||state==='countdown'))drawTut();}drawAchToast();}
+ if(state==='title')renderTitle();else if(state==='draw')renderDraw();else if(state==='bracket')renderBracket();else if(state==='album')renderAlbum();else if(state==='modes')renderModes();else if(state==='howto')renderHowto();else if(state==='shop')renderShop();else if(state==='bag')renderBag();else if(state==='box')renderBox();else if(state==='pass')renderPass();else if(state==='online')renderOnline();else if(state==='lobby')renderLobby();else if(state==='room')renderRoom();else if(state==='queue')renderQueue();else if(state==='prep')renderPrep();else if(state==='options')renderOptions();else if(state==='rankLobby')renderRankLobby();else if(state==='leader')renderLeader();else if(state==='account')renderAccount();else if(state==='missions')renderMissions();else if(state==='borders')renderBorders();else if(state==='ach')renderAch();else if(state==='icons')renderIcons();else if(state==='profile')renderProfile();else if(state==='streak')renderStreak();else{renderGame();if(G&&G.flashT>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(0.55,G.flashT*3)})`;ctx.fillRect(0,0,W,H);G.flashT-=1/60;}if(state==='countdown')renderCountdown();if(state==='result')renderResult();if(paused)renderPause();if(G&&G.tut&&(state==='fight'||state==='countdown'))drawTut();}drawAchToast();drawChal();}
 function logo(cx,y,s){const sc=s||1;
  // dado
  ctx.save();ctx.translate(cx-82*sc,y+10*sc);ctx.rotate(-0.2);const d=22*sc;ctx.fillStyle='#0b0c14';ctx.fillRect(-d/2-2,-d/2-2,d+4,d+4);ctx.fillStyle='#ffffff';ctx.fillRect(-d/2,-d/2,d,d);ctx.fillStyle='#c9cbe6';ctx.fillRect(-d/2,d/2-3*sc,d,3*sc);
@@ -1720,13 +1729,15 @@ function renderTitle(){if(!titleArena){titleArena=ARENAS[0];titleArena.bg=titleA
  text('VS',W/2,200,10,'#ff8a3d','center','#0b0c14');
  logo(W/2,34,1.6);
  weekCard(366,42);
- {const n=missClaimable(),M=missToday(),dn=M.list.filter(m=>m.p>=m.n).length;btn('missions',12,104,112,22,`MISSÕES ${dn}/3`,n?'#8ef0a0':'#2e3358',n?'#0b0c14':'#ffffff',7);if(n){const p=0.6+0.4*Math.sin(time*6);ctx.fillStyle=`rgba(255,106,106,${p})`;ctx.beginPath();ctx.arc(122,106,6,0,7);ctx.fill();text(String(n),122,109,7,'#ffffff','center');}if(wkHeroActive())text('Lenda fixa: '+wkHeroActive().name,68,136,7,'#4fd1ff','center','#0b0c14',PS);}
+ {const n=missClaimable(),M=missToday(),dn=M.list.filter(m=>m.p>=m.n).length;btn('missions',12,104,112,22,`MISSÕES ${dn}/3`,n?'#8ef0a0':'#2e3358',n?'#0b0c14':'#ffffff',7);if(n){const p=0.6+0.4*Math.sin(time*6);ctx.fillStyle=`rgba(255,106,106,${p})`;ctx.beginPath();ctx.arc(122,106,6,0,7);ctx.fill();text(String(n),122,109,7,'#ffffff','center');}if(fixedHero())text('Lenda fixa: '+fixedHero().name,68,136,7,'#4fd1ff','center','#0b0c14',PS);}
  btn('modes',24,148,128,28,'CONTRA BOTS','#ffd23f','#0b0c14',8);btn('online',160,148,128,28,'ONLINE','#4fd1ff','#0b0c14',8);btn('album',296,150,78,24,'COLEÇÃO','#2e3358','#ffffff',6);btn('profile',380,150,78,24,'PERFIL','#2e3358','#ffffff',6);
- btn('shop',W/2-206,180,76,16,'LOJA','#ffd23f','#0b0c14',6);btn('pass',W/2-124,180,76,16,'PASSE','#ffb02e','#0b0c14',6);btn('bag',W/2-42,180,76,16,'MOCHILA','#c77dff','#0b0c14',6);btn('howto',W/2+40,180,84,16,'COMO JOGAR','#2e3358','#ffffff',6);btn('options',W/2+130,180,76,16,'OPÇÕES','#2e3358','#ffffff',6);text(`Gemas ${save.gems||0}`,8,48,9,'#4fd1ff','left','#0b0c14',PS);text(`GD ${save.gd} · Pó ${save.po}${save.boxes?` · ${save.boxes} caixa(s)!`:''}`,8,36,9,'#ffd23f','left','#0b0c14',PS);if(save.boxes>0)btn('box',W/2-40,200,80,14,'ABRIR CAIXA','#ff8a3d','#0b0c14',5);text('v1.7 · teste',W-6,248,8,'#6a6f98','right','#0b0c14',PS);
+ btn('shop',W/2-206,180,76,16,'LOJA','#ffd23f','#0b0c14',6);btn('pass',W/2-124,180,76,16,'PASSE','#ffb02e','#0b0c14',6);btn('bag',W/2-42,180,76,16,'MOCHILA','#c77dff','#0b0c14',6);btn('howto',W/2+40,180,84,16,'COMO JOGAR','#2e3358','#ffffff',6);btn('options',W/2+130,180,76,16,'OPÇÕES','#2e3358','#ffffff',6);text(`Gemas ${save.gems||0}`,8,48,9,'#4fd1ff','left','#0b0c14',PS);text(`GD ${save.gd} · Pó ${save.po}${save.boxes?` · ${save.boxes} caixa(s)!`:''}`,8,36,9,'#ffd23f','left','#0b0c14',PS);if(save.boxes>0)btn('box',W/2-40,200,80,14,'ABRIR CAIXA','#ff8a3d','#0b0c14',5);text('v1.8 · teste',W-6,248,8,'#6a6f98','right','#0b0c14',PS);
  text(isTouch?'Joystick à esquerda · A, B, C, DASH e BLOQ à direita · mira automática':'WASD mover · mouse mirar · clique = A · E = B · Q = C · Espaço = dash · Shift ou botão direito = bloquear',W/2,262,9,'#ffe2d0','center','#0b0c14',PS);
  const tot=Object.keys(save.seen).length;text(`Coleção ${tot}/108 · Vitórias ${save.wins}`,8,12,9,'#c9cbe6','left','#0b0c14',PS);text(`Ranqueada online: ${rankLabel(save.rank)}`,8,24,9,rankCol(save.rank),'left','#0b0c14',PS);
  btn('sound',W-62,4,58,14,soundOn?'SOM ON':'SOM OFF','#2e3358','#ffffff',6);
  const nk=save.nick?save.nick:'CRIAR NOME';ctx.font=`6px ${PX}`;const nw=Math.max(70,ctx.measureText(nk).width+14);btn(save.nick&&!NET.canRename?'profile':'netnick',W-66-nw,4,nw,14,nk,save.nick?'#2e3358':'#ffd23f',save.nick?'#ffffff':'#0b0c14',6);portrait(W-66-nw-24,2,18,null);buttons.push({id:'icons',x:W-66-nw-24,y:2,w:18,h:18});
+ drawGoal();{const can=streakInfo().can;btn('streak',130,104,64,22,'DIÁRIO',can?'#8ef0a0':'#2e3358',can?'#0b0c14':'#ffffff',7);}
+ if(!modal&&save.tutDone&&streakInfo().can&&SK.shown!==dayIdx()){SK.shown=dayIdx();SK.spinT=0;SK.msg='';state='streak';}
  if(!save.user&&!save.accAsked&&!modal){save.accAsked=true;save.nickAsked=true;persist();modal={title:save.nick?'NOVIDADE: CONTAS!':'BEM-VINDO À ARENA!',lines:['Com uma conta, seu elo e seu ranking ficam salvos','e você joga com eles em qualquer aparelho.','A conta é obrigatória só na Ranqueada.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],[save.nick?'mod:x':'mod:nick','SEM CONTA','#c9cbe6']]};}
  renderModal();}
 function card(c,x,y,w,h,showStats){const rc=RAR[c.rar].col;ctx.fillStyle='#0b0c14';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle='#141626';ctx.fillRect(x,y,w,h);ctx.strokeStyle=rc;ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,h-2);
@@ -1742,7 +1753,7 @@ function renderDraw(){if(pick.choosing)return renderRankPick();if(isMulti())retu
  text('SORTEIO',W/2,22,10,'#ffd23f','center','#0b0c14');if(pick.mode)text(pick.ranked?`Ranqueada 1x1 · rival: ${pick.oppName?pick.oppName:save.rank.placed<5?'colocação':rankName(Object.assign({},fromScore((save.rank.oppMmr||1150)-400),{lp:0}))}`:MODES[pick.mode].lab,W/2,34,9,'#c9cbe6','center','#0b0c14',PS);
  // jogador
  text('VOCÊ',88,44,8,'#8ef0a0','center','#0b0c14');
- if(revealed[0]&&pick.fixed){ctx.fillStyle='#4fd1ff';ctx.fillRect(22,240,132,26);ctx.strokeStyle='#0b0c14';ctx.lineWidth=2;ctx.strokeRect(22,240,132,26);text('LENDA DO FIM DE SEMANA',88,251,6,'#0b0c14','center');text('escolhida na roleta',88,261,8,'#0b0c14','center',null,PS);}
+ if(revealed[0]&&pick.fixed){ctx.fillStyle='#4fd1ff';ctx.fillRect(22,240,132,26);ctx.strokeStyle='#0b0c14';ctx.lineWidth=2;ctx.strokeRect(22,240,132,26);text(dayHeroActive()?'LENDA FIXA DO DIA':'LENDA DO FIM DE SEMANA',88,251,6,'#0b0c14','center');text('escolhida na roleta',88,261,8,'#0b0c14','center',null,PS);}
  else if(revealed[0]&&pick.me.id===weekLegend().id){const p=0.75+0.25*Math.sin(performance.now()/160);ctx.globalAlpha=p;ctx.fillStyle='#ffd23f';ctx.fillRect(22,240,132,26);ctx.globalAlpha=1;ctx.strokeStyle='#0b0c14';ctx.lineWidth=2;ctx.strokeRect(22,240,132,26);text('★ LENDA DA SEMANA ★',88,251,7,'#0b0c14','center');text(`+${Math.round(WEEK_BONUS*100)}% de GD se vencer`,88,261,8,'#0b0c14','center',null,PS);}
  if(!revealed[0])roulette(28,50,120,160,CHARS,drawT,(c,x,y,w,h)=>{ctx.fillStyle='#141626';ctx.fillRect(x,y,w,h);drawSprite(c.id,x+w/2,y+100,3,1,false,0.6);text('?',x+w/2,y+140,16,'#ffd23f','center','#0b0c14');});
  else{if(pick.allies&&pick.allies.length){const nm=pick.allies.map(c=>c.name.length>12?c.name.slice(0,11)+'.':c.name);text('Aliados: '+nm.slice(0,2).join(', '),88,247,8,'#7fc8ff','center','#0b0c14',PS);if(nm.length>2)text(nm.slice(2).join(', '),88,257,8,'#7fc8ff','center','#0b0c14',PS);}if(pick.ranked){text(`RANQUEADA · ${rankLabel(save.rank)}`,88,247,8,rankCol(save.rank),'center','#0b0c14',PS);}card(pick.me,28,50,120,160,true);const m=save.mastery[pick.me.id]||0,g=gemOf(m);text(`${GEMS[g]} · ${m} maestria`,88,224,9,GEMCOL[g],'center','#0b0c14',PS);if(g>0)text(`+${g*10}% de chance no sorteio`,88,235,9,'#8ef0a0','center','#0b0c14',PS);}
@@ -1799,6 +1810,55 @@ function renderDrawGrid(){const a=pick.arena;ctx.drawImage(a.bg,0,0);ctx.fillSty
   const mp=arenaMod(a,pick.me.el);text(`Você: ${mp>1?'+10%':mp<1?'−10%':'normal'}`,ax+aw/2,ay+142,7,mp>1?'#8ef0a0':mp<1?'#ff9a9a':'#ffffff','center',null,PS);
   const hzT={lava:'Poças de lava',current:'Correntezas',ice:'Gelo liso',beam:'Feixes de luz',mush:'Cogumelos',none:'Sem perigos'}[a.hz];text(hzT,ax+aw/2,ay+158,7,'#ffe2d0','center',null,PS);}
  if(drawT>5.2)btn('fight',X0+AREA/2-56,240,112,24,'PREPARAR!','#ffd23f','#0b0c14',9);if(pick&&pick.online&&drawT>6.5&&state==='draw')enterNetPrep();}
+// ---- prêmio diário: sequência de 7 dias ----
+const STREAK=[{gd:100},{gd:150,po:1},{gd:200},{gd:250,po:2},{gd:300},{gd:350,po:3},{hero:true}];
+const SK={spinT:0,spinId:null,done:false,msg:'',shown:-1};
+function streakInfo(){const s=save.streak||{last:-99,n:0},d=dayIdx(),can=s.last!==d,n=can?(s.last===d-1?s.n%7+1:1):s.n;return {can,n,lost:can&&s.last<d-1&&s.n>0};}
+function dayHeroActive(){const h=save.dayHero;return h&&nowT()<h.until?CHARS.find(c=>c.id===h.id):null;}
+function fixedHero(){return dayHeroActive()||wkHeroActive();}
+function hoursLeft(t){const m=Math.max(0,Math.round((t-nowT())/60000));return m>=60?`${Math.floor(m/60)}h${String(m%60).padStart(2,'0')}`:`${m} min`;}
+function streakClaim(){const I=streakInfo();if(!I.can)return;const r=STREAK[I.n-1];save.streak={last:dayIdx(),n:I.n};
+ if(r.hero){const L=CHARS[Math.floor(Math.random()*CHARS.length)];save.dayHero={id:L.id,until:nowT()+DAY};save.useFixed=true;SK.spinT=performance.now();SK.spinId=L.id;SK.done=false;SK.msg=`${L.name} é sua lenda fixa por 24 horas!`;}
+ else{save.gd+=r.gd||0;save.po+=r.po||0;SK.msg=`+${r.gd} GD${r.po?` e +${r.po} Pó Mágico`:''}!`;sfx('go');}
+ persist();}
+function renderStreak(){screenBg();const I=streakInfo();text('PRÊMIO DIÁRIO',W/2,24,12,'#ffd23f','center','#0b0c14');
+ text(I.lost?'Você perdeu a sequência. Começando de novo!':'Entre todos os dias. No 7º dia, uma roleta sorteia uma lenda fixa por 24 horas!',W/2,40,8,I.lost?'#ff9a9a':'#c9cbe6','center',null,PS);
+ const cur=I.n-1;
+ for(let i=0;i<7;i++){const x=22+i*64,y=56,w=58,h=92,r=STREAK[i],got=i<cur||(!I.can&&i===cur),now=I.can&&i===cur;
+  ctx.fillStyle=got?'#1c3a26':now?'#3a3f66':'#141626';ctx.fillRect(x,y,w,h);ctx.strokeStyle=now?'#ffd23f':r.hero?'#4fd1ff':'#2e3358';ctx.lineWidth=now?2:1;ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);
+  text(`DIA ${i+1}`,x+w/2,y+12,6,now?'#ffd23f':'#c9cbe6','center');
+  if(r.hero){const c=CHARS[Math.floor(time*6+i)%CHARS.length];drawSprite(c.id,x+w/2,y+58,1.6,1,false,0.75);text('?',x+w/2,y+46,10,'#4fd1ff','center','#0b0c14');text('LENDA',x+w/2,y+72,7,'#4fd1ff','center',null,PS);text('por 24h',x+w/2,y+82,7,'#4fd1ff','center',null,PS);}
+  else{text(String(r.gd),x+w/2,y+44,12,'#ffd23f','center','#0b0c14',PS);text('GD',x+w/2,y+56,7,'#ffd23f','center',null,PS);if(r.po)text(`+${r.po} Pó`,x+w/2,y+72,8,'#c77dff','center',null,PS);}
+  if(got){ctx.fillStyle='rgba(11,12,20,0.45)';ctx.fillRect(x,y,w,h);text('✓',x+w/2,y+50,16,'#8ef0a0','center','#0b0c14');}}
+ const H=dayHeroActive();
+ if(SK.spinT){const el=(performance.now()-SK.spinT)/1000,L=el<2.4?CHARS[Math.floor(el*(16-el*5))%CHARS.length]:CHARS.find(c=>c.id===SK.spinId);panel(W/2-70,154,140,70);drawSprite(L.id,W/2,204,2.4,1);if(el>=2.4){text(L.name,W/2,218,9,'#ffd23f','center','#0b0c14',PS);if(!SK.done){SK.done=true;sfx('win');}}}
+ else if(I.can)btn('skclaim',W/2-70,166,140,28,`RESGATAR DIA ${I.n}`,'#8ef0a0','#0b0c14',8);
+ else if(H){drawSprite(H.id,W/2-90,206,2,1);text(`Lenda fixa: ${H.name}`,W/2-60,178,9,'#4fd1ff','left',null,PS);text(`termina em ${hoursLeft(save.dayHero.until)}`,W/2-60,192,8,'#8a8fb8','left',null,PS);
+  btn('usefix',W/2-60,198,120,16,save.useFixed===false?'USAR NAS PARTIDAS':'VOLTAR AO SORTEIO',save.useFixed===false?'#4fd1ff':'#2e3358',save.useFixed===false?'#0b0c14':'#ffffff',5);text('vale contra bots e na partida casual',W/2-60,226,7,'#8a8fb8','left',null,PS);}
+ else text('Volte amanhã para o próximo prêmio!',W/2,180,10,'#8ef0a0','center',null,PS);
+ if(SK.msg&&!(SK.spinT&&!SK.done))text(SK.msg,W/2,240,9,'#8ef0a0','center',null,PS);
+ btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);}
+// ---- próximo objetivo (menu principal) ----
+function nextGoal(){const d=dayIdx(),M=missToday();
+ if(streakInfo().can)return ['streak',`Prêmio diário: resgate o dia ${streakInfo().n}`];
+ if(missClaimable())return ['missions','Você tem missões para resgatar!'];
+ if(save.fwd!==d)return ['play','1ª vitória do dia vale GD em dobro!'];
+ const m=M.list.find(x=>x.p<x.n);if(m)return ['missions',`Missão: ${missText(m)} (${m.p}/${m.n})`];
+ const r=save.rank;if(save.user&&r.tier<0)return ['online',`Ranqueada: faltam ${5-(r.placed||0)} partidas de colocação`];
+ if(save.user&&r.tier>=0&&r.tier<7){const nx=rankName(Object.assign(fromScore(rankScore(r)+100-r.lp),{lp:0}));return ['online',`Ranqueada: faltam ${100-r.lp} PDL para ${nx}`];}
+ const tot=Object.keys(save.seen).length;if(tot<108)return ['play',`Coleção ${tot}/108: jogue para conhecer novas lendas`];
+ return ['play','Jogue e suba no ranking!'];}
+function drawGoal(){const [act,t]=nextGoal();const p=0.7+0.3*Math.sin(time*3);ctx.font=`8px ${PS}`;const w=Math.min(380,ctx.measureText(t).width+60),x=W/2-w/2,y=222;
+ ctx.fillStyle='rgba(11,12,20,0.85)';ctx.fillRect(x,y,w,18);ctx.strokeStyle=`rgba(255,210,63,${p})`;ctx.lineWidth=1.5;ctx.strokeRect(x+0.5,y+0.5,w-1,17);
+ text('PRÓXIMO',x+6,y+12,5,'#ffd23f','left');text(t,x+50,y+12,8,'#ffffff','left',null,PS);buttons.push({id:'goal:'+act,x,y,w,h:18});}
+// ---- desafio / revanche ----
+function rivalAdd(names,win){save.rivals=(save.rivals||[]).filter(r=>!names.includes(r.n));for(const n of names)save.rivals.unshift({n,t:Date.now(),w:win});save.rivals=save.rivals.slice(0,6);}
+function rematchBtn(x){const o=oppHuman();if(!o)return;const acc=NET.chal&&NET.chal.from===o,sent=NET.chalTo===o&&!acc;btn('rematch',x,224,104,24,acc?'ACEITAR REVANCHE':sent?'PEDIDO ENVIADO':'REVANCHE',acc?'#46d160':sent?'#2e3358':'#c77dff',acc?'#0b0c14':'#ffffff',6);if(sent&&NET.err&&performance.now()-NET.errT<4000)text('esperando o rival…',x+52,258,7,'#c9cbe6','center',null,PS);}
+function oppHuman(){const S=NET.start;if(!S)return null;const o=(S.slots||[]).filter(x=>x&&!x.bot&&x.pid!==NET.id);return o.length===1?o[0].name:null;}
+function challenge(name){if(NET.status!=='on'){NET.err='Conecte ao servidor para desafiar.';NET.errT=performance.now();return;}netSend({t:'challenge',name});}
+function drawChal(){const C=NET.chal;if(!C||['fight','countdown','prep','draw'].includes(state))return;if(performance.now()-C.t>60000){NET.chal=null;return;}
+ const y=2,w=300,x=W/2-w/2;ctx.fillStyle='#2a1f4a';ctx.fillRect(x,y,w,30);ctx.strokeStyle='#ffd23f';ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,28);
+ text(`${C.from} te desafiou para um 1x1!`,x+10,y+19,9,'#ffffff','left',null,PS);btn('chalok',x+w-112,y+6,62,18,'ACEITAR','#46d160','#0b0c14',6);btn('chalno',x+w-46,y+6,40,18,'NÃO','#5a2a36','#ffffff',6);}
 function renderGame(){const g=G,a=g.arena;ctx.save();
  if(g.shake>0)ctx.translate(Math.round(rnd(-g.shake,g.shake)),Math.round(rnd(-g.shake,g.shake)));
  ctx.translate(-Math.round(g.cam.x),-Math.round(g.cam.y));
@@ -1927,10 +1987,10 @@ function renderResult(){const r=G.res;if(pick.online&&NET.start&&(NET.start.slot
  text(`Coleção: ${Object.keys(save.seen).length}/108 lendas descobertas · ${save.wins} vitórias`,W/2,210,9,'#ffe2d0','center','#0b0c14',PS);
  if(G.tour)text(`${ROUNDS[T.r]}: ${r.win?'você avança!':'você foi eliminado'}`,W/2,78,10,r.win?'#8ef0a0':'#ff9a9a','center','#0b0c14',PS);
  {const s=G.p.stats||{};ctx.globalAlpha=Math.min(1,resultT*2);panel(8,104,112,r.rk&&r.rk.box?137:126);text('SUA LUTA',64,115,6,'#ffd23f','center');
-  [['Dano causado',Math.round(s.dmg||0)],['Dano recebido',Math.round(s.taken||0)],['Acertos',s.hits||0],['Esquivas',s.dodges||0],['Bloq. perfeitos',s.perfect||0],['Nocautes',s.kos||0],['Especiais',s.specials||0],['Duel Gold','+'+(r.gdW||0)+(r.wkB?` (+${r.wkB} lenda)`:'')],...(r.tutB?[['Tutorial','+'+r.tutB+' GD']]:[]),...(r.mDone?[['Missões',`${r.mDone} concluída(s)!`]]:[]),...(r.achNew&&r.achNew.length?[['Conquista',r.achNew[0].n+(r.achNew.length>1?` +${r.achNew.length-1}`:'')]]:[]),['Pó Mágico','+'+(r.poW||0)],['XP do Passe','+'+(r.passXp||0)+(r.passUp?' ↑':'')],...(r.rk&&r.rk.box?[['Caixa da Sorte','+1']]:[])].forEach((r,i)=>{text(r[0],13,129+i*11,8,'#c9cbe6','left',null,PS);text(String(r[1]),115,129+i*11,8,'#ffffff','right',null,PS);});
+  [['Dano causado',Math.round(s.dmg||0)],['Dano recebido',Math.round(s.taken||0)],['Acertos',s.hits||0],['Esquivas',s.dodges||0],['Bloq. perfeitos',s.perfect||0],['Nocautes',s.kos||0],['Especiais',s.specials||0],['Duel Gold','+'+(r.gdW||0)+(r.wkB?` (+${r.wkB} lenda)`:'')+(r.fwB?` (dobro: 1ª vitória do dia)`:'')],...(r.tutB?[['Tutorial','+'+r.tutB+' GD']]:[]),...(r.mDone?[['Missões',`${r.mDone} concluída(s)!`]]:[]),...(r.achNew&&r.achNew.length?[['Conquista',r.achNew[0].n+(r.achNew.length>1?` +${r.achNew.length-1}`:'')]]:[]),['Pó Mágico','+'+(r.poW||0)],['XP do Passe','+'+(r.passXp||0)+(r.passUp?' ↑':'')],...(r.rk&&r.rk.box?[['Caixa da Sorte','+1']]:[])].forEach((r,i)=>{text(r[0],13,129+i*11,8,'#c9cbe6','left',null,PS);text(String(r[1]),115,129+i*11,8,'#ffffff','right',null,PS);});
   if(G.all.length>2){const mvp=G.all.slice().sort((a,b)=>((b.stats||{}).dmg||0)-((a.stats||{}).dmg||0))[0];panel(360,104,112,104);text('DESTAQUE',416,115,6,'#ffd23f','center');drawSprite(mvp.def.id,416,160,2,1);text(mvp.def.name.slice(0,15),416,174,9,mvp.col||'#ffffff','center',null,PS);text(`${Math.round((mvp.stats||{}).dmg||0)} de dano · ${(mvp.stats||{}).kos||0} KO`,416,186,8,'#c9cbe6','center',null,PS);text(mvp===G.p?'É você!':mvp.team===G.p.team?'Aliado':'Rival',416,198,8,mvp===G.p?'#8ef0a0':mvp.team===G.p.team?'#7fc8ff':'#ff9a9a','center',null,PS);}
   ctx.globalAlpha=1;}
- if(resultT>0.8){if(G.tour)btn('tcont',W/2-65,224,130,24,'CONTINUAR','#ffd23f','#0b0c14',8);else if(pick&&pick.online&&pick.ranked){btn('again',W/2-118,224,130,24,'JOGAR DE NOVO','#ffd23f','#0b0c14',7);btn('rankback',W/2+22,224,96,24,'VOLTAR','#2e3358','#ffffff',8);}else if(pick&&pick.online){btn('toroom',W/2-70,224,140,24,'VOLTAR À SALA','#4fd1ff','#0b0c14',8);}else{btn('again',W/2-118,224,130,24,'SORTEAR DE NOVO','#ffd23f','#0b0c14',7);btn('menu',W/2+22,224,96,24,'MENU','#2e3358','#ffffff',8);}}}
+ if(resultT>0.8){if(G.tour)btn('tcont',W/2-65,224,130,24,'CONTINUAR','#ffd23f','#0b0c14',8);else if(pick&&pick.online&&pick.ranked){btn('again',W/2-118,224,130,24,'JOGAR DE NOVO','#ffd23f','#0b0c14',7);btn('rankback',W/2+22,224,96,24,'VOLTAR','#2e3358','#ffffff',8);rematchBtn(W/2+128);}else if(pick&&pick.online){btn('toroom',W/2-70,224,140,24,'VOLTAR À SALA','#4fd1ff','#0b0c14',8);rematchBtn(W/2+80);}else{btn('again',W/2-118,224,130,24,'SORTEAR DE NOVO','#ffd23f','#0b0c14',7);btn('menu',W/2+22,224,96,24,'MENU','#2e3358','#ffffff',8);}}}
 function controlsList(){return isTouch?[['Andar','joystick à esquerda'],['Ataque A','botão A (mira automática)'],['Habilidade B','botão B'],['Especial C','botão C quando carregar'],['Dash','botão DASH'],['Bloquear','segure BLOQ']]:[['Andar','WASD ou setas'],['Mirar','mouse'],['Ataque A','clique esquerdo'],['Habilidade B','E'],['Especial C','Q (quando carregar)'],['Dash','Espaço'],['Bloquear','Shift ou botão direito'],['Pausa','Esc']];}
 function renderHowto(){screenBg();const P=[['CONTROLES',null],['COMBATE',[['Ataque A','golpe básico, recarga curta'],['Habilidade B','tática: escudo, dash, armadilha, invocação...'],['Especial C','carrega com o tempo e com os acertos'],['Bloqueio','segure virado para o ataque; gasta a guarda'],['Bloqueio perfeito','na hora exata: rebate tiros e atordoa'],['Elementos','fogo vence gelo, água vence fogo... SUPER! = vantagem']]],
  ['MAPA E PROGRESSO',[['Sorteio','sua lenda e a arena são sempre sorteadas'],['Arena','o elemento dela dá +10% ou −10% de status'],['Esconderijos','arbustos, corais e névoa escondem você'],['Setas','mostram rivais fora da tela'],['Maestria','vença com uma lenda para subir de patente'],['Ranqueada','5 partidas de colocação, depois PDL e elos']]]];
@@ -1945,7 +2005,7 @@ function renderOptions(){screenBg();const o=save.opt;text('OPÇÕES',W/2,28,12,'
   else{btn(`opt:${r[1]}:-1`,290,y,18,18,'-','#2e3358','#ffffff',8);text(r[2],341,y+13,10,'#ffd23f','center',null,PS);btn(`opt:${r[1]}:1`,376,y,18,18,'+','#2e3358','#ffffff',8);}});
  text('A dificuldade vale para os modos normais e o torneio. Na ranqueada, o nível vem do seu elo.',W/2,186,8,'#8a8fb8','center',null,PS);
  btn('full',86,192,130,16,'TELA CHEIA','#2e3358','#ffffff',6);btn('sound',264,192,130,16,soundOn?'SOM LIGADO':'SOM DESLIGADO','#2e3358','#ffffff',6);
- btn('menu',W/2-48,232,96,20,'VOLTAR','#2e3358','#ffffff',7);text('v1.7 · teste',W-6,262,8,'#6a6f98','right',null,PS);}
+ btn('menu',W/2-48,232,96,20,'VOLTAR','#2e3358','#ffffff',7);text('v1.8 · teste',W-6,262,8,'#6a6f98','right',null,PS);}
 function renderPause(){ctx.fillStyle='rgba(11,12,20,0.75)';ctx.fillRect(0,0,W,H);text('PAUSA',W/2,100,16,'#ffd23f','center','#0b0c14');btn('pause',W/2-60,130,120,22,'CONTINUAR','#ffd23f','#0b0c14',8);btn('quit',W/2-60,160,120,22,'SAIR','#2e3358','#ffffff',8);btn('sound',W/2-60,190,120,18,soundOn?'SOM ON':'SOM OFF','#2e3358','#ffffff',7);controlsList().slice(0,8).forEach((r,i)=>{text(r[0]+': '+r[1],12,130+i*11,8,'#c9cbe6','left',null,PS);});}
 
 // ---------- LOOP ----------

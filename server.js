@@ -6,7 +6,7 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '1.6';
+const VERSION = '1.7';
 const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
 const QUICK = ['Oi!', 'Boa sorte!', 'Pronto!', 'Bora!', 'GG!', 'Revanche?', 'Valeu!'];
@@ -134,7 +134,7 @@ async function identify(c, pid, key) {
   c.name = p.name || c.name;
   p.rank.prof = { icon: c.icon || (p.rank.prof && p.rank.prof.icon) || '', title: c.title || '' };
   c.icon = p.rank.prof.icon;
-  seasonRoll(p); c.player = p; await savePlayer(p);
+  seasonRoll(p); c.player = p; c.actT = Date.now(); actRow(p.pid); await savePlayer(p);
   send(c, { t: 'rank', rank: p.rank, user: p.login || null, seasonEnd: seasonEndOf(p.rank.season || 1), name: p.name, rename: !!p.rename });
   if (c.room) pushRoom(c.room);
 }
@@ -199,6 +199,49 @@ function balPage(names) {
 <style>body{font-family:system-ui,sans-serif;background:#0b0c14;color:#e8e8f4;margin:16px}h1{color:#ffd23f;font-size:20px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid #2e3358;text-align:left}th{color:#ffd23f;position:sticky;top:0;background:#141626}small{color:#8a8fb8}p{color:#c9cbe6;font-size:13px}</style></head>
 <body><h1>Balanceamento das lendas</h1><p>${total} partidas registradas. <b style="color:#ff6a6a">Vermelho</b>: vence demais (acima de 58%). <b style="color:#7fc8ff">Azul</b>: vence pouco (abaixo de 42%). Cinza: menos de 30 partidas, ainda sem dado suficiente.</p>
 <table><tr><th>Lenda</th><th>Vitórias</th><th>Partidas</th><th>Bots 1x1</th><th>Online 1x1</th><th>Ranqueada</th><th>Equipe</th><th>Todos x Todos</th></tr>${tr}</table></body></html>`;
+}
+
+// ---------- retenção ----------
+// uma linha por jogador por dia em que ele abriu o jogo online: minutos jogados e partidas
+const DAYMS = 86400000, BRT = 3 * 3600000;
+function dayNow(t = Date.now()) { return Math.floor((t - BRT) / DAYMS); }
+const act = new Map();   // 'pid|dia' -> { pid, day, secs, games, dirty }
+async function actLoad() {
+  if (!useDb) return;
+  try { for (const r of await (await sb('activity?select=pid,day,secs,games&limit=100000')).json()) act.set(r.pid + '|' + r.day, { ...r, dirty: false }); console.log('retenção: ' + act.size + ' linhas'); }
+  catch (e) { console.error('activity', e.message); }
+}
+function actRow(pid) { const d = dayNow(), k = pid + '|' + d; let e = act.get(k); if (!e) { e = { pid, day: d, secs: 0, games: 0, dirty: true }; act.set(k, e); } return e; }
+function actSecs(c) { if (!c.player || !c.actT) return; const now = Date.now(); actRow(c.player.pid).secs += Math.round((now - c.actT) / 1000); actRow(c.player.pid).dirty = true; c.actT = now; }
+async function actFlush() {
+  for (const c of clients.values()) actSecs(c);
+  if (!useDb) return;
+  const rows = [...act.values()].filter(e => e.dirty); if (!rows.length) return;
+  try { await sb('activity', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify(rows.map(e => ({ pid: e.pid, day: e.day, secs: e.secs, games: e.games }))) }); rows.forEach(e => e.dirty = false); }
+  catch (e) { console.error('actFlush', e.message); }
+}
+setInterval(actFlush, 5 * 60000);
+function retPage() {
+  const first = new Map(), byDay = new Map();
+  for (const e of act.values()) { if (!first.has(e.pid) || e.day < first.get(e.pid)) first.set(e.pid, e.day); const d = byDay.get(e.day) || { pids: new Set(), secs: 0, games: 0 }; d.pids.add(e.pid); d.secs += e.secs; d.games += e.games; byDay.set(e.day, d); }
+  const played = (pid, day) => act.has(pid + '|' + day);
+  const today = dayNow(), pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+  const cohort = d => [...first.entries()].filter(([, f]) => f === d).map(([pid]) => pid);
+  const ret = (d, k) => { if (d + k > today) return null; const c = cohort(d); return [c.filter(pid => played(pid, d + k)).length, c.length]; };
+  let sum = { 1: [0, 0], 7: [0, 0], 30: [0, 0] };
+  for (const d of new Set(first.values())) for (const k of [1, 7, 30]) { const r = ret(d, k); if (r) { sum[k][0] += r[0]; sum[k][1] += r[1]; } }
+  const dateOf = d => new Date(d * DAYMS + BRT).toISOString().slice(5, 10).split('-').reverse().join('/');
+  let tr = '';
+  for (let d = today; d > today - 21; d--) {
+    const D = byDay.get(d); if (!D) continue; const n = cohort(d).length, r1 = ret(d, 1), r7 = ret(d, 7);
+    tr += `<tr><td>${dateOf(d)}</td><td>${D.pids.size}</td><td>${n}</td><td>${r1 ? pct(...r1) : '…'}</td><td>${r7 ? pct(...r7) : '…'}</td><td>${(D.secs / 60 / D.pids.size).toFixed(1)}</td><td>${D.games}</td></tr>`;
+  }
+  const box = (lab, k, meta) => `<div class="b"><div class="n">${pct(...sum[k])}</div><div>${lab}</div><small>${sum[k][1]} jogadores medidos · bom: ${meta}</small></div>`;
+  return `<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Retenção · Duel Legends Arena</title>
+<style>body{font-family:system-ui,sans-serif;background:#0b0c14;color:#e8e8f4;margin:16px}h1{color:#ffd23f;font-size:20px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid #2e3358;text-align:left}th{color:#ffd23f;background:#141626}small{color:#8a8fb8}p{color:#c9cbe6;font-size:13px}.bs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.b{background:#141626;border:1px solid #2e3358;border-radius:8px;padding:10px 14px;min-width:140px}.n{font-size:26px;font-weight:700;color:#8ef0a0}</style></head>
+<body><h1>Retenção de jogadores</h1><p>Conta quem abriu o modo online (conectou ao servidor). Partidas contra bots só entram quando o jogo conecta.</p>
+<div class="bs">${box('voltam no dia seguinte (D1)', 1, '30% ou mais')}${box('voltam após 7 dias (D7)', 7, '10% ou mais')}${box('voltam após 30 dias (D30)', 30, '4% ou mais')}</div>
+<table><tr><th>Dia</th><th>Ativos</th><th>Novos</th><th>D1 dos novos</th><th>D7 dos novos</th><th>Min. por jogador</th><th>Partidas</th></tr>${tr}</table></body></html>`;
 }
 
 // ---------- contas (usuário e senha) ----------
@@ -326,6 +369,7 @@ function close(c) {
   if (c.closed) return;
   c.closed = true;
   try { c.sock.end(); } catch (e) {}
+  actSecs(c);
   clients.delete(c.id);
   quickQueue = quickQueue.filter(q => q !== c);
   rankQueue = rankQueue.filter(q => q.c !== c);
@@ -507,6 +551,24 @@ function handle(c, m) {
       if (r.slots.every((s, i) => !s || r.rpick[i] != null)) rpickDone(r);
       break;
     }
+    case 'challenge': {
+      // desafiar alguém pelo nome (revanche ou rival recente); quem recebe aceita desafiando de volta
+      const nm = String(m.name || '').slice(0, 16);
+      const o = [...clients.values()].find(x => x !== c && !x.closed && x.name === nm && x.player);
+      if (!o) { send(c, { t: 'error', msg: `${nm} não está online agora.` }); break; }
+      if (o.room) { send(c, { t: 'error', msg: `${nm} está numa partida. Tente daqui a pouco.` }); break; }
+      if (o.chal && o.chal.to === c.id && Date.now() - o.chal.t < 60000) {
+        o.chal = null; c.chal = null; if (c.room) leaveRoom(c);
+        quickQueue = quickQueue.filter(q => q !== c && q !== o); rankQueue = rankQueue.filter(q => q.c !== c && q.c !== o);
+        const r = createRoom(o, 'Desafio', '1x1', '', true); joinRoom(o, r, 0); joinRoom(c, r, 1);
+        r.ready[c.id] = true; r.ready[o.id] = true; startRoom(r); break;
+      }
+      if (tooMany('chal:' + c.id)) { send(c, { t: 'error', msg: 'Espere um pouco antes de desafiar de novo.' }); break; }
+      failed('chal:' + c.id);
+      c.chal = { to: o.id, t: Date.now() };
+      send(o, { t: 'challenge', from: c.name }); send(c, { t: 'chalsent', to: o.name });
+      break;
+    }
     case 'prepready': {
       const r = c.room; if (!r || !r.prep) return;
       r.prep.ready[c.id] = true; r.gears[c.slot] = m.gear || {}; r.cos[c.slot] = m.cos || {};
@@ -533,6 +595,7 @@ function handle(c, m) {
       const list = Array.isArray(m.list) ? m.list.slice(0, 60) : [];
       if (tooMany('stat:' + (c.ip || '?'))) break; failed('stat:' + (c.ip || '?'));
       for (const x of list) balAdd(String(x.c || ''), String(x.m || ''), !!x.w);
+      if (c.player && list.length) { const e = actRow(c.player.pid); e.games += list.length; e.dirty = true; }
       break;
     }
     case 'register': register(c, m.user, m.pass).catch(e => { console.error('register', e.message); send(c, { t: 'auth', err: 'Não deu para criar a conta agora.' }); }); break;
@@ -552,6 +615,10 @@ const server = http.createServer((req, res) => {
   if (req.url === '/status') {
     res.writeHead(200, { 'content-type': 'application/json', 'access-control-allow-origin': '*' });
     res.end(JSON.stringify({ ok: true, ver: VERSION, players: clients.size, rooms: rooms.size, db: useDb }));
+    return;
+  }
+  if (req.url.split('?')[0] === '/retencao') {
+    actFlush().finally(() => { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(retPage()); });
     return;
   }
   if (req.url.split('?')[0] === '/balanceamento') {
@@ -581,5 +648,5 @@ setInterval(() => {
     try { c.sock.write(Buffer.from([0x89, 0])); } catch (e) { close(c); }
   }
 }, 30000);
-server.listen(PORT, () => { console.log(`Duel Legends Arena — servidor v${VERSION} na porta ${PORT}`); balLoad(); });
-process.on('SIGTERM', () => { balFlush().finally(() => process.exit(0)); });
+server.listen(PORT, () => { console.log(`Duel Legends Arena — servidor v${VERSION} na porta ${PORT}`); balLoad(); actLoad(); });
+process.on('SIGTERM', () => { Promise.all([balFlush(), actFlush()]).finally(() => process.exit(0)); });

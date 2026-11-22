@@ -35,5 +35,14 @@ create table if not exists legend_stats (
 );
 alter table legend_stats enable row level security;
 
+create table if not exists activity (
+  pid text not null,
+  day int not null,
+  secs int default 0,
+  games int default 0,
+  primary key (pid, day)
+);
+alter table activity enable row level security;
+
 -- para ver as denúncias mais recentes:
 -- select at, reporter_name, target_name, reason from reports order by at desc limit 50;
