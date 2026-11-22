@@ -1,0 +1,14 @@
+// ---------- RESULTADO E RECOMPENSAS ----------
+function finishResult(){const win=G.winner.team===G.p.team,id=G.p.def.id;const before=save.mastery[id]||0;const gain=win?(G.ffa?15:pick.ranked?12:10):3;save.mastery[id]=before+gain;save.games++;if(win)save.wins++;
+ let rk=null;if(pick.ranked&&!G.tour){if(pick.online&&NET.status==='on'){rk={pending:true,d:0};NET.rkPending=rk;netSend({t:'rres',win});}else rk=rankedResult(win);}
+ const mode=G.tour?'Torneio · '+ROUNDS[T.r]:pick.ranked?'Ranqueada':pick.online?'Online · '+MODES[pick.mode||'1x1'].lab:MODES[pick.mode||'1x1'].lab;const opp=G.ffa?(G.all.length-1)+' rivais':isMulti()?pick.foes.map(c=>c.name).join(', '):pick.foe.name;
+ save.hist=save.hist||[];save.hist.unshift({m:mode,c:id,o:opp,w:win,t:Date.now(),g:gain,r:rk&&!rk.placement?rk.d:null});if(save.hist.length>30)save.hist.length=30;persist();
+ const kos=(G.p.stats&&G.p.stats.kos)||0;let gdW=(win?(G.ffa?42:28):8)+kos*2+(pick.ranked&&win?6:0);let wkB=0;if(win&&id===weekLegend().id){wkB=Math.round(gdW*WEEK_BONUS);gdW+=wkB;}let fwB=0;if(win&&!pick.tut&&save.fwd!==dayIdx()){fwB=gdW;gdW+=fwB;save.fwd=dayIdx();}
+ if(pick.online&&NET.start){const hs=(NET.start.slots||[]).filter(x=>x&&!x.bot&&x.pid!==NET.id).map(x=>x.name).filter(Boolean);if(hs.length)rivalAdd(hs.slice(0,3),win);}let poW=(pick.ranked&&win)?1:(Math.random()<(win?0.6:0.2)?1:0);
+ let reward=null;const gb=gemOf(before),ga=gemOf(before+gain);if(ga>gb){const KB=Object.keys(BASES);const it=newItem(KB[Math.floor(Math.random()*KB.length)],gemReward(ga));save.inv.push(it);reward=it;poW+=ga*2;}
+ save.gd+=gdW;save.po+=poW;const lvB=passLevel();save.pass.xp+=100+(win?50:0);const passUp=passLevel()>lvB;save.shop.n=(save.shop.n||0)+1;if(save.shop.n>=3)shopRoll();persist();
+ const st=G.p.stats||{};{const S=stx();S.kos+=st.kos||0;S.spec+=st.specials||0;S.perf+=st.perfect||0;S.dodge+=st.dodges||0;if(pick.online)S.online++;if(win){if(G.ffa)S.ffa++;S.winsBy[id]=(S.winsBy[id]||0)+1;S.elWins[G.p.def.el]=1;for(const f of (G.ffa?G.all.filter(f=>f!==G.p):isMulti()?pick.foes:[pick.foe]))if(f){const fid=(f.def&&f.def.id)||f.id;S.winsVs[fid]=(S.winsVs[fid]||0)+1;}}}const mDone=G.tour?0:missTrack({win,el:G.p.def.el,spec:st.specials||0,perf:st.perfect||0,dodge:st.dodges||0,ko:st.kos||0,online:!!pick.online,ffa:!!G.ffa,team:!G.ffa&&isMulti()});
+ if(!pick.tut){const mk=G.tour?'bots_1x1':pick.ranked?'ranked':pick.online?(isMulti()?(G.ffa?'ffa':'equipe'):'online_1x1'):(G.ffa?'ffa':isMulti()?'equipe':'bots_1x1');save.statQ=(save.statQ||[]).slice(-59);save.statQ.push({c:G.p.def.name,m:mk,w:win});if(NET.status==='on'&&NET.ready){netSend({t:'stat',list:save.statQ});save.statQ=[];}}
+ let tutB=0;if(pick.tut&&!save.tutDone){save.tutDone=true;if(win){tutB=100;save.gd+=100;}persist();}
+ const achNew=achCheck();achToast(achNew);
+ G.res={win,gain,before,after:before+gain,gemUp:ga>gb,rk,gdW,wkB,fwB,poW,mDone,achNew,tutB,reward,passUp,passXp:100+(win?50:0)};sfx(win?'win':'beep');}

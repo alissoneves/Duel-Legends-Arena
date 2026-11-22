@@ -44,5 +44,13 @@ create table if not exists activity (
 );
 alter table activity enable row level security;
 
+create table if not exists client_errors (
+  msg text primary key,
+  stack text, ver text, state text,
+  n int default 0,
+  first_at timestamptz, last_at timestamptz
+);
+alter table client_errors enable row level security;
+
 -- para ver as denúncias mais recentes:
 -- select at, reporter_name, target_name, reason from reports order by at desc limit 50;

@@ -1,6 +1,6 @@
 {
   "name": "duel-legends-arena-servidor",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Servidor online do Duel Legends Arena: saguão, salas, partida rápida e repasse da luta",
   "main": "server.js",
   "scripts": {

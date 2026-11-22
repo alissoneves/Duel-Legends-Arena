@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Duel Legends Arena</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0c14">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#07080f;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#0b0c14}
+#rot{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:#0b0c14;color:#ffd23f;font-family:'Press Start 2P',monospace;font-size:14px;text-align:center;line-height:1.8;padding:24px}
+#rot span{font-family:'Pixelify Sans',sans-serif;color:#c9cbe6;font-size:16px}
+#ask{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(7,8,15,.82);z-index:50;touch-action:auto;-webkit-user-select:text;user-select:text}
+#ask .bx{background:#141626;border:3px solid #ffd23f;padding:18px;width:min(420px,88vw);box-shadow:0 0 0 4px #0b0c14;font-family:'Pixelify Sans',sans-serif;color:#fff}
+#ask .t{font-family:'Press Start 2P',monospace;font-size:12px;color:#ffd23f;line-height:1.6;margin-bottom:6px}
+#ask .s{font-size:15px;color:#c9cbe6;margin-bottom:12px}
+#ask input{width:100%;box-sizing:border-box;font:20px 'Pixelify Sans',sans-serif;padding:10px;border:2px solid #4fd1ff;background:#0b0c14;color:#fff;outline:none;border-radius:0}
+#ask .e{color:#ff9a9a;font-size:15px;min-height:20px;margin-top:6px}
+#ask .b{display:flex;gap:10px;margin-top:8px}
+#ask button{flex:1;font:11px 'Press Start 2P',monospace;padding:12px 6px;border:0;cursor:pointer}
+#ask .ok{background:#ffd23f;color:#0b0c14}#ask .no{background:#2e3358;color:#fff}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+</style>
+</head>
+<body>
+<div id="ask" role="dialog" aria-modal="true"><div class="bx"><div class="t" id="askT"></div><div class="s" id="askS"></div><input id="askI" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="done"><div class="e" id="askE"></div><div class="b"><button class="no" id="askN">CANCELAR</button><button class="ok" id="askO">OK</button></div></div></div>
+<div id="wrap"><canvas id="c" width="480" height="270" aria-label="Duel Legends Arena, protótipo jogável"></canvas></div>
+<div id="rot">GIRE O CELULAR<span>O jogo é feito para jogar deitado.</span></div>
+<script>
+/*@@JS@@*/</script>
+</body>
+</html>

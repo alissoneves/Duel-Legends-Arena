@@ -8,6 +8,7 @@
 | 1.3 | Contas com usuário e senha (scrypt), até 5 aparelhos | 1.3 |
 | 1.4 | Boas-vindas (Criar / Entrar / Sem conta), ranqueada exige conta | 1.3 |
 | 1.5 | Lenda da semana, missões diárias, herói de fim de semana, bordas de elo e temporadas, convite por código, conquistas, tutorial, replay vertical | 1.4 |
+| 2.2 | Política de Privacidade (`privacidade.html`); excluir conta / apagar dados online no jogo; erros do jogo enviados ao servidor (página `/erros`); opção de vibração; código dividido em `src/` com `build.js`; lenda renomeada para neurojor | 1.9 |
 | 2.1 | 110 lendas: Neurojor (Humano, Épico, cavaleiro) e Cabeça de Cuia (Água, Raro, lenda do Piauí); online exige a versão 2.1 | 1.8 |
 | 2.0 | Aviso de 0,35 s antes do especial (anel vermelho; atordoar interrompe); quem tem pouca vida carrega o especial mais rápido; bônus no centro da arena a cada 20 s (cura, velocidade, carga); arena fecha a partir de 40 s, a cada 12 s, até ficar pequena | 1.7 |
 | 1.9 | Economia mais apertada (~550 GD por dia): itens 2 a 3x mais caros, recompensas menores; vender itens virou desmanchar por Pó Mágico | 1.7 |
@@ -16,5 +17,7 @@
 | 1.6 | Filtro de nomes, denúncias, nome fixo, ícones de perfil, caixa de elo 1x por elo/temporada, telemetria `/balanceamento`, página própria + PWA | 1.5 |
 
 ## Pastas
+- `src/`: código do jogo dividido por assunto (`src/js/NN-nome.js`) e a casca HTML (`src/index.html`).
+- `build.js`: junta tudo no `index.html` final. Rode `node build.js` depois de mexer em `src/`.
 - Raiz: jogo web (`index.html`, PWA) e servidor (`server.js`, `supabase.sql`).
 - `godot/`: porte Godot 4.3 da versão 1.6 (ainda sem as mudanças da 1.7) (sem replay, ainda não testado).

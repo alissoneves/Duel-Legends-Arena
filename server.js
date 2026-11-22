@@ -6,7 +6,7 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '1.8';
+const VERSION = '1.9';
 const MIN_VER = 2.1;   // 110 lendas: versões antigas sorteiam diferente
 const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
@@ -119,7 +119,7 @@ async function findLogin(login) {
 }
 async function savePlayer(p) {
   topCache = null;
-  if (!useDb) return;
+  if (!useDb || p.deleted) return;
   await sb('players', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' },
     body: JSON.stringify({ pid: p.pid, keyh: p.keyh, keys: p.keys || [], name: p.name, rank: Object.assign(p.rank, { rename: !!p.rename }), score: rankScore(p.rank), login: p.login || null, passh: p.passh || null, updated: new Date().toISOString() }) });
 }
@@ -282,6 +282,49 @@ async function changePass(c, oldp, newp) {
   if (!checkPass(oldp, p.passh)) { failed('u:' + p.login); return send(c, { t: 'auth', err: 'Senha atual incorreta.' }); }
   newp = String(newp || ''); if (newp.length < 6 || newp.length > 64) return send(c, { t: 'auth', err: 'A senha nova precisa ter de 6 a 64 caracteres.' });
   p.passh = hashPass(newp); await savePlayer(p); send(c, { t: 'auth', ok: 'pass', user: p.login });
+}
+// ---------- excluir conta (exigência da Google Play e da LGPD) ----------
+async function deleteAccount(c, pass) {
+  const p = c.player; if (!p) return send(c, { t: 'auth', err: 'Conecte-se primeiro.' });
+  if (p.login) {
+    if (tooMany('u:' + p.login)) return send(c, { t: 'auth', err: 'Muitas tentativas. Espere alguns minutos.' });
+    if (!checkPass(pass, p.passh)) { failed('u:' + p.login); return send(c, { t: 'auth', err: 'Senha incorreta.' }); }
+  }
+  p.deleted = true; players.delete(p.pid); topCache = null;
+  for (const k of [...act.keys()]) if (k.startsWith(p.pid + '|')) act.delete(k);
+  if (useDb) { await sb('players?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }); await sb('activity?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }); }
+  for (const o of clients.values()) if (o.player === p) { o.player = null; if (o !== c) send(o, { t: 'auth', expired: true }); }
+  console.log('conta excluída', p.login || '(sem login)');
+  send(c, { t: 'auth', ok: 'deleted' });
+}
+// ---------- erros enviados pelos jogos ----------
+const errs = new Map();   // mensagem -> { msg, stack, ver, state, n, first, last, dirty }
+async function errLoad() {
+  if (!useDb) return;
+  try { for (const r of await (await sb('client_errors?select=msg,stack,ver,state,n,first_at,last_at&limit=500')).json()) errs.set(r.msg, { msg: r.msg, stack: r.stack, ver: r.ver, state: r.state, n: r.n, first: Date.parse(r.first_at), last: Date.parse(r.last_at), dirty: false }); }
+  catch (e) { console.error('client_errors', e.message); }
+}
+function errAdd(x, ver) {
+  const msg = String(x.m || '').slice(0, 200); if (!msg) return;
+  const e = errs.get(msg) || { msg, stack: '', ver: '', state: '', n: 0, first: Date.now() };
+  e.n += Math.max(1, Math.min(50, x.n | 0)); e.stack = String(x.s || '').slice(0, 800); e.ver = String(ver || '').slice(0, 8); e.state = String(x.w || '').slice(0, 20); e.last = Date.now(); e.dirty = true; errs.set(msg, e);
+}
+async function errFlush() {
+  if (!useDb) return;
+  const rows = [...errs.values()].filter(e => e.dirty); if (!rows.length) return;
+  try { await sb('client_errors', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify(rows.map(e => ({ msg: e.msg, stack: e.stack, ver: e.ver, state: e.state, n: e.n, first_at: new Date(e.first).toISOString(), last_at: new Date(e.last).toISOString() }))) }); rows.forEach(e => e.dirty = false); }
+  catch (e) { console.error('errFlush', e.message); }
+}
+setInterval(errFlush, 5 * 60000);
+function errPage() {
+  const esc = x => String(x).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+  const when = t => new Date(t - 3 * 3600000).toISOString().slice(0, 16).replace('T', ' ');
+  const rows = [...errs.values()].sort((a, b) => b.last - a.last).slice(0, 100);
+  const tr = rows.map(e => `<tr><td><b>${esc(e.msg)}</b><pre>${esc(e.stack)}</pre></td><td>${e.n}</td><td>${esc(e.ver)}</td><td>${esc(e.state)}</td><td>${when(e.last)}</td></tr>`).join('');
+  return `<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Erros · Duel Legends Arena</title>
+<style>body{font-family:system-ui,sans-serif;background:#0b0c14;color:#e8e8f4;margin:16px}h1{color:#ffd23f;font-size:20px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid #2e3358;text-align:left;vertical-align:top}th{color:#ffd23f;background:#141626}pre{white-space:pre-wrap;color:#8a8fb8;font-size:11px;margin:4px 0 0}p{color:#c9cbe6;font-size:13px}</style></head>
+<body><h1>Erros nos aparelhos dos jogadores</h1><p>${rows.length ? 'Mais recentes primeiro. "Vezes" soma todos os aparelhos.' : 'Nenhum erro registrado. Ótimo sinal!'}</p>
+<table><tr><th>Erro</th><th>Vezes</th><th>Versão</th><th>Tela</th><th>Último (Brasília)</th></tr>${tr}</table></body></html>`;
 }
 let topCache = null, topT = 0;
 async function topList() {
@@ -570,6 +613,12 @@ function handle(c, m) {
       send(o, { t: 'challenge', from: c.name }); send(c, { t: 'chalsent', to: o.name });
       break;
     }
+    case 'delacc': deleteAccount(c, m.pass).catch(e => { console.error('delacc', e.message); send(c, { t: 'auth', err: 'Não deu para excluir agora. Tente de novo.' }); }); break;
+    case 'err': {
+      if (tooMany('err:' + (c.ip || '?'))) break; failed('err:' + (c.ip || '?'));
+      for (const x of (Array.isArray(m.list) ? m.list.slice(0, 10) : [])) errAdd(x, c.ver);
+      break;
+    }
     case 'prepready': {
       const r = c.room; if (!r || !r.prep) return;
       r.prep.ready[c.id] = true; r.gears[c.slot] = m.gear || {}; r.cos[c.slot] = m.cos || {};
@@ -618,6 +667,10 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({ ok: true, ver: VERSION, players: clients.size, rooms: rooms.size, db: useDb }));
     return;
   }
+  if (req.url.split('?')[0] === '/erros') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(errPage());
+    return;
+  }
   if (req.url.split('?')[0] === '/retencao') {
     actFlush().finally(() => { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(retPage()); });
     return;
@@ -649,5 +702,5 @@ setInterval(() => {
     try { c.sock.write(Buffer.from([0x89, 0])); } catch (e) { close(c); }
   }
 }, 30000);
-server.listen(PORT, () => { console.log(`Duel Legends Arena — servidor v${VERSION} na porta ${PORT}`); balLoad(); actLoad(); });
-process.on('SIGTERM', () => { Promise.all([balFlush(), actFlush()]).finally(() => process.exit(0)); });
+server.listen(PORT, () => { console.log(`Duel Legends Arena — servidor v${VERSION} na porta ${PORT}`); balLoad(); actLoad(); errLoad(); });
+process.on('SIGTERM', () => { Promise.all([balFlush(), actFlush(), errFlush()]).finally(() => process.exit(0)); });
