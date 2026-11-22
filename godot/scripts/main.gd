@@ -79,6 +79,7 @@ var result_t := 0.0
 var cd_t := 0.0
 var revealed := [false, false, false]
 var buttons: Array = []
+var sq := 0.0   # amassado do sprite que está sendo desenhado
 var save := {"mastery": {}, "seen": {}, "wins": 0, "games": 0, "rank": {"pts": 0, "best": 0, "season": 1}, "hist": []}
 var last_mode := "1x1"
 var T: Dictionary = {}       # torneio
@@ -205,6 +206,8 @@ class Fighter:
 	var nx := 0.0
 	var ny := 0.0
 	var moving := false
+	var wind_t := 0.0      # preparo do especial (aviso para o rival)
+	var squash := 0.0     # amassado ao levar golpe
 	var last_in := {"b": 0, "c": 0, "d": 0, "e": 0}
 	var ai := {"strafe": 1.0, "strafe_t": 0.0, "react": 0.0, "think_b": 2.0, "block_t": 0.0, "lx": null, "ly": 0.0}
 
@@ -515,7 +518,7 @@ func draw_unique(used: Dictionary) -> Dictionary:
 
 func new_pick(mode: String, ranked: bool) -> void:
 	var used := {}
-	var fx: Dictionary = wk_hero_active() if (not ranked and save.get("use_fixed", true) != false) else {}
+	var fx: Dictionary = fixed_hero() if (not ranked and save.get("use_fixed", true) != false) else {}
 	var me: Dictionary = fx if not fx.is_empty() else weighted_pick()
 	used[me["id"]] = true
 	var allies: Array = []
@@ -549,7 +552,7 @@ func on_button(id: String) -> void:
 		return
 	if not modal.is_empty() and not id.begins_with("mod:"):
 		return
-	if _item_button(id) or _shop2_button(id) or _net_button(id) or _feat_button(id) or _v16_button(id):
+	if _v22_button(id) or _item_button(id) or _shop2_button(id) or _net_button(id) or _feat_button(id) or _v16_button(id):
 		return
 	match id:
 		"ranked":
@@ -705,7 +708,7 @@ func _item_button(id: String) -> bool:
 		return true
 	if id.begins_with("buypo:"):
 		var n := int(id.substr(6))
-		var pr := 400 if n == 5 else 90
+		var pr := 650 if n == 5 else 150
 		if int(save["gd"]) < pr:
 			_flash("GD insuficiente", "#ff9a9a")
 			return true
@@ -745,14 +748,26 @@ func _item_button(id: String) -> bool:
 	if id == "bsell":
 		var it := Items.by_id(save, bag_sel)
 		if not it.is_empty():
-			save["gd"] = int(save["gd"]) + Items.sell_price(it)
+			var n := Items.dism_po(it)
+			var eq := false
 			for k in save["equip"].keys():
 				if int(save["equip"][k]) == int(it["id"]):
-					save["equip"].erase(k)
-			save["inv"].erase(it)
-			bag_sel = -1
-			_persist()
-			_flash("Vendido!", "#ffd23f")
+					eq = true
+			var _cbd := func() -> void:
+				if not save["inv"].has(it):
+					return
+				save["po"] = int(save["po"]) + n
+				for k in save["equip"].keys():
+					if int(save["equip"][k]) == int(it["id"]):
+						save["equip"].erase(k)
+				save["inv"].erase(it)
+				bag_sel = -1
+				_persist()
+				_flash("+%d Pó Mágico" % n, "#c77dff")
+			var ln := [Items.item_name(it), "Vira %d Pó Mágico. Não dá para desfazer." % n]
+			if eq:
+				ln.append("Ele está equipado e sai do herói.")
+			open_modal("DESMANCHAR ITEM?", ln, [["mod:ok", "DESMANCHAR", "#c77dff"], ["mod:x", "CANCELAR", "#2e3358"]], _cbd)
 		return true
 	if id == "bup":
 		var it := Items.by_id(save, bag_sel)
@@ -806,6 +821,10 @@ func _item_button(id: String) -> bool:
 			opt["diff"] = clampi(int(opt["diff"]) + int(parts[2]), 0, 2)
 		elif parts[1] == "tips":
 			opt["tips"] = not opt["tips"]
+		elif parts[1] == "vib":
+			opt["vib"] = not opt.get("vib", true)
+			if opt["vib"]:
+				Input.vibrate_handheld(30)
 		save["opt"] = opt
 		_persist()
 		return true
@@ -1095,6 +1114,16 @@ func sparks(p: Vector2, c: String, n := 8, sp := 90.0) -> void:
 		G["parts"].append({"p": p, "v": Vector2(cos(a), sin(a)) * s, "life": randf_range(0.2, 0.5), "t": 0.0, "col": c, "sz": 2.0 if randf() < 0.5 else 1.0})
 
 
+func buzz(ms: int) -> void:
+	if opt.get("vib", true):
+		Input.vibrate_handheld(ms)
+
+
+# quem está com pouca vida carrega o especial mais rápido (chance de virada)
+func cbk(f: Fighter) -> float:
+	return 1.6 if f.hp < 300 else (1.3 if f.hp < 500 else 1.0)
+
+
 func hit(src: Fighter, tgt: Fighter, base: float, o: Dictionary = {}) -> Variant:
 	if tgt.inv > 0 and tgt.dash_t > 0 and not G["over"] and not tgt.dead and not tgt.dodged and src.team != tgt.team:
 		tgt.dodged = true
@@ -1150,8 +1179,8 @@ func hit(src: Fighter, tgt: Fighter, base: float, o: Dictionary = {}) -> Variant
 	stat(src, "hits", 1)
 	stat(tgt, "taken", dmg)
 	tgt.last_by = src
-	src.charge = minf(100, src.charge + 4)
-	tgt.charge = minf(100, tgt.charge + 2)
+	src.charge = minf(100, src.charge + 4 * cbk(src))
+	tgt.charge = minf(100, tgt.charge + 3 * cbk(tgt))
 	if src.drain > 0:
 		var hl := roundf(dmg * BAL["drain"])
 		src.hp = minf(1000, src.hp + hl)
@@ -1175,9 +1204,15 @@ func hit(src: Fighter, tgt: Fighter, base: float, o: Dictionary = {}) -> Variant
 	var c := "#bfeaff" if blocked else ("#ffd23f" if el > 1 else ("#9aa3c7" if el < 1 else "#ffffff"))
 	var sub := "bloqueado" if blocked else ("SUPER!" if el > 1 else ("fraco" if el < 1 else ""))
 	popup(tgt.pos + Vector2(randf_range(-4, 4), -24), "-%d" % int(dmg), c, sub, 10 if o.get("special", false) else 8)
-	G["shake"] = maxf(G["shake"], 5.0 if o.get("special", false) else 2.0)
+	var mine: bool = src == G["p"] or tgt == G["p"]
+	G["shake"] = maxf(G["shake"], 5.0 if o.get("special", false) else (3.5 if el > 1 else (2.5 if mine else 1.5)))
 	if o.get("special", false):
 		G["hitstop"] = 0.07
+	elif mine and not blocked:
+		G["hitstop"] = maxf(G["hitstop"], 0.05 if el > 1 else 0.03)
+	if tgt == G["p"] and not blocked:
+		buzz(45 if o.get("special", false) else 18)
+	tgt.squash = 0.12
 	sparks(tgt.pos - Vector2(0, 9), o.get("col", "#ffffff"), 16 if o.get("special", false) else 7, 140.0 if o.get("special", false) else 90.0)
 	if tgt.hp <= 0:
 		ko_check(tgt)
@@ -1220,6 +1255,8 @@ func ko_check(t: Fighter) -> void:
 	t.channel = {}
 	popup(t.pos - Vector2(0, 34), "NOCAUTE!", "#ff7a7a")
 	G["shake"] = maxf(G["shake"], 6.0)
+	G["flash_t"] = 0.18
+	buzz(120 if t == G["p"] else 35)
 	var p: Fighter = G["p"]
 	var alive: Array = []
 	var teams := {}
@@ -1476,13 +1513,27 @@ func do_b(f: Fighter) -> void:
 		announce(f, 1)
 
 
+const WIND := 0.35
+
+
 func do_c(f: Fighter) -> void:
-	if f.charge < 100 or not can_act(f):
+	if f.charge < 100 or not can_act(f) or f.wind_t > 0:
 		return
 	tut_ev(f, "c")
-	stat(f, "specials", 1)
-	f.reveal_t = maxf(f.reveal_t, 1.0)
 	f.charge = 0
+	f.wind_t = WIND
+	f.reveal_t = maxf(f.reveal_t, 1.0)
+
+
+# o especial sai depois do preparo; se o lutador for atordoado, perde e recupera metade da carga
+func fire_c(f: Fighter) -> void:
+	if f.dead:
+		return
+	if f.stun > 0:
+		f.charge = 50
+		popup(f.pos - Vector2(0, 34), "INTERROMPIDO!", "#ff9a9a")
+		return
+	stat(f, "specials", 1)
 	G["shake"] = maxf(G["shake"], 3)
 	if f.d["hand"]:
 		pow_hand(f, "c")
@@ -1666,8 +1717,13 @@ func update_fighter(f: Fighter, dt: float) -> void:
 	f.cd_a = maxf(0, f.cd_a - dt * BAL["atk_rate"])
 	f.cd_b = maxf(0, f.cd_b - dt * BAL["b_rate"])
 	for k in ["cd_dash", "inv", "flash", "stun", "freeze", "drain", "haste", "tp_cd", "spin",
-			"shield_t", "ghost", "power", "marked", "reflect", "big", "fire_t", "reveal_t"]:
+			"shield_t", "ghost", "power", "marked", "reflect", "big", "fire_t", "reveal_t", "squash"]:
 		f.set(k, maxf(0, f.get(k) - dt))
+	if f.wind_t > 0:
+		f.wind_t -= dt
+		if f.wind_t <= 0:
+			f.wind_t = 0.0
+			fire_c(f)
 	f.slow_t = maxf(0, f.slow_t - dt)
 	if f.slow_t <= 0:
 		f.slow_f = 1.0
@@ -1679,7 +1735,7 @@ func update_fighter(f: Fighter, dt: float) -> void:
 	if not f.blocking and f.guard_regen <= 0 and f.broken <= 0:
 		f.guard = minf(f.guard_max, f.guard + f.guard_max * 0.3 * dt)
 	if not G["over"]:
-		f.charge = minf(100, f.charge + f.st["esp"] / 30.0 * dt * BAL["charge_rate"])
+		f.charge = minf(100, f.charge + f.st["esp"] / 30.0 * dt * BAL["charge_rate"] * cbk(f))
 	var mv := Vector2.ZERO
 	if f.remote:
 		mv = net_remote_input(f)
@@ -1806,7 +1862,7 @@ func update_fighter(f: Fighter, dt: float) -> void:
 				f.tp_cd = 2.0
 				break
 	if not (G["zone"] as Rect2).has_point(f.pos):
-		env_damage(f, 55, dt, "#ff5a5a")
+		env_damage(f, 80, dt, "#ff5a5a")
 
 
 func _process(delta: float) -> void:
@@ -1818,10 +1874,17 @@ func _process(delta: float) -> void:
 			if cd_t <= 0:
 				state = "fight"
 		"draw":
-			draw_t += dt
-			if draw_t > 1.6: revealed[0] = true
-			if draw_t > 3.0: revealed[1] = true
-			if draw_t > 4.3: revealed[2] = true
+			if pick.get("choosing", false):
+				draw_t = 0.0
+			else:
+				if pick.get("mode", "1x1") != "1x1":
+					var nn: int = 1 + (pick.get("allies", []) as Array).size() + (pick.get("foes", []) as Array).size()
+					while int(pick.get("grid_n", 0)) < nn and draw_t > grid_at(int(pick.get("grid_n", 0))):
+						pick["grid_n"] = int(pick.get("grid_n", 0)) + 1
+				draw_t += dt
+				if draw_t > 1.6: revealed[0] = true
+				if draw_t > 3.0: revealed[1] = true
+				if draw_t > 4.3: revealed[2] = true
 		"result":
 			result_t += dt
 		"prep":
@@ -1836,6 +1899,60 @@ func _process(delta: float) -> void:
 				update_fight(dt)
 	net_poll(dt)
 	queue_redraw()
+
+
+# bônus no centro da arena a cada 20 s: cura, velocidade ou carga
+const PKS := [["cura", "CURA", "#46d160"], ["vel", "VELOCIDADE", "#ffd23f"], ["carga", "CARGA", "#4fc3ff"]]
+
+
+func pk_info(k: String) -> Array:
+	for q in PKS:
+		if q[0] == k:
+			return q
+	return PKS[0]
+
+
+func update_pick(dt: float) -> void:
+	G["pick_t"] = float(G.get("pick_t", 20.0)) - dt
+	if G["pick_t"] <= 0 and G.get("pk", {}).is_empty():
+		G["pick_t"] = 20.0
+		var zt: Rect2 = G["zt"]
+		var K: Array = PKS[randi() % PKS.size()]
+		G["pk"] = {"p": zt.get_center() + Vector2(0, 6), "k": K[0]}
+		popup(G["pk"]["p"] - Vector2(0, 20), K[1] + " NO CENTRO!", K[2])
+	var q: Dictionary = G.get("pk", {})
+	if q.is_empty():
+		return
+	for f: Fighter in G["all"]:
+		if f.dead or (f.pos - Vector2(0, 4)).distance_to(q["p"]) > 14:
+			continue
+		var K := pk_info(q["k"])
+		match q["k"]:
+			"cura": f.hp = minf(1000, f.hp + 150)
+			"vel":
+				f.slow_t = 5.0
+				f.slow_f = 1.35
+			"carga": f.charge = minf(100, f.charge + 40)
+		popup(f.pos - Vector2(0, 34), K[1] + "!", K[2])
+		sparks(q["p"], K[2], 14, 110.0)
+		G["pk"] = {}
+		if f == G["p"]:
+			buzz(25)
+		break
+
+
+func draw_pick() -> void:
+	var q: Dictionary = G.get("pk", {})
+	if q.is_empty():
+		return
+	var K := pk_info(q["k"])
+	var p: Vector2 = q["p"] + Vector2(0, sin(time * 5) * 2)
+	var g := 0.5 + 0.5 * sin(time * 6)
+	var c := Color.html(K[2])
+	draw_circle(p, 11, Color(c.r, c.g, c.b, 0.25 + 0.2 * g))
+	draw_rect(Rect2(p.x - 6, p.y - 6, 12, 12), Color.html("#0b0c14"))
+	draw_rect(Rect2(p.x - 5, p.y - 5, 10, 10), c)
+	text("+" if q["k"] == "cura" else (">>" if q["k"] == "vel" else "!"), p + Vector2(0, 4), 8, "#0b0c14", HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func update_fight(dt: float) -> void:
@@ -1863,12 +1980,17 @@ func update_fight(dt: float) -> void:
 						best = x
 				end_match(best)
 		G["shrink_t"] -= dt
+		if not G.get("z_warn", false) and G["shrink_t"] <= 5 and G["shrink_t"] > 4:
+			G["z_warn"] = true
+			popup(cam + Vector2(W / 2, 70), "A ARENA FECHA EM 5 SEGUNDOS", "#ff8a3d")
 		if G["shrink_t"] <= 0:
-			G["shrink_t"] = 25.0
+			G["shrink_t"] = 12.0
 			var z: Rect2 = G["zt"]
-			if z.size.x > 260:
-				G["zt"] = z.grow_individual(-z.size.x * 0.07, -z.size.y * 0.07, -z.size.x * 0.07, -z.size.y * 0.07)
+			if z.size.x > maxf(150, (BX2 - BX1) * 0.32):
+				G["zt"] = z.grow_individual(-z.size.x * 0.09, -z.size.y * 0.09, -z.size.x * 0.09, -z.size.y * 0.09)
 				popup(cam + Vector2(W / 2, 70), "A ARENA ESTÁ FECHANDO", "#ff8a3d")
+	if not G.has("tut") and not G["over"]:
+		update_pick(dt)
 	var zc: Rect2 = G["zone"]
 	var zt: Rect2 = G["zt"]
 	var k := clampf(dt * 0.4, 0, 1)
@@ -2050,12 +2172,24 @@ func finish_result() -> void:
 			rk = Ranked.result(save, win)
 	# Duel Gold e Pó Mágico (só se ganham jogando)
 	var kos := int(pl.stats.get("kos", 0))
-	var gd_w := (70 if G.get("ffa", false) else 50) if win else 20
-	gd_w += kos * 5 + (10 if ranked and win else 0)
+	var gd_w := (42 if G.get("ffa", false) else 28) if win else 8
+	gd_w += kos * 2 + (6 if ranked and win else 0)
 	var wk_b := 0
 	if win and id == week_legend()["id"]:
 		wk_b = roundi(gd_w * WEEK_BONUS)
 		gd_w += wk_b
+	var fw_b := 0
+	if win and not pick.get("tut", false) and int(save.get("fwd", -1)) != day_idx():
+		fw_b = gd_w
+		gd_w += fw_b
+		save["fwd"] = day_idx()
+	if pick.get("online", false) and not (net.get("start", {}) as Dictionary).is_empty():
+		var hs: Array = []
+		for x in net["start"].get("slots", []):
+			if x != null and not x.get("bot", false) and x.get("pid") != null and int(x["pid"]) != int(net["id"]):
+				hs.append(str(x["name"]))
+		if hs.size() > 0:
+			rival_add(hs.slice(0, 3), win)
 	var po_w := 1 if (ranked and win) else (1 if randf() < (0.6 if win else 0.2) else 0)
 	var reward := {}
 	var gb := gem_of(before)
@@ -2123,7 +2257,7 @@ func finish_result() -> void:
 			save["gd"] = int(save["gd"]) + 100
 	var ach_new := ach_check()
 	_persist()
-	G["res"] = {"win": win, "gain": gain, "after": before + gain, "gem_up": ga > gb, "rk": rk, "gd": gd_w, "po": po_w, "reward": reward, "xp": 100 + (50 if win else 0), "pass_up": pass_level() > lv_b, "wk_b": wk_b, "m_done": m_done, "tut_b": tut_b, "ach_new": ach_new}
+	G["res"] = {"win": win, "gain": gain, "after": before + gain, "gem_up": ga > gb, "rk": rk, "gd": gd_w, "po": po_w, "reward": reward, "xp": 100 + (50 if win else 0), "pass_up": pass_level() > lv_b, "wk_b": wk_b, "fw_b": fw_b, "m_done": m_done, "tut_b": tut_b, "ach_new": ach_new}
 
 
 # =====================================================================
@@ -2158,7 +2292,7 @@ func btn(id: String, r: Rect2, label: String, c: String, fg := "#0b0c14", size :
 
 func spr(id: String, p: Vector2, s := 1.0, face := 1.0, flash := false, alpha := 1.0, rot := 0.0) -> void:
 	var tex: Texture2D = sprites[id][1 if flash else 0]
-	_xf(p.round(), rot, Vector2(s * face, s))
+	_xf(p.round(), rot, Vector2(s * face * (1.0 + sq), s * (1.0 - sq)))
 	draw_texture(tex, Vector2(-tex.get_width() / 2.0, -tex.get_height()), Color(1, 1, 1, alpha))
 	_xf(Vector2.ZERO)
 
@@ -2191,18 +2325,23 @@ func _draw() -> void:
 		"lobby": draw_lobby()
 		"room": draw_room()
 		"queue": draw_queue()
+		"streak": draw_streak()
 		"missions": draw_missions()
 		"borders": draw_borders()
 		"ach": draw_ach()
 		"icons": draw_icons()
 		_:
 			draw_game()
+			if G.get("flash_t", 0.0) > 0:
+				draw_rect(Rect2(0, 0, W, H), Color(1, 1, 1, minf(0.55, G["flash_t"] * 3)))
+				G["flash_t"] -= 1.0 / 60.0
 			if state == "countdown": draw_countdown()
 			if state == "result": draw_result()
 			if paused: draw_pause()
 			if G.has("tut") and state in ["fight", "countdown"]: draw_tut()
 	draw_modal()
 	draw_ach_toast()
+	draw_chal()
 
 
 func draw_logo(c: Vector2) -> void:
@@ -2238,7 +2377,7 @@ func draw_title() -> void:
 	text("Gemas %d" % int(save["gems"]), Vector2(8, 50), 9, "#4fd1ff", HORIZONTAL_ALIGNMENT_LEFT, "#0b0c14")
 	if int(save["boxes"]) > 0:
 		btn("box", Rect2(W / 2 - 45, 202, 90, 14), "ABRIR CAIXA", "#ff8a3d", "#0b0c14", 7)
-	text("v1.6 Godot", Vector2(W - 6, 248), 8, "#6a6f98", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
+	text("v2.2 Godot", Vector2(W - 6, 248), 8, "#6a6f98", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
 	var nk: String = str(save["nick"]) if save.has("nick") else "CRIAR NOME"
 	var fixed_nick: bool = save.has("nick") and not net.get("can_rename", false)
 	btn("profile" if fixed_nick else "netnick", Rect2(W - 130, 4, 124, 14), nk, "#2e3358" if save.has("nick") else "#ffd23f", "#ffffff" if save.has("nick") else "#0b0c14", 7)
@@ -2276,6 +2415,12 @@ func card(c: Dictionary, r: Rect2, stats: bool) -> void:
 
 
 func draw_draw() -> void:
+	if pick.get("choosing", false):
+		draw_rank_pick()
+		return
+	if pick.get("mode", "1x1") != "1x1":
+		draw_draw_grid()
+		return
 	var a: Dictionary = pick["arena"]
 	draw_texture(arena_tex[a["id"]], Vector2.ZERO)
 	draw_rect(Rect2(0, 0, W, H), Color(0.04, 0.05, 0.08, 0.78))
@@ -2283,7 +2428,7 @@ func draw_draw() -> void:
 	text("VOCÊ", Vector2(88, 44), 9, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 	if revealed[0] and pick.get("fixed", false):
 		draw_rect(Rect2(22, 240, 132, 26), Color.html("#4fd1ff"))
-		text("LENDA DO FIM DE SEMANA", Vector2(88, 251), 7, "#0b0c14", HORIZONTAL_ALIGNMENT_CENTER)
+		text("LENDA FIXA DO DIA" if not day_hero_active().is_empty() else "LENDA DO FIM DE SEMANA", Vector2(88, 251), 7, "#0b0c14", HORIZONTAL_ALIGNMENT_CENTER)
 		text("escolhida na roleta", Vector2(88, 261), 8, "#0b0c14", HORIZONTAL_ALIGNMENT_CENTER)
 	elif revealed[0] and pick["me"]["id"] == week_legend()["id"]:
 		draw_rect(Rect2(22, 240, 132, 26), Color(1, 0.82, 0.25, 0.75 + 0.25 * sin(time * 6)))
@@ -2303,7 +2448,7 @@ func draw_draw() -> void:
 		if al.size() > 0:
 			var nm: Array = []
 			for c in al:
-				nm.append((c["name"] as String).left(12))
+				nm.append(short_n(c, 12))
 			text("Aliados: " + ", ".join(PackedStringArray(nm.slice(0, 2))), Vector2(88, 247), 8, "#7fc8ff", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 			if nm.size() > 2:
 				text(", ".join(PackedStringArray(nm.slice(2))), Vector2(88, 257), 8, "#7fc8ff", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
@@ -2326,7 +2471,7 @@ func draw_draw() -> void:
 		if fo.size() > 1:
 			var nm2: Array = []
 			for c in fo.slice(1):
-				nm2.append((c["name"] as String).left(12))
+				nm2.append(short_n(c, 12))
 			text("+ " + ", ".join(PackedStringArray(nm2)), Vector2(W / 2, 211), 7, "#ff9a9a", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 	text("ARENA", Vector2(392, 44), 9, "#ff8a3d", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 	var ar := Rect2(332, 50, 120, 160)
@@ -2427,8 +2572,14 @@ func draw_game() -> void:
 		if f.freeze > 0:
 			draw_rect(Rect2(f.pos.x - 10, f.pos.y - 22, 20, 22), Color(0.62, 0.89, 1, 0.55))
 		if not blink:
+			sq = f.squash * 1.4 if f.squash > 0 and not f.dead else 0.0
 			spr(f.d["id"], f.pos + Vector2(0, bob) + off, 1.35 if f.big > 0 and not f.dead else 1.0, f.face, f.flash > 0 and not f.dead, 0.5 if f.dead else (0.35 if f.ghost > 0 else 1.0), rot)
+			sq = 0.0
 		_xf(off)
+		if f.wind_t > 0 and not f.dead:
+			var kk := 0.5 + 0.5 * sin(time * 40)
+			draw_arc(f.pos - Vector2(0, 8), 15 + 3 * kk, 0, TAU, 24, Color(1, 0.27, 0.27, 0.5 + 0.5 * kk), 2.0)
+			text("!", f.pos - Vector2(0, 30), 12, "#ff4d5e", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 		if f.blocking:
 			var perfect := time - f.block_start <= 0.22
 			draw_arc(f.pos - Vector2(0, 9), 14, f.aim - 1.3, f.aim + 1.3, 16, Color.html("#ffd23f" if perfect else "#bfeaff"), 3.0)
@@ -2464,6 +2615,7 @@ func draw_game() -> void:
 				text(f.emote, f.pos - Vector2(0, 42), 8, "#0b0c14", HORIZONTAL_ALIGNMENT_CENTER)
 			if G.get("multi", false) and not me:
 				bar(Rect2(f.pos.x - 9, f.pos.y - 25, 18, 2), f.hp / 1000.0, lc)
+	draw_pick()
 	# esconderijos por cima dos personagens
 	var covs: Array = G["covers"]
 	var pl: Fighter = G["p"]
@@ -2563,7 +2715,7 @@ func hud_panel(f: Fighter, x: float, right: bool) -> void:
 	var tx := x + w - 30 if right else x + 30
 	var al := HORIZONTAL_ALIGNMENT_RIGHT if right else HORIZONTAL_ALIGNMENT_LEFT
 	var el: String = f.d["el"] + (" +10%" if f.mods > 1 else (" −10%" if f.mods < 1 else ""))
-	text("%s · %s" % [(f.d["name"] as String).left(14), el], Vector2(tx, y + 10), 8, "#ffffff", al)
+	text("%s · %s" % [short_n(f.d, 14), el], Vector2(tx, y + 10), 8, "#ffffff", al)
 	var hp := f.hp / 1000.0
 	var hc := "#46d160" if hp > 0.5 else ("#ffb02e" if hp > 0.25 else "#ff4d4d")
 	bar(Rect2(x + w - 30 - 134 if right else x + 30, y + 13, 134, 6), hp, hc)
@@ -2594,7 +2746,7 @@ func draw_hud() -> void:
 				var f: Fighter = arr[i]
 				var y := 36.0 + i * 9
 				draw_rect(Rect2(x0 - 1, y, 100, 9), Color(0.04, 0.05, 0.08, 0.85))
-				text((f.d["name"] as String).left(11), Vector2(x0 + 2 if side == 0 else x0 + 96, y + 7), 7, "#6a6f98" if f.dead else ("#7fc8ff" if side == 0 else "#ff9a9a"), HORIZONTAL_ALIGNMENT_LEFT if side == 0 else HORIZONTAL_ALIGNMENT_RIGHT)
+				text(short_n(f.d, 11), Vector2(x0 + 2 if side == 0 else x0 + 96, y + 7), 7, "#6a6f98" if f.dead else ("#7fc8ff" if side == 0 else "#ff9a9a"), HORIZONTAL_ALIGNMENT_LEFT if side == 0 else HORIZONTAL_ALIGNMENT_RIGHT)
 				bar(Rect2(x0 + 56 if side == 0 else x0 + 2, y + 3, 40, 3), f.hp / 1000.0, "#3a3f66" if f.dead else "#46d160")
 		var al := 0
 		var en := 0
@@ -2729,6 +2881,8 @@ func draw_result() -> void:
 		["Bloq. perfeitos", int(stt.get("perfect", 0))], ["Nocautes", int(stt.get("kos", 0))], ["Especiais", int(stt.get("specials", 0))], ["Duel Gold", "+%d" % int(r.get("gd", 0))], ["Pó Mágico", "+%d" % int(r.get("po", 0))], ["XP do Passe", "+%d%s" % [int(r.get("xp", 0)), " ↑" if r.get("pass_up", false) else ""]]]
 	if int(r.get("wk_b", 0)) > 0:
 		rows.append(["Lenda da semana", "+%d GD" % int(r["wk_b"])])
+	if int(r.get("fw_b", 0)) > 0:
+		rows.append(["1ª vitória do dia", "+%d GD" % int(r["fw_b"])])
 	if int(r.get("tut_b", 0)) > 0:
 		rows.append(["Tutorial", "+%d GD" % int(r["tut_b"])])
 	if int(r.get("m_done", 0)) > 0:
@@ -2750,7 +2904,7 @@ func draw_result() -> void:
 		panel(Rect2(360, 104, 112, 104))
 		text("DESTAQUE", Vector2(416, 115), 7, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER)
 		spr(mvp.d["id"], Vector2(416, 160), 2)
-		text((mvp.d["name"] as String).left(15), Vector2(416, 174), 9, mvp.colr, HORIZONTAL_ALIGNMENT_CENTER)
+		text(short_n(mvp.d, 15), Vector2(416, 174), 9, mvp.colr, HORIZONTAL_ALIGNMENT_CENTER)
 		text("%d de dano · %d KO" % [roundi(mvp.stats.get("dmg", 0)), int(mvp.stats.get("kos", 0))], Vector2(416, 186), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
 		text("É você!" if mvp == G["p"] else ("Aliado" if mvp.team == (G["p"] as Fighter).team else "Rival"), Vector2(416, 198), 8, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER)
 	text("%s · +%d de maestria" % [G["p"].d["name"], r["gain"]], Vector2(W / 2, 146), 11, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
@@ -2767,8 +2921,10 @@ func draw_result() -> void:
 		elif pick.get("online", false) and pick.get("ranked", false):
 			btn("again", Rect2(W / 2 - 118, 224, 130, 24), "JOGAR DE NOVO", "#ffd23f", "#0b0c14", 9)
 			btn("rankback", Rect2(W / 2 + 22, 224, 96, 24), "VOLTAR", "#2e3358", "#ffffff", 10)
+			rematch_btn(W / 2 + 128)
 		elif pick.get("online", false):
 			btn("toroom", Rect2(W / 2 - 70, 224, 140, 24), "VOLTAR À SALA", "#4fd1ff", "#0b0c14", 9)
+			rematch_btn(W / 2 + 80)
 		else:
 			btn("again", Rect2(W / 2 - 118, 224, 130, 24), "SORTEAR DE NOVO", "#ffd23f", "#0b0c14", 9)
 			btn("menu", Rect2(W / 2 + 22, 224, 96, 24), "MENU", "#2e3358", "#ffffff", 10)
@@ -2880,7 +3036,7 @@ func draw_profile() -> void:
 		var gi := gem_of(top[i][1])
 		draw_rect(Rect2(168, y, 28, 30), Color.html("#23264a"))
 		spr(id, Vector2(182, y + 28), 1)
-		text((c["name"] as String).left(13), Vector2(200, y + 10), 8, "#ffffff")
+		text(short_n(c, 13), Vector2(200, y + 10), 8, "#ffffff")
 		text(GEMS[gi], Vector2(200, y + 20), 8, GEMCOL[gi])
 		text("%d pts" % top[i][1], Vector2(200, y + 29), 8, "#c9cbe6")
 	panel(Rect2(290, 32, 180, 200))
@@ -2913,13 +3069,13 @@ func draw_album() -> void:
 	text("COLEÇÃO %d/%d" % [save["seen"].size(), chars.size()], Vector2(8, 18), 10, "#ffd23f", HORIZONTAL_ALIGNMENT_LEFT, "#0b0c14")
 	for i in chars.size():
 		var c: Dictionary = chars[i]
-		var r := Rect2(8 + (i % 12) * 30, 26 + (i / 12) * 24, 28, 22)
+		var r := Rect2(8 + (i % 12) * 30, 25 + (i / 12) * 22, 28, 21)
 		draw_rect(r, Color.html("#3a3f66" if i == alb_sel else "#141626"))
-		draw_rect(Rect2(r.position.x, r.position.y + 20, 28, 2), Color.html(RAR[c["rar"]][1]))
+		draw_rect(Rect2(r.position.x, r.position.y + 19, 28, 2), Color.html(RAR[c["rar"]][1]))
 		if save["seen"].has(c["id"]):
-			spr(c["id"], Vector2(r.position.x + 14, r.position.y + 21), 1)
+			spr(c["id"], Vector2(r.position.x + 14, r.position.y + 20), 1)
 		else:
-			spr_dark(c["id"], Vector2(r.position.x + 14, r.position.y + 21), 1)
+			spr_dark(c["id"], Vector2(r.position.x + 14, r.position.y + 20), 1)
 		buttons.append({"id": "alb:%d" % i, "r": r})
 	var px := 374.0
 	var py := 26.0
@@ -2936,7 +3092,7 @@ func draw_album() -> void:
 			text("Ainda não sorteada", Vector2(px + 50, py + 100), 9, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
 		else:
 			spr(c["id"], Vector2(px + 50, py + 66), 2.4)
-			text((c["name"] as String).left(16), Vector2(px + 50, py + 80), 10, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+			text(c["name"], Vector2(px + 50, py + 80), 7 if (c["name"] as String).length() > 16 else 10, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
 			text(c["el"], Vector2(px + 50, py + 92), 9, ELCOL[c["el"]], HORIZONTAL_ALIGNMENT_CENTER)
 			var st := [["ATQ", c["atk"], "#ff6a3d"], ["DEF", c["def"], "#9aa3c7"], ["VEL", c["vel"], "#ffd23f"], ["ESP", c["esp"], "#4fc3ff"], ["ESQ", c["esq"], "#8ef0a0"]]
 			for i in st.size():
@@ -2973,7 +3129,7 @@ func draw_bracket() -> void:
 			var lost: bool = r < int(T["r"]) and rounds.size() > r + 1 and not (rounds[r + 1] as Array).has(c)
 			draw_rect(Rect2(x, y - 6, 94, 12), Color(0.27, 0.82, 0.38, 0.28) if is_me else Color(0.12, 0.13, 0.23, 0.95))
 			spr(c["id"], Vector2(x + 6, y + 7), 0.6, 1, false, 0.35 if lost else 1.0)
-			text((c["name"] as String).left(16), Vector2(x + 15, y + 3), 8, "#6a6f98" if lost else ("#8ef0a0" if is_me else "#ffffff"))
+			text(short_n(c, 16), Vector2(x + 15, y + 3), 8, "#6a6f98" if lost else ("#8ef0a0" if is_me else "#ffffff"))
 			if r < 3:
 				draw_rect(Rect2(x + 94, y, 4, 1), Color.html("#4a4f7a"))
 				if k % 2 == 0:
@@ -2985,7 +3141,7 @@ func draw_bracket() -> void:
 	if T["champion"] != null:
 		var ch: Dictionary = T["champion"]
 		spr(ch["id"], Vector2(438, 150), 2.4)
-		text((ch["name"] as String).left(14), Vector2(438, 166), 9, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+		text(short_n(ch, 14), Vector2(438, 166), 9, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
 		var win: bool = ch == T["me"]
 		text("VOCÊ É O CAMPEÃO! +20 de maestria" if win else "Você caiu na fase: %s. Campeão: %s" % [ROUNDS[int(T["lost_at"])], ch["name"]], Vector2(W / 2, 250), 10, "#8ef0a0" if win else "#ffe2d0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 		btn("tour", Rect2(300, 224, 92, 18), "NOVO TORNEIO", "#ff8a3d", "#0b0c14", 8)
@@ -3145,6 +3301,8 @@ func draw_options() -> void:
 	btn("opt:tips:0", Rect2(290, 104, 104, 18), "Ligadas" if opt["tips"] else "Desligadas", "#46d160" if opt["tips"] else "#2e3358", "#0b0c14" if opt["tips"] else "#ffffff", 8)
 	text("A dificuldade vale para os modos normais e o torneio. Na ranqueada, vem do seu elo.", Vector2(W / 2, 146), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
 	btn("full", Rect2(86, 160, 130, 18), "TELA CHEIA", "#2e3358", "#ffffff", 8)
+	btn("opt:vib:0", Rect2(264, 160, 130, 18), "VIBRAR: SIM" if opt.get("vib", true) else "VIBRAR: NÃO", "#2e3358", "#ffffff", 8)
+	btn("privacy", Rect2(W / 2 + 60, 234, 100, 16), "PRIVACIDADE", "#2e3358", "#c9cbe6", 7)
 	btn("menu", Rect2(W / 2 - 48, 232, 96, 20), "VOLTAR", "#2e3358", "#ffffff", 9)
 
 
@@ -3200,8 +3358,8 @@ func draw_shop_old() -> void:
 	text("PÓ MÁGICO", Vector2(411, 98), 8, "#c77dff", HORIZONTAL_ALIGNMENT_CENTER)
 	text("Melhora itens até +10", Vector2(411, 110), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
 	text("Também cai nas partidas", Vector2(411, 120), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
-	btn("buypo:1", Rect2(360, 130, 102, 20), "1 por 90 GD", "#c77dff" if int(save["gd"]) >= 90 else "#3a3f66", "#0b0c14", 8)
-	btn("buypo:5", Rect2(360, 156, 102, 20), "5 por 400 GD", "#c77dff" if int(save["gd"]) >= 400 else "#3a3f66", "#0b0c14", 8)
+	btn("buypo:1", Rect2(360, 130, 102, 20), "1 por 150 GD", "#c77dff" if int(save["gd"]) >= 150 else "#3a3f66", "#0b0c14", 8)
+	btn("buypo:5", Rect2(360, 156, 102, 20), "5 por 650 GD", "#c77dff" if int(save["gd"]) >= 650 else "#3a3f66", "#0b0c14", 8)
 	btn("reroll", Rect2(360, 190, 102, 20), "NOVAS OFERTAS 40", "#2e3358", "#ffffff", 7)
 	text("Ofertas novas a cada 3 partidas (%d restantes)" % (3 - int(save["shop"].get("n", 0))), Vector2(W / 2, 236), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
 	_msg_show(Vector2(W / 2, 226))
@@ -3278,7 +3436,7 @@ func draw_bag() -> void:
 				text("Se falhar, volta de 1 a 3 níveis (nunca quebra)", Vector2(381, 179), 7, "#ff9a9a", HORIZONTAL_ALIGNMENT_CENTER)
 			var can := int(save["po"]) >= po and int(save["gd"]) >= gd
 			btn("bup", Rect2(300, 184, 162, 20), "MELHORAR", "#c77dff" if can else "#3a3f66", "#0b0c14" if can else "#8a8fb8", 8)
-		btn("bsell", Rect2(300, 210, 162, 16), "VENDER POR %d GD" % Items.sell_price(it), "#2e3358", "#ffffff", 7)
+		btn("bsell", Rect2(300, 210, 162, 16), "DESMANCHAR: +%d PÓ" % Items.dism_po(it), "#5a2a6a", "#ffffff", 7)
 	_msg_show(Vector2(381, 252))
 	btn("menu", Rect2(8, 248, 70, 16), "VOLTAR", "#2e3358", "#ffffff", 8)
 	btn("shop", Rect2(150, 248, 90, 16), "LOJA", "#ffd23f", "#0b0c14", 8)
@@ -3354,7 +3512,7 @@ func draw_prep() -> void:
 	panel(Rect2(8, 40, 128, 196))
 	var c: Dictionary = pick["me"]
 	spr(c["id"], Vector2(72, 96), 2.4)
-	text((c["name"] as String).left(16), Vector2(72, 108), 9, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+	text(short_n(c, 16), Vector2(72, 108), 9, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
 	text(c["el"], Vector2(72, 118), 8, ELCOL.get(c["el"], "#ffffff"), HORIZONTAL_ALIGNMENT_CENTER)
 	var g := Items.my_gear(save, ranked)
 	var m := arena_mod(a, c["el"])
@@ -3491,8 +3649,8 @@ func pass_reward(lv: int, prem: bool) -> Dictionary:
 		if lv % 5 == 0:
 			return {"k": "po", "n": 3, "txt": "3 Pó Mágico"}
 		if lv % 3 == 0:
-			return {"k": "gd", "n": 200, "txt": "200 GD"}
-		return {"k": "gd", "n": 80, "txt": "80 GD"}
+			return {"k": "gd", "n": 70, "txt": "70 GD"}
+		return {"k": "gd", "n": 25, "txt": "25 GD"}
 	if PASS_PREM.has(lv):
 		return {"k": "cos", "id": PASS_PREM[lv], "txt": cos_find(PASS_PREM[lv])["n"]}
 	var g := 100 if lv % 5 == 0 else 30
@@ -3660,8 +3818,8 @@ func draw_shop() -> void:
 		draw_icon("orbe", Vector2(382, 54), 4, "#c77dff")
 		text("PÓ MÁGICO", Vector2(411, 98), 8, "#c77dff", HORIZONTAL_ALIGNMENT_CENTER)
 		text("Melhora itens até +10", Vector2(411, 110), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
-		btn("buypo:1", Rect2(360, 118, 102, 18), "1 por 90 GD", "#c77dff" if int(save["gd"]) >= 90 else "#3a3f66", "#0b0c14", 8)
-		btn("buypo:5", Rect2(360, 142, 102, 18), "5 por 400 GD", "#c77dff" if int(save["gd"]) >= 400 else "#3a3f66", "#0b0c14", 8)
+		btn("buypo:1", Rect2(360, 118, 102, 18), "1 por 150 GD", "#c77dff" if int(save["gd"]) >= 150 else "#3a3f66", "#0b0c14", 8)
+		btn("buypo:5", Rect2(360, 142, 102, 18), "5 por 650 GD", "#c77dff" if int(save["gd"]) >= 650 else "#3a3f66", "#0b0c14", 8)
 		panel(Rect2(12, 194, 458, 40))
 		text("Todos os itens estão no CATÁLOGO. Visuais e o Passe usam Gemas.", Vector2(W / 2, 208), 9, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
 		text("Gemas nunca compram itens, GD, Pó Mágico ou caixas: só aparência e o Passe.", Vector2(W / 2, 222), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
@@ -4093,7 +4251,7 @@ func ident() -> Dictionary:
 
 func hello_msg(n: String) -> Dictionary:
 	var I := ident()
-	return {"t": "hello", "name": n, "ver": "1.6", "pid": I["pid"], "key": I["key"], "title": str(save.get("title", "")), "icon": my_icon()}
+	return {"t": "hello", "name": n, "ver": "2.2", "pid": I["pid"], "key": I["key"], "title": str(save.get("title", "")), "icon": my_icon()}
 
 
 # ---------- conta (usuário e senha) ----------
@@ -4219,6 +4377,14 @@ func _auth_msg(m: Dictionary) -> void:
 			ACC["msg"] = "Bem-vindo de volta, %s!" % str(m["user"])
 		"pass":
 			ACC["msg"] = "Senha alterada."
+		"deleted":
+			save["user"] = ""
+			save.erase("ident")
+			save.erase("rank")
+			Ranked.init_save(save)
+			ACC["msg"] = "Pronto: seus dados online foram apagados."
+			_persist()
+			net_send(hello_msg(save.get("nick", "Jogador")))
 	_persist()
 
 
@@ -4233,13 +4399,17 @@ func draw_account() -> void:
 		text("Entre com este usuário em outro aparelho para jogar com o mesmo elo.", Vector2(W / 2, 130), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
 		btn("accpass", Rect2(100, 150, 130, 22), "TROCAR SENHA", "#4fd1ff", "#0b0c14", 8)
 		btn("accout", Rect2(250, 150, 130, 22), "SAIR", "#ff6a6a", "#0b0c14", 9)
+		btn("accdel", Rect2(100, 178, 130, 14), "EXCLUIR CONTA", "#5a2a36", "#ff9a9a", 7)
+		btn("privacy", Rect2(250, 178, 130, 14), "PRIVACIDADE", "#2e3358", "#ffffff", 7)
 	else:
 		text("Crie uma conta para guardar seu elo", Vector2(W / 2, 70), 10, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
 		text("e jogar com ele em qualquer aparelho.", Vector2(W / 2, 84), 10, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
 		text("Sem conta, o elo fica preso a este aparelho.", Vector2(W / 2, 102), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
 		btn("accreg", Rect2(100, 120, 130, 26), "CRIAR CONTA", "#ffd23f", "#0b0c14", 9)
 		btn("acclog", Rect2(250, 120, 130, 26), "ENTRAR", "#4fd1ff", "#0b0c14", 9)
-		text("Não pedimos e-mail. Guarde bem sua senha: sem ela não dá para recuperar a conta.", Vector2(W / 2, 166), 7, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
+		text("Não pedimos e-mail. Guarde bem sua senha: sem ela não dá para recuperar a conta.", Vector2(W / 2, 160), 7, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
+		btn("accdel", Rect2(100, 172, 130, 14), "APAGAR MEUS DADOS ONLINE", "#5a2a36", "#ff9a9a", 6)
+		btn("privacy", Rect2(250, 172, 130, 14), "PRIVACIDADE", "#2e3358", "#ffffff", 7)
 	if ACC["busy"]:
 		text("Conectando ao servidor… (pode levar até 1 minuto)" if ACC.has("pending") else "Aguarde…", Vector2(W / 2, 200), 9, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
 	elif str(ACC["err"]) != "":
@@ -4267,6 +4437,8 @@ func net_msg(m: Dictionary) -> void:
 				t_off = int(m["now"]) - int(Time.get_unix_time_from_system() * 1000.0)
 		"rooms":
 			net["rooms"] = m["rooms"]
+			if m.has("online"):
+				net["online"] = int(m["online"])
 		"room":
 			net["room"] = m
 			if state in ["online", "lobby", "queue"]:
@@ -4280,8 +4452,32 @@ func net_msg(m: Dictionary) -> void:
 			net["err_t"] = time
 		"queued":
 			state = "queue"
+			net["q_t"] = time
 		"start":
+			net["chal"] = {}
+			net["chal_to"] = ""
 			net_begin_draw(m)
+		"rpick":
+			if pick.get("choosing", false) and net.has("ropts"):
+				var me: int = net["my_slot"]
+				var P: Dictionary = m["picks"]
+				var ro: Array = net["ropts"]
+				pick["me"] = ro[me][int(P.get(str(me), 0))]
+				var fs: Array = []
+				for i in net["order"]:
+					if int(i) != me:
+						fs.append(ro[int(i)][int(P.get(str(i), 0))])
+				pick["foes"] = fs
+				pick["foe"] = fs[0]
+				pick["choosing"] = false
+				draw_t = 1.65
+				revealed = [true, false, false]
+		"challenge":
+			net["chal"] = {"from": str(m["from"]), "t": time}
+		"chalsent":
+			net["chal_to"] = str(m["to"])
+			net["err"] = "Desafio enviado para %s. Esperando resposta…" % str(m["to"])
+			net["err_t"] = time
 		"prep":
 			net["prep_ready"] = (m["ready"] as Array).map(func(x): return int(x))
 		"go":
@@ -4385,6 +4581,17 @@ func net_begin_draw(S: Dictionary) -> void:
 			c = chars[int(mrand() * chars.size())]
 		used[c["id"]] = true
 		picks.append(c)
+	var ropts: Array = []
+	if bool(S.get("ranked", false)):
+		for i in slots.size():
+			var o3: Array = []
+			for k in 3:
+				var c3: Dictionary = chars[int(mrand() * chars.size())]
+				while used.has(c3["id"]):
+					c3 = chars[int(mrand() * chars.size())]
+				used[c3["id"]] = true
+				o3.append(c3)
+			ropts.append(o3)
 	var me: int = net["my_slot"]
 	var my_team := int(slots[me]["team"])
 	var ffa: bool = S["mode"] == "ffa"
@@ -4401,6 +4608,14 @@ func net_begin_draw(S: Dictionary) -> void:
 	pick = {"me": picks[me], "allies": ally_slots.map(func(i): return picks[i]), "foes": foe_slots.map(func(i): return picks[i]), "arena": arena, "mode": S["mode"], "online": true}
 	pick["foe"] = pick["foes"][0]
 	pick["ranked"] = bool(S.get("ranked", false))
+	pick["names"] = (net["order"] as Array).map(func(i): return "Bot" if slots[i]["bot"] else str(slots[i]["name"]))
+	if pick["ranked"] and ropts.size() > 0:
+		net["ropts"] = ropts
+		net["rmy"] = -1
+		pick["choosing"] = true
+		pick["choose_t0"] = time
+		pick["opts"] = ropts[me]
+		pick["me"] = ropts[me][0]
 	if pick["ranked"]:
 		for i in slots.size():
 			if i != me and not slots[i]["bot"]:
@@ -4616,7 +4831,7 @@ func net_host_tick(dt: float) -> void:
 	net["snap_t"] = 0.0
 	var F: Array = []
 	for f: Fighter in G["all"]:
-		var fl := (1 if f.blocking else 0) | (2 if f.stun > 0 else 0) | (4 if f.freeze > 0 else 0) | (8 if f.shield_t > 0 else 0) | (16 if f.ghost > 0 else 0) | (32 if f.big > 0 else 0) | (64 if f.marked > 0 else 0) | (128 if f.reflect > 0 else 0) | (512 if f.inv > 0 else 0) | (1024 if f.broken > 0 else 0) | (2048 if f.dead else 0) | (4096 if f.dash_t > 0 else 0) | (8192 if f.vel.length() > 15 else 0)
+		var fl := (1 if f.blocking else 0) | (2 if f.stun > 0 else 0) | (4 if f.freeze > 0 else 0) | (8 if f.shield_t > 0 else 0) | (16 if f.ghost > 0 else 0) | (32 if f.big > 0 else 0) | (64 if f.marked > 0 else 0) | (128 if f.reflect > 0 else 0) | (512 if f.inv > 0 else 0) | (1024 if f.broken > 0 else 0) | (2048 if f.dead else 0) | (4096 if f.dash_t > 0 else 0) | (8192 if f.vel.length() > 15 else 0) | (16384 if f.wind_t > 0 else 0)
 		F.append([f.slot, snappedf(f.pos.x, 0.1), snappedf(f.pos.y, 0.1), roundi(f.hp), roundi(f.charge), f.face, snappedf(f.aim, 0.01), fl, roundi(f.guard), roundi(f.guard_max), snappedf(f.cd_a, 0.01), snappedf(f.cd_b, 0.01), snappedf(f.cd_dash, 0.01),
 			f.emote if f.emote_t > 0 else 0, snappedf(f.reveal_t, 0.01), f.cover, [f.channel["kind"], f.channel["col"]] if not f.channel.is_empty() else 0, snappedf(f.block_start - time, 0.01)])
 	var P: Array = []
@@ -4635,10 +4850,13 @@ func net_host_tick(dt: float) -> void:
 	var zt: Rect2 = G["zt"]
 	var pops: Array = net["new_pops"].slice(0, 30)
 	net["new_pops"] = []
-	net_send({"t": "snap", "s": {"tm": snappedf(G["time"], 0.1), "zt": [zt.position.x, zt.position.y, zt.end.x, zt.end.y], "f": F, "p": P, "z": Z, "d": D, "sl": SL, "pp": pops}})
+	var pkq: Dictionary = G.get("pk", {})
+	net_send({"t": "snap", "s": {"pk": [snappedf(pkq["p"].x, 0.1), snappedf(pkq["p"].y, 0.1), pkq["k"]] if not pkq.is_empty() else 0, "tm": snappedf(G["time"], 0.1), "zt": [zt.position.x, zt.position.y, zt.end.x, zt.end.y], "f": F, "p": P, "z": Z, "d": D, "sl": SL, "pp": pops}})
 
 
 func net_apply_snap(S: Dictionary) -> void:
+	var pks = S.get("pk", 0)
+	G["pk"] = {"p": Vector2(float(pks[0]), float(pks[1])), "k": str(pks[2])} if pks is Array else {}
 	G["time"] = float(S["tm"])
 	var zt: Array = S["zt"]
 	G["zt"] = Rect2(zt[0], zt[1], zt[2] - zt[0], zt[3] - zt[1])
@@ -4670,6 +4888,7 @@ func net_apply_snap(S: Dictionary) -> void:
 		f.broken = 0.1 if fl & 1024 else 0.0
 		f.dash_t = 0.1 if fl & 4096 else 0.0
 		f.moving = fl & 8192 != 0
+		f.wind_t = 0.1 if fl & 16384 else 0.0
 		if fl & 2048 and not f.dead:
 			f.dead = true
 			f.hp = 0
@@ -4793,6 +5012,7 @@ func _net_button(id: String) -> bool:
 			net_send({"t": "quickmatch"})
 			return true
 		"unqueue":
+			net["q_t"] = -1.0
 			net_send({"t": "unqueue"})
 			state = "rank_lobby" if net.get("rank_q", false) else "online"
 			return true
@@ -4869,7 +5089,7 @@ func online_header(t: String) -> void:
 	screen_bg()
 	text(t, Vector2(W / 2, 22), 13, "#4fd1ff", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 	var st: String = net["status"]
-	text("%s · %s" % [save.get("nick", "Jogador"), ("online · %dms" % int(net["ping"])) if st == "on" else ("conectando…" if st == "connecting" else "desconectado")], Vector2(W - 8, 14), 8, "#46d160" if st == "on" else "#ff9a9a", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
+	text("%s · %s" % [save.get("nick", "Jogador"), ("online · %dms%s" % [int(net["ping"]), (" · %d jogando" % int(net["online"])) if int(net.get("online", 0)) > 0 else ""]) if st == "on" else ("conectando…" if st == "connecting" else "desconectado")], Vector2(W - 8, 14), 8, "#46d160" if st == "on" else "#ff9a9a", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
 	if net["err"] != "" and time - float(net["err_t"]) < 4.0:
 		text(net["err"], Vector2(W / 2, 240), 9, "#ff9a9a", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 
@@ -4896,7 +5116,13 @@ func draw_online() -> void:
 		var u := str(save.get("user", ""))
 		btn("account", Rect2(182, 150, 116, 18), ("CONTA: " + u.substr(0, 8)) if u != "" else "CRIAR CONTA", "#7a5af0", "#ffffff", 8)
 		btn("netsrv", Rect2(312, 150, 116, 18), "SERVIDOR", "#2e3358", "#ffffff", 8)
-		text("Itens valem online com o mesmo teto dos modos normais. Chat só com mensagens prontas.", Vector2(W / 2, 196), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
+		var RV: Array = (save.get("rivals", []) as Array).slice(0, 3)
+		if RV.size() > 0:
+			text("ÚLTIMOS RIVAIS · toque para desafiar", Vector2(W / 2, 184), 7, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER)
+			for i in RV.size():
+				btn("rival:%d" % i, Rect2(W / 2 - RV.size() * 64 + i * 128 + 4, 190, 120, 18), str(RV[i]["n"]).left(14), "#1c3a26" if RV[i].get("w", false) else "#3a1c22", "#ffffff", 7)
+		else:
+			text("Itens valem online com o mesmo teto dos modos normais. Chat só com mensagens prontas.", Vector2(W / 2, 196), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
 	btn("menu", Rect2(8, 248, 70, 16), "VOLTAR", "#2e3358", "#ffffff", 8)
 
 
@@ -4905,6 +5131,19 @@ func draw_queue() -> void:
 	if net.get("rank_q", false):
 		text(Ranked.label(save["rank"]) + " · procurando rival do seu nível", Vector2(W / 2, 80), 9, Ranked.color(save["rank"]), HORIZONTAL_ALIGNMENT_CENTER)
 	text("Procurando outro jogador" + ".".repeat(1 + int(time * 2) % 3), Vector2(W / 2, 110), 11, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+	if int(net.get("online", 0)) > 0:
+		text("%d %s online agora" % [int(net["online"]), "pessoa" if int(net["online"]) == 1 else "pessoas"], Vector2(W / 2, 126), 9, "#46d160", HORIZONTAL_ALIGNMENT_CENTER)
+	if not net.get("rank_q", false) and float(net.get("q_t", -1.0)) >= 0:
+		var left := ceili(20.0 - (time - float(net["q_t"])))
+		if left <= 0:
+			net["q_t"] = -1.0
+			net_send({"t": "unqueue"})
+			new_pick("1x1", false)
+			pick["qbot"] = true
+			net["err"] = "Ninguém apareceu. Treine contra um bot enquanto isso!"
+			net["err_t"] = time
+			return
+		text("Sem rival em %ds, você luta contra um bot" % left, Vector2(W / 2, 232), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
 	spr("saci", Vector2(W / 2, 170), 2, 1.0 if sin(time * 3) > 0 else -1.0)
 	btn("unqueue", Rect2(W / 2 - 50, 200, 100, 18), "CANCELAR", "#2e3358", "#ffffff", 8)
 
@@ -5034,10 +5273,20 @@ func week_idx(t := -1) -> int:
 	return int(floor(float(t - BRT_MS - 4 * DAY_MS) / WEEK_MS))
 
 
+# nome curto para lugares apertados: "Nerojor, The Knight" vira "Nerojor"
+func short_n(c, n: int) -> String:
+	var s: String = str(c["name"]) if c is Dictionary else str(c.d["name"])
+	if s.length() <= n:
+		return s
+	var b := s.split(",")[0]
+	return b if b.length() <= n else s.left(n)
+
+
 func week_legend(w := -999999) -> Dictionary:
 	if w == -999999:
 		w = week_idx()
-	var n := chars.size()
+	# a semana em que as lendas 109 e 110 chegaram continua com a lenda antiga
+	var n := 108 if w < 2968 else chars.size()
 	return chars[posmod(w * 41 + 7, n)]
 
 
@@ -5096,7 +5345,7 @@ func miss_today() -> Dictionary:
 	while list.size() < 3:
 		var m: Dictionary = pool.pop_at(rng.randi() % pool.size())
 		var n := int(m["n"][0]) + rng.randi() % (int(m["n"][1]) - int(m["n"][0]) + 1)
-		list.append({"k": m["k"], "n": n, "p": 0, "el": MEL[rng.randi() % MEL.size()] if m["k"] == "el" else "", "gd": int(m["gd"]) + (n - int(m["n"][0])) * 20, "po": 1 + rng.randi() % 2, "cl": false})
+		list.append({"k": m["k"], "n": n, "p": 0, "el": MEL[rng.randi() % MEL.size()] if m["k"] == "el" else "", "gd": roundi((int(m["gd"]) + (n - int(m["n"][0])) * 20) * 0.5 / 5.0) * 5, "po": 1 + rng.randi() % 2, "cl": false})
 	save["miss"] = {"day": d, "list": list, "all": false}
 	_persist()
 	return save["miss"]
@@ -5196,9 +5445,17 @@ func draw_title_extras() -> void:
 	if n > 0:
 		draw_circle(Vector2(122, 106), 6, Color(1, 0.42, 0.42, 0.6 + 0.4 * sin(time * 6)))
 		text(str(n), Vector2(122, 109), 7, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
-	var HH := wk_hero_active()
+	var HH := fixed_hero()
 	if not HH.is_empty():
-		text("Lenda fixa: " + str(HH["name"]), Vector2(68, 136), 7, "#4fd1ff", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+		text("Lenda fixa: " + short_n(HH, 16), Vector2(68, 136), 7, "#4fd1ff", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	var can_d: bool = streak_info()["can"]
+	btn("streak", Rect2(130, 104, 64, 22), "DIÁRIO", "#8ef0a0" if can_d else "#2e3358", "#0b0c14" if can_d else "#ffffff", 8)
+	draw_goal()
+	if modal.is_empty() and save.get("tut_done", false) and can_d and int(SK["shown"]) != day_idx():
+		SK["shown"] = day_idx()
+		SK["spin_t"] = -1.0
+		SK["msg"] = ""
+		state = "streak"
 
 
 func draw_missions() -> void:
@@ -5412,7 +5669,7 @@ const ACH := [
 	["w1", "Primeira vitória", "Vença 1 partida", "Novato da Arena", 1], ["w10", "Duelista", "Vença 10 partidas", "Duelista", 10],
 	["w50", "Veterano", "Vença 50 partidas", "Veterano", 50], ["w200", "Lenda viva", "Vença 200 partidas", "Lenda Viva", 200],
 	["g100", "Incansável", "Jogue 100 partidas", "Incansável", 100], ["c25", "Colecionador", "Descubra 25 lendas", "Colecionador", 25],
-	["c60", "Curador", "Descubra 60 lendas", "Curador", 60], ["c108", "Enciclopédia", "Descubra as 108 lendas", "Enciclopédia das Lendas", 108],
+	["c60", "Curador", "Descubra 60 lendas", "Curador", 60], ["c108", "Enciclopédia", "Descubra todas as lendas", "Enciclopédia das Lendas", 110],
 	["ko100", "Derrubador", "Derrube 100 lendas", "Derrubador", 100], ["pf50", "Muralha", "Faça 50 bloqueios perfeitos", "Muralha", 50],
 	["dg200", "Intocável", "Esquive 200 vezes", "Intocável", 200], ["sp100", "Especialista", "Acerte 100 especiais", "Mestre dos Especiais", 100],
 	["ffa10", "Último de pé", "Vença 10 Todos contra Todos", "Último de Pé", 10], ["tour1", "Campeão", "Vença um torneio", "Campeão", 1],
@@ -5906,6 +6163,386 @@ func _v16_button(id: String) -> bool:
 			var o := opp_humans()
 			if o.size() == 1:
 				open_report(int(o[0]["pid"]), str(o[0]["name"]))
+		_:
+			return false
+	return true
+
+
+# =====================================================================
+# Versões 1.7 a 2.2 (porte da versão web)
+# =====================================================================
+
+# ---- ranqueada: escolha 1 de 3 ----
+func draw_rank_pick() -> void:
+	var a: Dictionary = pick["arena"]
+	draw_texture(arena_tex[a["id"]], Vector2.ZERO)
+	draw_rect(Rect2(0, 0, W, H), Color(0.04, 0.05, 0.08, 0.84))
+	var left := maxi(0, ceili(15.0 - (time - float(pick.get("choose_t0", time)))))
+	text("ESCOLHA SUA LENDA", Vector2(W / 2, 20), 12, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	text("Ranqueada · rival: %s · %ds" % [pick.get("opp_name", "?"), left], Vector2(W / 2, 33), 9, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	var opts: Array = pick["opts"]
+	var my: int = int(net.get("rmy", -1))
+	for i in opts.size():
+		var c: Dictionary = opts[i]
+		var r := Rect2(W / 2 - 196 + i * 136, 46, 120, 160)
+		card(c, r, true)
+		if my >= 0 and my != i:
+			draw_rect(r.grow(2), Color(0.04, 0.05, 0.08, 0.6))
+		if my == i:
+			draw_rect(r.grow(4), Color.html("#46d160"), false, 3.0)
+		var m := int(save["mastery"].get(c["id"], 0))
+		text("%d maestria" % m, Vector2(r.get_center().x, r.position.y + 172), 8, GEMCOL[gem_of(m)], HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+		if my < 0:
+			btn("rpick:%d" % i, Rect2(r.position.x + 10, r.position.y + 180, 100, 20), "ESCOLHER", "#46d160", "#0b0c14", 8)
+	if my >= 0:
+		text("Aguardando o rival escolher" + ".".repeat(1 + int(time * 2) % 3), Vector2(W / 2, 240), 10, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	else:
+		text("O rival também escolhe 1 de 3. As escolhas aparecem juntas.", Vector2(W / 2, 262), 8, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+
+
+# ---- sorteio em grade (2x2, 3x3, 5x5, todos contra todos) ----
+func grid_at(i: int) -> float:
+	return 0.5 + i * 0.3
+
+
+func draw_draw_grid() -> void:
+	var a: Dictionary = pick["arena"]
+	draw_texture(arena_tex[a["id"]], Vector2.ZERO)
+	draw_rect(Rect2(0, 0, W, H), Color(0.04, 0.05, 0.08, 0.8))
+	var SW := 72.0
+	var SH := 86.0
+	var GP := 4.0
+	var X0 := 8.0
+	var AREA := 5 * SW + 4 * GP
+	var md: String = pick.get("mode", "2x2")
+	text("SORTEIO", Vector2(X0 + AREA / 2, 16), 12, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	text(MODES[md][1], Vector2(X0 + AREA / 2, 28), 9, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	var ffa := md == "ffa"
+	var all: Array = [pick["me"]] + pick.get("allies", []) + pick.get("foes", [])
+	var names: Array = pick.get("names", [])
+	var n_t: int = ceili(all.size() / 2.0) if ffa else 1 + (pick.get("allies", []) as Array).size()
+	var rows := [["TODOS CONTRA TODOS" if ffa else "SUA EQUIPE", "#ffd23f" if ffa else "#7fc8ff", 0, n_t, 44.0], ["" if ffa else "EQUIPE RIVAL", "#ff9a9a", n_t, all.size(), 144.0]]
+	var shown_n := int(pick.get("grid_n", 0))
+	for ri in 2:
+		var row: Array = rows[ri]
+		if row[0] != "":
+			text(row[0], Vector2(X0 + AREA / 2, row[4] - 4), 7, row[1], HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+		var n: int = int(row[3]) - int(row[2])
+		var x0 := X0 + (AREA - (n * SW + (n - 1) * GP)) / 2
+		for k in n:
+			var i: int = int(row[2]) + k
+			var c: Dictionary = all[i]
+			var r := Rect2(x0 + k * (SW + GP), row[4], SW, SH)
+			var me := i == 0
+			var friend := not ffa and ri == 0
+			draw_rect(r.grow(1), Color.html("#0b0c14"))
+			draw_rect(r, Color.html("#1c3a26" if me else ("#1c2a40" if friend else "#3a1c22")))
+			if shown_n <= i:
+				var R2: Dictionary = chars[int(time * 14 + i * 7) % chars.size()]
+				spr(R2["id"], Vector2(r.get_center().x, r.position.y + 56), 2, 1, false, 0.35)
+				text("?", Vector2(r.get_center().x, r.position.y + 76), 12, row[1], HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+				continue
+			draw_rect(r.grow(-1), Color.html("#8ef0a0" if me else RAR[c["rar"]][1]), false, 3.0 if me else 2.0)
+			var who: String = "VOCÊ" if me else (str(names[i]) if i < names.size() else ("Rival" if ffa else ("Aliado" if friend else "Bot")))
+			text(who.left(11), Vector2(r.get_center().x, r.position.y + 11), 7, "#8ef0a0" if me else "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+			spr(c["id"], Vector2(r.get_center().x, r.position.y + 58), 2, 1.0 if (friend or me) else -1.0)
+			text(short_n(c, 12), Vector2(r.get_center().x, r.position.y + 70), 7, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+			text(c["el"], Vector2(r.get_center().x, r.position.y + 80), 6, ELCOL[c["el"]], HORIZONTAL_ALIGNMENT_CENTER)
+	var ar := Rect2(392, 44, 82, 186)
+	draw_rect(ar.grow(1), Color.html("#0b0c14"))
+	draw_rect(ar, Color.html("#141626"))
+	text("ARENA", Vector2(ar.get_center().x, ar.position.y - 4), 7, "#ff8a3d", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	if not revealed[2]:
+		var ra: Dictionary = ARENAS[int(draw_t * 12) % ARENAS.size()]
+		draw_rect(Rect2(ar.position.x + 6, ar.position.y + 8, ar.size.x - 12, 44), Color.html(ra["tiles"][0]))
+		text("?", Vector2(ar.get_center().x, ar.position.y + 80), 12, "#ff8a3d", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	else:
+		draw_texture_rect_region(arena_tex[a["id"]], Rect2(ar.position.x + 6, ar.position.y + 8, ar.size.x - 12, 44), Rect2(120, 80, 240, 120))
+		var w: PackedStringArray = str(a["name"]).split(" ")
+		text(" ".join(w.slice(0, 2)), Vector2(ar.get_center().x, ar.position.y + 66), 8, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+		if w.size() > 2:
+			text(" ".join(w.slice(2)), Vector2(ar.get_center().x, ar.position.y + 76), 8, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+		if a["el"] == "Neutro":
+			text("Sem elemento", Vector2(ar.get_center().x, ar.position.y + 94), 7, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
+		else:
+			text("%s: +10%%" % a["el"], Vector2(ar.get_center().x, ar.position.y + 94), 7, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER)
+			var dn: Array = weak_to(a["el"])
+			for k in dn.size():
+				text("%s: −10%%" % dn[k], Vector2(ar.get_center().x, ar.position.y + 105 + k * 10), 7, "#ff9a9a", HORIZONTAL_ALIGNMENT_CENTER)
+		var mp := arena_mod(a, pick["me"]["el"])
+		text("Você: %s" % ("+10%" if mp > 1 else ("−10%" if mp < 1 else "normal")), Vector2(ar.get_center().x, ar.position.y + 142), 7, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+	if draw_t > 5.2:
+		btn("fight", Rect2(X0 + AREA / 2 - 56, 240, 112, 24), "PREPARAR!", "#ffd23f", "#0b0c14", 11)
+		if pick.get("online", false) and draw_t > 6.5 and state == "draw":
+			enter_net_prep()
+
+
+# ---- prêmio diário: sequência de 7 dias ----
+const STREAK := [[50, 0], [70, 1], [90, 0], [110, 2], [140, 0], [180, 3], [-1, 0]]   # dia 7 = roleta de lenda
+var SK := {"spin_t": -1.0, "spin_id": "", "msg": "", "shown": -999}
+
+
+func streak_info() -> Dictionary:
+	var s: Dictionary = save.get("streak", {"last": -99, "n": 0})
+	var d := day_idx()
+	var can: bool = int(s["last"]) != d
+	var n: int = (int(s["n"]) % 7 + 1 if int(s["last"]) == d - 1 else 1) if can else int(s["n"])
+	return {"can": can, "n": n, "lost": can and int(s["last"]) < d - 1 and int(s["n"]) > 0}
+
+
+func day_hero_active() -> Dictionary:
+	var h: Dictionary = save.get("day_hero", {})
+	if h.is_empty() or now_ms() >= int(h["until"]):
+		return {}
+	return _char_by_id(h["id"])
+
+
+func fixed_hero() -> Dictionary:
+	var dh := day_hero_active()
+	return dh if not dh.is_empty() else wk_hero_active()
+
+
+func streak_claim() -> void:
+	var I := streak_info()
+	if not I["can"]:
+		return
+	var r: Array = STREAK[int(I["n"]) - 1]
+	save["streak"] = {"last": day_idx(), "n": I["n"]}
+	if int(r[0]) < 0:
+		var L: Dictionary = chars[randi() % chars.size()]
+		save["day_hero"] = {"id": L["id"], "until": now_ms() + DAY_MS}
+		save["use_fixed"] = true
+		SK["spin_t"] = time
+		SK["spin_id"] = L["id"]
+		SK["msg"] = "%s é sua lenda fixa por 24 horas!" % L["name"]
+	else:
+		save["gd"] = int(save["gd"]) + int(r[0])
+		save["po"] = int(save["po"]) + int(r[1])
+		SK["msg"] = "+%d GD%s!" % [int(r[0]), (" e +%d Pó Mágico" % int(r[1])) if int(r[1]) > 0 else ""]
+	_persist()
+
+
+func draw_streak() -> void:
+	screen_bg()
+	var I := streak_info()
+	text("PRÊMIO DIÁRIO", Vector2(W / 2, 24), 13, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	text("Você perdeu a sequência. Começando de novo!" if I["lost"] else "Entre todos os dias. No 7º dia, uma roleta sorteia uma lenda fixa por 24 horas!", Vector2(W / 2, 40), 8, "#ff9a9a" if I["lost"] else "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
+	var cur: int = int(I["n"]) - 1
+	for i in 7:
+		var r := Rect2(22 + i * 64, 56, 58, 92)
+		var rw: Array = STREAK[i]
+		var got: bool = i < cur or (not I["can"] and i == cur)
+		var now: bool = I["can"] and i == cur
+		draw_rect(r, Color.html("#1c3a26" if got else ("#3a3f66" if now else "#141626")))
+		draw_rect(r, Color.html("#ffd23f" if now else ("#4fd1ff" if int(rw[0]) < 0 else "#2e3358")), false, 2.0 if now else 1.0)
+		text("DIA %d" % (i + 1), Vector2(r.get_center().x, r.position.y + 12), 7, "#ffd23f" if now else "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
+		if int(rw[0]) < 0:
+			var c: Dictionary = chars[int(time * 6 + i) % chars.size()]
+			spr(c["id"], Vector2(r.get_center().x, r.position.y + 58), 1.6, 1, false, 0.75)
+			text("LENDA", Vector2(r.get_center().x, r.position.y + 72), 7, "#4fd1ff", HORIZONTAL_ALIGNMENT_CENTER)
+			text("por 24h", Vector2(r.get_center().x, r.position.y + 82), 7, "#4fd1ff", HORIZONTAL_ALIGNMENT_CENTER)
+		else:
+			text(str(rw[0]), Vector2(r.get_center().x, r.position.y + 44), 12, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+			text("GD", Vector2(r.get_center().x, r.position.y + 56), 7, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER)
+			if int(rw[1]) > 0:
+				text("+%d Pó" % int(rw[1]), Vector2(r.get_center().x, r.position.y + 72), 8, "#c77dff", HORIZONTAL_ALIGNMENT_CENTER)
+		if got:
+			draw_rect(r, Color(0.04, 0.05, 0.08, 0.45))
+			text("OK", Vector2(r.get_center().x, r.position.y + 50), 12, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	var HH := day_hero_active()
+	if SK["spin_t"] >= 0:
+		var el: float = time - float(SK["spin_t"])
+		var L: Dictionary = chars[int(el * (16 - el * 5)) % chars.size()] if el < 2.4 else _char_by_id(SK["spin_id"])
+		panel(Rect2(W / 2 - 70, 154, 140, 70))
+		spr(L["id"], Vector2(W / 2, 204), 2.4)
+		if el >= 2.4:
+			text(L["name"], Vector2(W / 2, 218), 9, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	elif I["can"]:
+		btn("skclaim", Rect2(W / 2 - 70, 166, 140, 28), "RESGATAR DIA %d" % int(I["n"]), "#8ef0a0", "#0b0c14", 9)
+	elif not HH.is_empty():
+		spr(HH["id"], Vector2(W / 2 - 90, 206), 2)
+		text("Lenda fixa: " + short_n(HH, 18), Vector2(W / 2 - 60, 178), 9, "#4fd1ff")
+		var mins := maxi(0, (int(save["day_hero"]["until"]) - now_ms()) / 60000)
+		text("termina em %dh%02d" % [mins / 60, mins % 60], Vector2(W / 2 - 60, 192), 8, "#8a8fb8")
+		var off: bool = save.get("use_fixed", true) == false
+		btn("usefix", Rect2(W / 2 - 60, 198, 120, 16), "USAR NAS PARTIDAS" if off else "VOLTAR AO SORTEIO", "#4fd1ff" if off else "#2e3358", "#0b0c14" if off else "#ffffff", 7)
+		text("vale contra bots e na partida casual", Vector2(W / 2 - 60, 226), 7, "#8a8fb8")
+	else:
+		text("Volte amanhã para o próximo prêmio!", Vector2(W / 2, 180), 10, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER)
+	if str(SK["msg"]) != "" and not (SK["spin_t"] >= 0 and time - float(SK["spin_t"]) < 2.4):
+		text(SK["msg"], Vector2(W / 2, 240), 9, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER)
+	btn("menu", Rect2(8, 248, 70, 16), "VOLTAR", "#2e3358", "#ffffff", 8)
+
+
+# ---- próximo objetivo (menu principal) ----
+func next_goal() -> Array:
+	var d := day_idx()
+	var I := streak_info()
+	if I["can"]:
+		return ["streak", "Prêmio diário: resgate o dia %d" % int(I["n"])]
+	if miss_claimable() > 0:
+		return ["missions", "Você tem missões para resgatar!"]
+	if int(save.get("fwd", -1)) != d:
+		return ["play", "1ª vitória do dia vale GD em dobro!"]
+	for m: Dictionary in miss_today()["list"]:
+		if int(m["p"]) < int(m["n"]):
+			return ["missions", "Missão: %s (%d/%d)" % [miss_text(m), int(m["p"]), int(m["n"])]]
+	var r: Dictionary = save["rank"]
+	var u := str(save.get("user", ""))
+	if u != "" and int(r.get("tier", -1)) < 0:
+		return ["online", "Ranqueada: faltam %d partidas de colocação" % (5 - int(r.get("placed", 0)))]
+	if u != "" and int(r.get("tier", -1)) >= 0 and int(r["tier"]) < 7:
+		var nx := Ranked.from_score(Ranked.score(r) + 100 - int(r.get("lp", 0)))
+		nx["lp"] = 0
+		return ["online", "Ranqueada: faltam %d PDL para %s" % [100 - int(r.get("lp", 0)), Ranked.tier_name(nx)]]
+	var tot: int = save["seen"].size()
+	if tot < chars.size():
+		return ["play", "Coleção %d/%d: jogue para conhecer novas lendas" % [tot, chars.size()]]
+	return ["play", "Jogue e suba no ranking!"]
+
+
+func draw_goal() -> void:
+	var g := next_goal()
+	var t: String = g[1]
+	var w := minf(380, t.length() * 5.2 + 60)
+	var r := Rect2(W / 2 - w / 2, 222, w, 18)
+	draw_rect(r, Color(0.04, 0.05, 0.08, 0.85))
+	draw_rect(r, Color(1, 0.82, 0.25, 0.7 + 0.3 * sin(time * 3)), false, 1.5)
+	text("PRÓXIMO", Vector2(r.position.x + 6, r.position.y + 12), 6, "#ffd23f")
+	text(t, Vector2(r.position.x + 50, r.position.y + 12), 8, "#ffffff")
+	buttons.append({"id": "goal:" + str(g[0]), "r": r})
+
+
+# ---- desafio / revanche ----
+func rival_add(names: Array, win: bool) -> void:
+	var L: Array = (save.get("rivals", []) as Array).filter(func(x): return not names.has(x["n"]))
+	for n in names:
+		L.push_front({"n": n, "w": win})
+	save["rivals"] = L.slice(0, 6)
+
+
+func opp_human() -> String:
+	var S: Dictionary = net.get("start", {})
+	if S.is_empty():
+		return ""
+	var o: Array = []
+	for x in S.get("slots", []):
+		if x != null and not x.get("bot", false) and x.get("pid") != null and int(x["pid"]) != int(net["id"]):
+			o.append(str(x["name"]))
+	return o[0] if o.size() == 1 else ""
+
+
+func challenge(name: String) -> void:
+	if net["status"] != "on":
+		net["err"] = "Conecte ao servidor para desafiar."
+		net["err_t"] = time
+		return
+	net_send({"t": "challenge", "name": name})
+
+
+func rematch_btn(x: float) -> void:
+	var o := opp_human()
+	if o == "":
+		return
+	var ch: Dictionary = net.get("chal", {})
+	var acc: bool = not ch.is_empty() and ch["from"] == o
+	var sent: bool = str(net.get("chal_to", "")) == o and not acc
+	btn("rematch", Rect2(x, 224, 104, 24), "ACEITAR REVANCHE" if acc else ("PEDIDO ENVIADO" if sent else "REVANCHE"), "#46d160" if acc else ("#2e3358" if sent else "#c77dff"), "#0b0c14" if acc else "#ffffff", 7)
+
+
+func draw_chal() -> void:
+	var C: Dictionary = net.get("chal", {})
+	if C.is_empty() or state in ["fight", "countdown", "prep", "draw"]:
+		return
+	if time - float(C["t"]) > 60.0:
+		net["chal"] = {}
+		return
+	var r := Rect2(W / 2 - 150, 2, 300, 30)
+	draw_rect(r, Color.html("#2a1f4a"))
+	draw_rect(r.grow(-1), Color.html("#ffd23f"), false, 2.0)
+	text("%s te desafiou para um 1x1!" % C["from"], Vector2(r.position.x + 10, r.position.y + 19), 9, "#ffffff")
+	btn("chalok", Rect2(r.end.x - 112, r.position.y + 6, 62, 18), "ACEITAR", "#46d160", "#0b0c14", 7)
+	btn("chalno", Rect2(r.end.x - 46, r.position.y + 6, 40, 18), "NÃO", "#5a2a36", "#ffffff", 7)
+
+
+# ---- excluir conta (Google Play e LGPD) ----
+func acc_delete() -> void:
+	if net["status"] != "on":
+		ACC["err"] = "Conecte ao servidor primeiro."
+		net_connect()
+		return
+	if str(save.get("user", "")) != "":
+		ask_text("Digite sua senha para excluir a conta:", "", _acc_delete_confirm, true)
+	else:
+		_acc_delete_confirm("")
+
+
+func _acc_delete_confirm(pass_: String) -> void:
+	if str(save.get("user", "")) != "" and pass_ == "":
+		return
+	var go := func() -> void:
+		ACC["busy"] = true
+		ACC["err"] = ""
+		net_send({"t": "delacc", "pass": pass_})
+	open_modal("EXCLUIR CONTA?" if str(save.get("user", "")) != "" else "APAGAR DADOS ONLINE?", ["Apaga para sempre do servidor: conta, elo e histórico online.", "O que está só neste aparelho (itens, GD, coleção) continua aqui.", "Não dá para desfazer."], [["mod:ok", "EXCLUIR", "#ff6a6a"], ["mod:x", "CANCELAR", "#2e3358"]], go)
+
+
+func open_privacy() -> void:
+	OS.shell_open("https://alissoneves.github.io/Duel-Legends-Arena/privacidade.html")
+
+
+# ---- botões das novidades ----
+func _v22_button(id: String) -> bool:
+	if id.begins_with("rpick:"):
+		if pick.get("choosing", false) and int(net.get("rmy", -1)) < 0:
+			net["rmy"] = int(id.substr(6))
+			pick["me"] = pick["opts"][net["rmy"]]
+			net_send({"t": "rpick", "i": net["rmy"]})
+		return true
+	if id.begins_with("goal:"):
+		var a := id.substr(5)
+		match a:
+			"streak":
+				state = "streak"
+				SK["spin_t"] = -1.0
+				SK["msg"] = ""
+			"missions":
+				state = "missions"
+				MS["msg"] = ""
+				MS["spin_t"] = -1.0
+			"online":
+				on_button("online")
+			_:
+				state = "modes"
+		return true
+	if id.begins_with("rival:"):
+		var L: Array = save.get("rivals", [])
+		var k := int(id.substr(6))
+		if k < L.size():
+			challenge(str(L[k]["n"]))
+		return true
+	match id:
+		"streak":
+			state = "streak"
+			SK["spin_t"] = -1.0
+			SK["msg"] = ""
+		"skclaim":
+			streak_claim()
+		"chalok":
+			var C: Dictionary = net.get("chal", {})
+			if not C.is_empty():
+				challenge(str(C["from"]))
+			net["chal"] = {}
+		"chalno":
+			net["chal"] = {}
+		"rematch":
+			var o := opp_human()
+			if o != "":
+				challenge(o)
+		"accdel":
+			acc_delete()
+		"privacy":
+			open_privacy()
 		_:
 			return false
 	return true

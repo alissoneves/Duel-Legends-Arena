@@ -1,8 +1,21 @@
 # Duel Legends Arena — projeto Godot
 
-Base do jogo no Godot 4, com a mesma lógica do protótipo do navegador: 108 lendas sorteadas, 7 arenas com elementos, poderes A/B/C, dash, bloqueio com guarda e bloqueio perfeito, bot, sorteio por raridade, maestria e coleção salvas.
+Base do jogo no Godot 4, com a mesma lógica do protótipo do navegador: 110 lendas sorteadas, 7 arenas com elementos, poderes A/B/C, dash, bloqueio com guarda e bloqueio perfeito, bot, sorteio por raridade, maestria e coleção salvas.
 
 **Novo nesta versão:** modos 1x1, 2x2, 3x3, 5x5 e todos contra todos contra bots; torneio de 16 vagas com chave; telas de Coleção e Perfil com histórico; ajuste fino de dano por personagem (`TUNE`). No torneio, as lutas entre bots são decididas na hora por uma estimativa de vantagem, sem rodar a luta inteira.
+
+**Versão 2.2 (igual à versão web 2.2, menos o replay):**
+- ranqueada com escolha de 1 entre 3 lendas; sorteio em grade nos modos em equipe;
+- fila casual chama um bot depois de 20 s; contador de pessoas online;
+- golpes com mais impacto (pausa, tremida, amassado, vibração, clarão no nocaute);
+- aviso antes do especial, chance de virada, bônus no centro da arena, arena fechando a partir de 40 s;
+- prêmio diário de 7 dias (dia 7: lenda fixa por 24 h), 1ª vitória do dia em dobro, próximo objetivo no menu;
+- revanche e desafio aos últimos rivais;
+- economia nova (itens mais caros, desmanchar por Pó Mágico);
+- excluir conta, link da Política de Privacidade e opção de vibração;
+- 110 lendas, com Nerojor, The Knight e Cabeça de Cuia.
+
+Ainda não testado num computador com Godot. O aviso automático de erros só existe na versão web.
 
 ## Como abrir
 

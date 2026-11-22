@@ -20,4 +20,4 @@
 - `src/`: código do jogo dividido por assunto (`src/js/NN-nome.js`) e a casca HTML (`src/index.html`).
 - `build.js`: junta tudo no `index.html` final. Rode `node build.js` depois de mexer em `src/`.
 - Raiz: jogo web (`index.html`, PWA) e servidor (`server.js`, `supabase.sql`).
-- `godot/`: porte Godot 4.3 da versão 1.6 (ainda sem as mudanças da 1.7) (sem replay, ainda não testado).
+- `godot/`: porte Godot 4.3 da versão 2.2 (sem replay e sem o aviso de erros; ainda não testado).

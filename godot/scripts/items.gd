@@ -7,8 +7,8 @@ const ITEM_CAP_RANK := 50    # teto de bônus na ranqueada
 
 const SLOTS := [["arma", "Arma"], ["mao", "Mão secundária"], ["corpo", "Corpo"], ["costas", "Costas"], ["pes", "Pés"], ["cabeca", "Cabeça"]]
 # nome, cor, pontos de atributo, preço em GD (Supremo não é vendido na loja)
-const RARI := [["Normal", "#c9cbe6", 3, 80], ["Incomum", "#46d160", 6, 220], ["Raro", "#4f8dff", 10, 550],
-	["Épico", "#b07aff", 15, 1300], ["Lendário", "#ffb02e", 21, 3200], ["Supremo", "#ff4d5e", 28, 7000]]
+const RARI := [["Normal", "#c9cbe6", 3, 120], ["Incomum", "#46d160", 6, 400], ["Raro", "#4f8dff", 10, 1200],
+	["Épico", "#b07aff", 15, 3500], ["Lendário", "#ffb02e", 21, 9000], ["Supremo", "#ff4d5e", 28, 20000]]
 const SHOP_ODDS := [0.45, 0.30, 0.17, 0.07, 0.01, 0.0]
 const BOX_ODDS := [0.50, 0.30, 0.145, 0.042, 0.010, 0.003]
 const UPG_PO := [1, 1, 2, 2, 3, 3, 4, 5, 6, 8]
@@ -118,8 +118,12 @@ static func price(it: Dictionary) -> int:
 	return int(RARI[int(it["r"])][3])
 
 
-static func sell_price(it: Dictionary) -> int:
-	return roundi(float(RARI[int(it["r"])][3]) * 0.35 * (1.0 + 0.12 * int(it.get("up", 0))))
+# desmanchar: o item vira Pó Mágico (não existe mais venda por GD)
+const DISM := [1, 2, 3, 6, 12, 25]
+
+
+static func dism_po(it: Dictionary) -> int:
+	return int(DISM[int(it["r"])]) + int(it.get("up", 0)) / 2
 
 
 static func new_item(save: Dictionary, b: String, r: int) -> Dictionary:
