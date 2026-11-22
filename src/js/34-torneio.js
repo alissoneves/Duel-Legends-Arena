@@ -49,6 +49,6 @@ function renderAlbum(){const bg=ARENAS[6];bg.bg=bg.bg||buildArena(bg);ctx.drawIm
   if(!seen){drawSpriteDark(c.id,px+50,py+70,2.4);text('???',px+50,py+86,12,'#8a8fb8','center',null,PS);text('Ainda não sorteada',px+50,py+100,9,'#8a8fb8','center',null,PS);}
   else{drawSprite(c.id,px+50,py+66,2.4,1);text(c.name,px+50,py+80,c.name.length>16?7:10,'#ffffff','center',null,PS);text(c.el,px+50,py+92,9,ELCOL[c.el]||'#ffffff','center',null,PS);
    [['ATQ',c.atk,'#ff6a3d'],['DEF',c.def,'#9aa3c7'],['VEL',c.vel,'#ffd23f'],['ESP',c.esp,'#4fc3ff'],['ESQ',c.esq,'#8ef0a0']].forEach((s2,i)=>{const yy=py+100+i*9;text(s2[0],px+4,yy+6,6,'#c9cbe6');bar(px+28,yy+1,48,5,(s2[1]-40)/60,s2[2]);text(String(s2[1]),px+96,yy+6,6,'#ffffff','right');});
-   c.pw.forEach((p,i)=>text(`${'ABC'[i]} ${p.length>17?p.slice(0,16)+'…':p}`,px+4,py+158+i*10,8,'#ffe2d0','left',null,PS));
+   c.pw.forEach((p,i)=>{p=tr(p);text(`${'ABC'[i]} ${p.length>17?p.slice(0,16)+'…':p}`,px+4,py+158+i*10,8,'#ffe2d0','left',null,PS);});
    const m=save.mastery[c.id]||0,gi=gemOf(m);text(`${GEMS[gi]} · ${m} pts`,px+50,py+196,9,GEMCOL[gi],'center',null,PS);if(gi>0)text(`+${gi*10}% no sorteio`,px+50,py+207,8,'#8ef0a0','center',null,PS);}}
  btn('menu',374,248,100,16,'VOLTAR','#2e3358','#ffffff',7);}

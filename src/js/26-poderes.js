@@ -75,7 +75,7 @@ function genC(f,t){const col=ELCOL[f.def.el],o=f.foe;sfx('special');
   case 'storm':for(let i=0;i<6;i++)zone(f,cx(o.x+rnd(-30,30)),cy(o.y+rnd(-24,24)),18,{delay:0.5+i*0.2,base:75,special:true,col,kind:'bolt'});break;
   case 'nova':zone(f,f.x,f.y-4,58,{delay:0.35,base:230,special:true,col,kb:220,kind:'nova'});break;
   default:zone(f,o.x,o.y,38,{delay:0.85,base:250,special:true,stun:0.5,col,kind:'blast'});}}
-function announce(f,i){if(!f.def.hand)popup(f.x,f.y-36,f.def.pw[i].toUpperCase(),ELCOL[f.def.el]||'#ffffff','',6);}
+function announce(f,i){if(!f.def.hand)popup(f.x,f.y-36,tr(f.def.pw[i]).toUpperCase(),ELCOL[f.def.el]||'#ffffff','',6);}
 function doA(f){if(f.blocking||f.cdA>0||f.stun>0||f.dashT>0||f.channel)return;tutEv(f,'a');f.revealT=Math.max(f.revealT||0,0.6);if(f.def.hand)POW[f.def.id].a(f);else genA(f);if(!f.def.melee)f.fireT=BAL.fireSlow[0];}
 function doB(f){if(f.blocking||f.cdB>0||f.stun>0||f.dashT>0||f.channel)return;tutEv(f,'b');f.revealT=Math.max(f.revealT||0,0.6);if(f.def.hand)POW[f.def.id].b(f);else{genB(f,f.def.kit.B);f.cdB=5;announce(f,1);}}
 const WIND=0.35;

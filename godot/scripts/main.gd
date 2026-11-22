@@ -708,7 +708,7 @@ func _item_button(id: String) -> bool:
 		save["inv"].append(it)
 		bag_sel = it["id"]
 		_persist()
-		_flash("Comprado: " + Items.item_name(it), "#8ef0a0")
+		_flash("Comprado: " + tr_s(Items.item_name(it)), "#8ef0a0")
 		return true
 	if id.begins_with("buypo:"):
 		var n := int(id.substr(6))
@@ -768,7 +768,7 @@ func _item_button(id: String) -> bool:
 				bag_sel = -1
 				_persist()
 				_flash("+%d Pó Mágico" % n, "#c77dff")
-			var ln := [Items.item_name(it), "Vira %d Pó Mágico. Não dá para desfazer." % n]
+			var ln := [tr_s(Items.item_name(it)), "Vira %d Pó Mágico. Não dá para desfazer." % n]
 			if eq:
 				ln.append("Ele está equipado e sai do herói.")
 			open_modal("DESMANCHAR ITEM?", ln, [["mod:ok", "DESMANCHAR", "#c77dff"], ["mod:x", "CANCELAR", "#2e3358"]], _cbd)
@@ -1486,7 +1486,7 @@ func gen_c(f: Fighter, t: String) -> void:
 
 func announce(f: Fighter, i: int) -> void:
 	if not f.d["hand"]:
-		popup(f.pos - Vector2(0, 36), (f.d["pw"][i] as String).to_upper(), ELCOL.get(f.d["el"], "#ffffff"), "", 6)
+		popup(f.pos - Vector2(0, 36), tr_s(str(f.d["pw"][i])).to_upper(), ELCOL.get(f.d["el"], "#ffffff"), "", 6)
 
 
 func can_act(f: Fighter) -> bool:
@@ -2388,7 +2388,7 @@ func draw_title() -> void:
 	text("Gemas %d" % int(save["gems"]), Vector2(8, 50), 9, "#4fd1ff", HORIZONTAL_ALIGNMENT_LEFT, "#0b0c14")
 	if int(save["boxes"]) > 0:
 		btn("box", Rect2(W / 2 - 45, 202, 90, 14), "ABRIR CAIXA", "#ff8a3d", "#0b0c14", 7)
-	text("v2.3 Godot", Vector2(W - 6, 248), 8, "#6a6f98", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
+	text("v2.4 Godot", Vector2(W - 6, 248), 8, "#6a6f98", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
 	var nk: String = str(save["nick"]) if save.has("nick") else "CRIAR NOME"
 	var fixed_nick: bool = save.has("nick") and not net.get("can_rename", false)
 	btn("profile" if fixed_nick else "netnick", Rect2(W - 130, 4, 124, 14), nk, "#2e3358" if save.has("nick") else "#ffd23f", "#ffffff" if save.has("nick") else "#0b0c14", 7)
@@ -2924,7 +2924,7 @@ func draw_result() -> void:
 	bar(Rect2(W / 2 - 80, 166, 160, 6), 1.0 if gi >= 8 else (r["after"] % 100) / 100.0, GEMCOL[mini(8, gi + 1)])
 	if r["gem_up"]:
 		var rw: Dictionary = r.get("reward", {})
-		text(("NOVA PATENTE! Recompensa: %s" % Items.item_name(rw)) if not rw.is_empty() else "NOVA PATENTE! +10% de chance de sortear esta lenda", Vector2(W / 2, 192), 9, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+		text(("NOVA PATENTE! Recompensa: %s" % tr_s(Items.item_name(rw))) if not rw.is_empty() else "NOVA PATENTE! +10% de chance de sortear esta lenda", Vector2(W / 2, 192), 9, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 	text("Coleção: %d/%d lendas descobertas" % [save["seen"].size(), chars.size()], Vector2(W / 2, 208), 9, "#ffe2d0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
 	if result_t > 0.8:
 		if G.get("tour", false):
@@ -3112,7 +3112,7 @@ func draw_album() -> void:
 				bar(Rect2(px + 28, yy + 1, 48, 5), (st[i][1] - 40) / 60.0, st[i][2])
 				text(str(int(st[i][1])), Vector2(px + 96, yy + 6), 7, "#ffffff", HORIZONTAL_ALIGNMENT_RIGHT)
 			for i in 3:
-				text("%s %s" % ["ABC"[i], (c["pw"][i] as String).left(17)], Vector2(px + 4, py + 158 + i * 10), 8, "#ffe2d0")
+				text("%s %s" % ["ABC"[i], tr_s(str(c["pw"][i])).left(17)], Vector2(px + 4, py + 158 + i * 10), 8, "#ffe2d0")
 			var m := int(save["mastery"].get(c["id"], 0))
 			var gi := gem_of(m)
 			text("%s · %d pts" % [GEMS[gi], m], Vector2(px + 50, py + 196), 9, GEMCOL[gi], HORIZONTAL_ALIGNMENT_CENTER)
@@ -3422,7 +3422,7 @@ func draw_bag() -> void:
 		var sl := Items.slot_of(it)
 		var eq: bool = save["equip"].get(sl, null) != null and int(save["equip"][sl]) == int(it["id"])
 		draw_icon(it["b"], Vector2(300, 56), 4, R[1])
-		text(Items.item_name(it).left(20), Vector2(336, 66), 9, "#ffffff")
+		text(tr_s(Items.item_name(it)).left(20), Vector2(336, 66), 9, "#ffffff")
 		text("%s · %s" % [R[0], Items.bases[it["b"]]["k"]], Vector2(336, 77), 8, R[1])
 		text(Items.slot_name(sl), Vector2(336, 87), 8, "#8a8fb8")
 		var st := Items.item_stats(it)
@@ -3699,7 +3699,7 @@ func buy_item(b: String, r: int, price: int) -> bool:
 	save["inv"].append(it)
 	bag_sel = it["id"]
 	_persist()
-	_flash("Comprado: " + Items.item_name(it), "#8ef0a0")
+	_flash("Comprado: " + tr_s(Items.item_name(it)), "#8ef0a0")
 	return true
 
 
@@ -4263,7 +4263,7 @@ func ident() -> Dictionary:
 
 func hello_msg(n: String) -> Dictionary:
 	var I := ident()
-	return {"t": "hello", "name": n, "ver": "2.3", "pid": I["pid"], "key": I["key"], "title": str(save.get("title", "")), "icon": my_icon()}
+	return {"t": "hello", "name": n, "ver": "2.4", "pid": I["pid"], "key": I["key"], "title": str(save.get("title", "")), "icon": my_icon()}
 
 
 # ---------- conta (usuário e senha) ----------
@@ -6636,7 +6636,10 @@ func tr_s(s: String) -> String:
 		return tr_cache[key]
 	var k := 0 if L == "en" else 1
 	var out := s
-	if i18n_exact.has(s):
+	if s.length() > 4 and s.substr(0, 3) in ["ATQ", "DEF", "VEL", "ESP", "ESQ"] and s.substr(3, 2) in [" +", " -", " −"]:
+		for w in ["ATQ", "VEL", "ESP", "ESQ"]:
+			out = out.replace(w + " ", _tr_exact(w, k) + " ")
+	elif i18n_exact.has(s):
 		out = str(i18n_exact[s][k])
 	else:
 		for p in i18n_pats:

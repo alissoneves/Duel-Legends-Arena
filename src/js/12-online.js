@@ -49,4 +49,4 @@ function askNick(first,then){askText(first?'BEM-VINDO!':'SEU NOME',NET.canRename
   else if(first&&!save.nick){save.nick='Jogador'+Math.floor(Math.random()*900+100);persist();}
   if(then)then();},{max:16,ph:'Ex.: Alisson',check:v=>cleanNick(v).length<3?'Use pelo menos 3 letras ou números.':badName(v)?'Esse nome não é permitido. Escolha outro.':null});}
 function ident(){if(!save.ident||!save.ident.pid){const h=n=>{const a=new Uint8Array(n);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach((v,i)=>a[i]=Math.random()*256|0);return [...a].map(v=>v.toString(16).padStart(2,'0')).join('');};save.ident={pid:h(12),key:h(16)};persist();}return save.ident;}
-function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.3',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
+function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.4',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
