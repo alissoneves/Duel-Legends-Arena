@@ -77,7 +77,7 @@ function prepUpdate(){if(!prepInfo)return;if(prepInfo.net){const el=(performance
 function renderPrep(){prepUpdate();if(state!=='prep'||!prepInfo)return;const a=pick.arena;ctx.drawImage(a.bg,0,0);ctx.fillStyle='rgba(11,12,20,0.84)';ctx.fillRect(0,0,W,H);
  const el=(performance.now()-prepInfo.t0)/1000,ranked=!!pick.ranked;if(prepInfo.net)for(const q of prepInfo.players)if(q.me)q.at=prepInfo.ready?0:1e9;text('PREPARAÇÃO',W/2,18,11,'#ffd23f','center','#0b0c14');text(`Equipe seu herói e aperte PRONTO · ${Math.max(0,Math.ceil(30-el))}s`,W/2,31,9,'#c9cbe6','center','#0b0c14',PS);
  // herói + atributos
- panel(8,40,128,196);const c=pick.me;drawSprite(c.id,72,96,2.4,1);text(c.name.slice(0,16),72,108,9,'#ffffff','center',null,PS);text(c.el,72,118,8,ELCOL[c.el]||'#ffffff','center',null,PS);
+ panel(8,40,128,196);const c=pick.me;drawSprite(c.id,72,96,2.4,1);text(shortN(c,16),72,108,9,'#ffffff','center',null,PS);text(c.el,72,118,8,ELCOL[c.el]||'#ffffff','center',null,PS);
  const g=myGear(ranked),m=arenaMod(a,c.el);[['atk','ATQ','#ff6a3d'],['def','DEF','#9aa3c7'],['vel','VEL','#ffd23f'],['esp','ESP','#4fc3ff'],['esq','ESQ','#8ef0a0']].forEach((r,i)=>{const y=128+i*14,base=Math.round(c[r[0]]*m),bon=g[r[0]]||0;
   text(r[1],14,y+6,7,'#c9cbe6','left');ctx.fillStyle='#0b0c14';ctx.fillRect(38,y,70,6);ctx.fillStyle=r[2];ctx.fillRect(38,y,Math.min(70,base/150*70),6);ctx.fillStyle='#ffffff';ctx.fillRect(38+Math.min(70,base/150*70),y,Math.min(70-Math.min(70,base/150*70),bon/150*70),6);
   text(`${base}${bon?'+'+bon:''}`,132,y+6,7,bon?'#8ef0a0':'#ffffff','right',null,PS);});
@@ -100,7 +100,7 @@ function renderPrep(){prepUpdate();if(state!=='prep'||!prepInfo)return;const a=p
   L.slice(0,6).forEach((it,i)=>{const y=110+i*19;ctx.fillStyle='#141626';ctx.fillRect(326,y,142,17);drawIcon(it.b,328,y+1,2,RARI[it.r].col);text(BASES[it.b].names[it.r].slice(0,15)+(it.up?' +'+it.up:''),346,y+8,7,RARI[it.r].col,'left',null,PS);text(statLine(itemStats(it)),346,y+15,6,'#8ef0a0','left',null,PS);buttons.push({id:'pitem:'+it.id,x:326,y,w:142,h:17});});
   if(L.length>6)text(`+${L.length-6} na mochila`,397,234,7,'#8a8fb8','center',null,PS);}
  else{text('JOGADORES',397,50,6,'#ffd23f','center');prepInfo.players.slice(0,10).forEach((q,i)=>{const y=56+i*17,rd=q.me?prepInfo.ready:q.at<=el;ctx.fillStyle=q.team===0?'#1c2a40':'#3a1c22';ctx.fillRect(326,y,142,15);
-   text(`${q.n}: ${q.c.name}`.slice(0,22),330,y+10,7,q.me?'#8ef0a0':'#ffffff','left',null,PS);ctx.fillStyle=rd?'#46d160':'#3a3f66';ctx.fillRect(452,y+3,12,9);text(rd?'✓':'…',458,y+11,7,rd?'#0b0c14':'#c9cbe6','center',null,PS);});}
+   text(`${q.n}: ${shortN(q.c,14)}`.slice(0,22),330,y+10,7,q.me?'#8ef0a0':'#ffffff','left',null,PS);ctx.fillStyle=rd?'#46d160':'#3a3f66';ctx.fillRect(452,y+3,12,9);text(rd?'✓':'…',458,y+11,7,rd?'#0b0c14':'#c9cbe6','center',null,PS);});}
  if(!prepInfo.ready)btn('ready',W/2-70,242,140,22,'PRONTO!','#46d160','#0b0c14',9);else text('Aguardando os outros jogadores…',W/2,256,10,'#8ef0a0','center','#0b0c14',PS);
  if(!prepInfo.ready)btn('bag',8,244,70,18,'MOCHILA','#2e3358','#ffffff',6);}
 itemsInit();cosInit();

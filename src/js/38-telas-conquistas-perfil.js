@@ -23,7 +23,7 @@ function renderProfile(){screenBg();text('PERFIL',W/2,22,12,'#ffd23f','center','
  panel(162,32,118,200);text('MAIS DOMINADAS',221,44,7,'#ffd23f','center');const top=Object.entries(save.mastery).sort((a,b)=>b[1]-a[1]).slice(0,5);
  if(!top.length)text('Jogue para ganhar maestria',221,120,8,'#6a6f98','center',null,PS);
  top.forEach(([id,m],i)=>{const c=CHARS.find(x=>x.id===id);if(!c)return;const y=52+i*36,gi=gemOf(m);ctx.fillStyle='#23264a';ctx.fillRect(168,y,28,30);ctx.save();ctx.beginPath();ctx.rect(168,y,28,30);ctx.clip();drawSprite(id,182,y+28,1,1);ctx.restore();
-  text(c.name.slice(0,13),200,y+10,8,'#ffffff','left',null,PS);text(GEMS[gi],200,y+20,8,GEMCOL[gi],'left',null,PS);text(`${m} pts`,200,y+29,8,'#c9cbe6','left',null,PS);});
+  text(shortN(c,13),200,y+10,8,'#ffffff','left',null,PS);text(GEMS[gi],200,y+20,8,GEMCOL[gi],'left',null,PS);text(`${m} pts`,200,y+29,8,'#c9cbe6','left',null,PS);});
  // histórico
  panel(290,32,180,200);text('HISTÓRICO',380,44,7,'#ffd23f','center');const hs=save.hist||[];if(!hs.length)text('Nenhuma partida ainda',380,120,8,'#6a6f98','center',null,PS);
  hs.slice(0,9).forEach((h,i)=>{const y=52+i*20,c=CHARS.find(x=>x.id===h.c);ctx.fillStyle=h.w?'#1c3a26':'#3a1c22';ctx.fillRect(294,y,172,18);ctx.fillStyle=h.w?'#46d160':'#ff4d5e';ctx.fillRect(294,y,3,18);

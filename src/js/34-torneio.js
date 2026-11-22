@@ -26,11 +26,11 @@ function renderBracket(){const bg=ARENAS[6];bg.bg=bg.bg||buildArena(bg);ctx.draw
   for(let k=0;k<list.length;k++){const c=list[k],x=colX[r],y=yOf(r,k);const isMe=c===T.me;const lost=r<T.r&&T.rounds[r+1]&&!T.rounds[r+1].includes(c);
    ctx.fillStyle=isMe?'rgba(70,209,96,0.28)':'rgba(30,33,58,0.95)';ctx.fillRect(x,y-6,94,12);
    ctx.save();ctx.beginPath();ctx.rect(x,y-6,12,12);ctx.clip();drawSprite(c.id,x+6,y+8,0.6,1,false,lost?0.35:1);ctx.restore();
-   text(c.name.length>16?c.name.slice(0,15)+'…':c.name,x+15,y+3,9,lost?'#6a6f98':isMe?'#8ef0a0':'#ffffff','left',null,PS);
+   text(shortN(c,16),x+15,y+3,9,lost?'#6a6f98':isMe?'#8ef0a0':'#ffffff','left',null,PS);
    if(r<3){ctx.fillStyle='#4a4f7a';ctx.fillRect(x+94,y,4,1);if(k%2===0){const y2=yOf(r,k+1);ctx.fillRect(x+98,y,1,y2-y+1);ctx.fillRect(x+98,(y+y2)/2,colX[r+1]-x-98,1);}}}}
  const cx0=400,cy0=yOf(3,0)+26;
  ctx.fillStyle='#0b0c14';ctx.fillRect(cx0-2,72,80,104);ctx.fillStyle='#141626';ctx.fillRect(cx0,74,76,100);text('CAMPEÃO',cx0+38,86,7,'#ffd23f','center');
- if(T.champion){drawSprite(T.champion.id,cx0+38,150,2.4,1);text(T.champion.name.slice(0,14),cx0+38,166,9,'#ffffff','center',null,PS);}
+ if(T.champion){drawSprite(T.champion.id,cx0+38,150,2.4,1);text(shortN(T.champion,14),cx0+38,166,9,'#ffffff','center',null,PS);}
  else text('?',cx0+38,140,20,'#3a3f66','center');
  if(T.champion){const win=T.champion===T.me;
   text(win?'VOCÊ É O CAMPEÃO! +20 de maestria':`Você caiu na fase: ${ROUNDS[T.lostAt]}. Campeão: ${T.champion.name}`,W/2,250,10,win?'#8ef0a0':'#ffe2d0','center','#0b0c14',PS);
@@ -47,7 +47,7 @@ function renderAlbum(){const bg=ARENAS[6];bg.bg=bg.bg||buildArena(bg);ctx.drawIm
  if(albSel<0)text('Toque numa lenda',px+50,py+100,9,'#8a8fb8','center',null,PS);
  else{const c=CHARS[albSel],seen=!!save.seen[c.id];ctx.fillStyle=RAR[c.rar].col;ctx.fillRect(px+20,py+4,60,10);text(c.rar.toUpperCase(),px+50,py+12,6,'#0b0c14','center');
   if(!seen){drawSpriteDark(c.id,px+50,py+70,2.4);text('???',px+50,py+86,12,'#8a8fb8','center',null,PS);text('Ainda não sorteada',px+50,py+100,9,'#8a8fb8','center',null,PS);}
-  else{drawSprite(c.id,px+50,py+66,2.4,1);text(c.name.length>16?c.name.slice(0,15)+'…':c.name,px+50,py+80,10,'#ffffff','center',null,PS);text(c.el,px+50,py+92,9,ELCOL[c.el]||'#ffffff','center',null,PS);
+  else{drawSprite(c.id,px+50,py+66,2.4,1);text(c.name,px+50,py+80,c.name.length>16?7:10,'#ffffff','center',null,PS);text(c.el,px+50,py+92,9,ELCOL[c.el]||'#ffffff','center',null,PS);
    [['ATQ',c.atk,'#ff6a3d'],['DEF',c.def,'#9aa3c7'],['VEL',c.vel,'#ffd23f'],['ESP',c.esp,'#4fc3ff'],['ESQ',c.esq,'#8ef0a0']].forEach((s2,i)=>{const yy=py+100+i*9;text(s2[0],px+4,yy+6,6,'#c9cbe6');bar(px+28,yy+1,48,5,(s2[1]-40)/60,s2[2]);text(String(s2[1]),px+96,yy+6,6,'#ffffff','right');});
    c.pw.forEach((p,i)=>text(`${'ABC'[i]} ${p.length>17?p.slice(0,16)+'…':p}`,px+4,py+158+i*10,8,'#ffe2d0','left',null,PS));
    const m=save.mastery[c.id]||0,gi=gemOf(m);text(`${GEMS[gi]} · ${m} pts`,px+50,py+196,9,GEMCOL[gi],'center',null,PS);if(gi>0)text(`+${gi*10}% no sorteio`,px+50,py+207,8,'#8ef0a0','center',null,PS);}}

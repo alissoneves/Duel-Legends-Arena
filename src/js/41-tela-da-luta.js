@@ -71,8 +71,8 @@ function drawProj(p){ctx.save();ctx.translate(p.x,p.y);
 function hudPanel(f,x,right){const w=168,y=4;ctx.fillStyle='#0b0c14';ctx.fillRect(x-2,y-2,w+4,32);ctx.fillStyle='#141626';ctx.fillRect(x,y,w,28);if(f===G.p&&save.cos.eq.frame){const c=cosFind(save.cos.eq.frame);ctx.strokeStyle=c.col;ctx.lineWidth=2;ctx.strokeRect((right?x+w-26:x+2)-1,y+1,26,26);}
  const px=right?x+w-26:x+2;ctx.fillStyle='#23264a';ctx.fillRect(px,y+2,24,24);ctx.save();ctx.beginPath();ctx.rect(px,y+2,24,24);ctx.clip();drawSprite(f.def.id,px+12,y+27,1,right?-1:1);ctx.restore();
  const tx=right?x+w-30:x+30,al=right?'right':'left';
- text(f.def.name.toUpperCase().slice(0,14),tx,y+9,6,'#ffffff',al);
- ctx.font=`9px ${PS}`;const el=f.def.el+(f.mod>1?' +10%':f.mod<1?' −10%':'');const tw=ctx.measureText(el).width+6;const ex=right?x+w-30-tw-(ctx.font=`6px ${PX}`,ctx.measureText(f.def.name.toUpperCase().slice(0,14)).width)-4:x+30+(ctx.font=`6px ${PX}`,ctx.measureText(f.def.name.toUpperCase().slice(0,14)).width)+4;
+ text(shortN(f.def,14).toUpperCase(),tx,y+9,6,'#ffffff',al);
+ ctx.font=`9px ${PS}`;const el=f.def.el+(f.mod>1?' +10%':f.mod<1?' −10%':'');const tw=ctx.measureText(el).width+6;const ex=right?x+w-30-tw-(ctx.font=`6px ${PX}`,ctx.measureText(shortN(f.def,14).toUpperCase()).width)-4:x+30+(ctx.font=`6px ${PX}`,ctx.measureText(shortN(f.def,14).toUpperCase()).width)+4;
  ctx.fillStyle=f.mod<1?'#ff7a7a':ELCOL[f.def.el];ctx.fillRect(ex,y+2,tw,9);text(el,ex+tw/2,y+9,9,'#0b0c14','center',null,PS);
  const bw=134,bx=right?x+w-30-bw:x+30;const hp=f.hp/1000;const hc=hp>0.5?'#46d160':hp>0.25?'#ffb02e':'#ff4d4d';
  if(right){ctx.save();ctx.translate(bx+bw,0);ctx.scale(-1,1);bar(0,y+13,bw,6,hp,hc);ctx.restore();}else bar(bx,y+13,bw,6,hp,hc);
@@ -82,8 +82,8 @@ function hudPanel(f,x,right){const w=168,y=4;ctx.fillStyle='#0b0c14';ctx.fillRec
  text(ready?'C PRONTO':'C',right?cx-4:cx+cw+4,y+27,8,ready?'#4fc3ff':'#8a8fb8',right?'right':'left',null,PS);}
 function renderHUD(){const g=G;const tgt=g.multi&&g.p.foe&&!g.p.foe.dead?g.p.foe:g.b;hudPanel(g.p,6,false);hudPanel(tgt,W-174,true);
  const L=g.all.filter(x=>x!==g.p&&x.team===g.p.team),R=g.all.filter(x=>x!==tgt&&x.team!==g.p.team);
- if(L.length+R.length<=2){for(const [f,x,right] of [[L[0],6,false],[R[0],W-174,true]]){if(!f)continue;ctx.fillStyle='#0b0c14';ctx.fillRect(x-2,36,172,13);ctx.fillStyle='#141626';ctx.fillRect(x,37,168,11);text((f.team===g.p.team?'Aliado: ':'')+f.def.name.slice(0,16),right?x+164:x+4,45,8,f.dead?'#6a6f98':'#ffffff',right?'right':'left',null,PS);bar(right?x+4:x+94,40,70,4,f.hp/1000,f.dead?'#3a3f66':'#46d160');}}
- else{for(const [arr,x,right,col] of [[L,6,false,'#7fc8ff'],[R,W-104,true,'#ff9a9a']])arr.forEach((f,i)=>{const y=36+i*9;ctx.globalAlpha=0.85;ctx.fillStyle='#0b0c14';ctx.fillRect(x-1,y,100,9);ctx.globalAlpha=1;text(f.def.name.slice(0,11),right?x+96:x+2,y+7,7,f.dead?'#6a6f98':col,right?'right':'left',null,PS);bar(right?x+2:x+56,y+3,40,3,f.hp/1000,f.dead?'#3a3f66':'#46d160');});
+ if(L.length+R.length<=2){for(const [f,x,right] of [[L[0],6,false],[R[0],W-174,true]]){if(!f)continue;ctx.fillStyle='#0b0c14';ctx.fillRect(x-2,36,172,13);ctx.fillStyle='#141626';ctx.fillRect(x,37,168,11);text((f.team===g.p.team?'Aliado: ':'')+shortN(f.def,16),right?x+164:x+4,45,8,f.dead?'#6a6f98':'#ffffff',right?'right':'left',null,PS);bar(right?x+4:x+94,40,70,4,f.hp/1000,f.dead?'#3a3f66':'#46d160');}}
+ else{for(const [arr,x,right,col] of [[L,6,false,'#7fc8ff'],[R,W-104,true,'#ff9a9a']])arr.forEach((f,i)=>{const y=36+i*9;ctx.globalAlpha=0.85;ctx.fillStyle='#0b0c14';ctx.fillRect(x-1,y,100,9);ctx.globalAlpha=1;text(shortN(f.def,11),right?x+96:x+2,y+7,7,f.dead?'#6a6f98':col,right?'right':'left',null,PS);bar(right?x+2:x+56,y+3,40,3,f.hp/1000,f.dead?'#3a3f66':'#46d160');});
   const al=L.filter(x=>!x.dead).length+(g.p.dead?0:1),en=g.all.filter(x=>x.team!==g.p.team&&!x.dead).length;text(g.ffa?`Restam ${en+(g.p.dead?0:1)}`:`${al} x ${en}`,W/2,48,8,'#ffffff','center','#0b0c14',PS);}
  ctx.fillStyle='#0b0c14';ctx.fillRect(W/2-24,2,48,20);ctx.fillStyle='#141626';ctx.fillRect(W/2-22,4,44,16);text(String(Math.ceil(g.time)).padStart(2,'0'),W/2,17,10,g.time<15?'#ff7a7a':'#ffd23f','center');
  const a=g.arena;text(a.name,W/2,30,9,'#ff8a3d','center','#0b0c14',PS);
