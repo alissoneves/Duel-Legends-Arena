@@ -6,7 +6,7 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '1.9';
+const VERSION = '2.0';
 const MIN_VER = 2.1;   // 110 lendas: versões antigas sorteiam diferente
 const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
@@ -88,6 +88,7 @@ function seasonRoll(p) {
   const r = p.rank, cur = seasonNow(); if ((r.season || 1) >= cur) return false;
   r.borders = r.borders || [];
   if (r.peak >= 0 && !r.borders.some(b => b.s === r.season)) r.borders.push({ s: r.season || 1, ...frameOfScore(r.peak) });
+  r.lastSeason = { s: r.season || 1, peakName: r.peakName || '', w: r.w || 0, l: r.l || 0, f: r.peak >= 0 ? frameOfScore(r.peak) : null };
   Object.assign(r, { tier: -1, div: 0, lp: 0, placed: 0, w: 0, l: 0, shield: 0, streak: 0, peak: -1, peakName: '', season: cur, boxT: [], mmr: Math.round((r.mmr + 1150) / 2) });
   return true;
 }

@@ -1,5 +1,5 @@
 // ---------- TEXTO ----------
-function text(s,x,y,size,col,align,outline,font){ctx.font=`${size}px ${font||PX}`;ctx.textAlign=align||'left';ctx.textBaseline='alphabetic';
+function text(s,x,y,size,col,align,outline,font){s=tr(s);ctx.font=`${size}px ${font||PX}`;ctx.textAlign=align||'left';ctx.textBaseline='alphabetic';
  if(outline){ctx.fillStyle=outline;for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,-1],[1,-1],[-1,1]])ctx.fillText(s,Math.round(x)+dx,Math.round(y)+dy);}
  ctx.fillStyle=col;ctx.fillText(s,Math.round(x),Math.round(y));}
 function bar(x,y,w,h,pct,col,back){ctx.fillStyle='#0b0c14';ctx.fillRect(x-1,y-1,w+2,h+2);ctx.fillStyle=back||'#262a46';ctx.fillRect(x,y,w,h);ctx.fillStyle=col;ctx.fillRect(x,y,Math.round(w*clamp(pct,0,1)),h);ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fillRect(x,y,Math.round(w*clamp(pct,0,1)),1);}

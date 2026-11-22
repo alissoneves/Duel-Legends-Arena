@@ -47,3 +47,18 @@ function challenge(name){if(NET.status!=='on'){NET.err='Conecte ao servidor para
 function drawChal(){const C=NET.chal;if(!C||['fight','countdown','prep','draw'].includes(state))return;if(performance.now()-C.t>60000){NET.chal=null;return;}
  const y=2,w=300,x=W/2-w/2;ctx.fillStyle='#2a1f4a';ctx.fillRect(x,y,w,30);ctx.strokeStyle='#ffd23f';ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,28);
  text(`${C.from} te desafiou para um 1x1!`,x+10,y+19,9,'#ffffff','left',null,PS);btn('chalok',x+w-112,y+6,62,18,'ACEITAR','#46d160','#0b0c14',6);btn('chalno',x+w-46,y+6,40,18,'NÃO','#5a2a36','#ffffff',6);}
+// ---- fim de temporada: mostra o resultado da temporada que acabou (uma vez) ----
+function seasonEndCheck(){const L=save.rank&&save.rank.lastSeason;if(!L||save.seasonSeen===L.s)return;SE.data=L;if(['title','online','rankLobby'].includes(state))state='seasonEnd';}
+const SE={data:null};
+function renderSeasonEnd(){screenBg();const L=SE.data||(save.rank&&save.rank.lastSeason);if(!L){state='title';return;}
+ const p=0.6+0.4*Math.sin(time*3);text(`FIM DA TEMPORADA ${L.s}`,W/2,26,13,'#ffd23f','center','#0b0c14');text('Obrigado por jogar! Veja como foi sua temporada.',W/2,40,8,'#c9cbe6','center',null,PS);
+ panel(W/2-150,50,300,170);
+ if(L.f){portrait(W/2-38,62,76,L.f);text('Borda conquistada:',W/2,156,8,'#c9cbe6','center',null,PS);text(frameName(L.f.t,L.f.d),W/2,170,12,`rgba(255,210,63,${p})`,'center','#0b0c14',PS);}
+ else{portrait(W/2-38,62,76,null);text('Sem elo nesta temporada',W/2,162,10,'#8a8fb8','center',null,PS);}
+ text(`Elo máximo: ${L.peakName||'—'}`,W/2,188,9,'#ffffff','center',null,PS);
+ const pos=save.lastPos&&save.lastPos.s===L.s?save.lastPos:null;
+ text(`Vitórias ${L.w||0} · Derrotas ${L.l||0}${pos?` · ${pos.pos}º no ranking`:''}`,W/2,202,9,'#8ef0a0','center',null,PS);
+ text('A borda fica no seu perfil para sempre. A nova temporada começa com 5 partidas de colocação.',W/2,232,7,'#8a8fb8','center',null,PS);
+ btn('seshare',W/2-150,244,140,20,'COPIAR RESULTADO','#4fd1ff','#0b0c14',6);btn('seok',W/2+10,244,140,20,'NOVA TEMPORADA!','#ffd23f','#0b0c14',7);}
+function seasonShare(){const L=SE.data||{};const pos=save.lastPos&&save.lastPos.s===L.s?` · ${save.lastPos.pos}º no ranking`:'';
+ const t=`🏆 Temporada ${L.s} do Duel Legends Arena: ${L.peakName||'sem elo'}${pos}! Vitórias ${L.w||0}.\n${GAME_URL}`;try{navigator.clipboard.writeText(t);NET.err='Resultado copiado! Cole onde quiser.';NET.errT=performance.now();}catch(e){}}

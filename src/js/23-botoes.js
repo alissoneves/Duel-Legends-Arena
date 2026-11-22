@@ -34,7 +34,7 @@ function onButton(id){sfx('beep');
  if(id==='account'){ACC.back='online';state='account';ACC.msg='';ACC.err='';if(NET.status!=='on')netConnect();return;}
  if(id==='accreg'){accRegister();return;}
  if(id==='acclog'){accLogin();return;}
- if(id==='accpass'){accPass();return;}if(id==='accdel'){accDelete();return;}if(id==='privacy'){try{window.open(GAME_URL+'privacidade.html','_blank');}catch(e){}return;}
+ if(id==='accpass'){accPass();return;}if(id==='accdel'){accDelete();return;}if(id==='seok'){const L=SE.data||save.rank.lastSeason;if(L)save.seasonSeen=L.s;persist();state='title';return;}if(id==='seshare'){seasonShare();return;}if(id==='lang'){const i=LANGS.findIndex(l=>l[0]===curLang());save.opt.lang=LANGS[(i+1)%LANGS.length][0];persist();return;}if(id==='privacy'){try{window.open(GAME_URL+'privacidade.html','_blank');}catch(e){}return;}
  if(id==='accout'){accLogout();return;}
  if(id==='leader'){state='leader';LB.page=0;LB.loading=true;LB.err='';if(NET.status!=='on'){netConnect();LB.loading=false;LB.err='Conectando ao servidor… toque em ATUALIZAR.';}else netSend({t:'top'});return;}
  if(id==='ldr'){if(NET.status==='on'){LB.loading=true;netSend({t:'top'});}else netConnect();return;}
@@ -106,7 +106,7 @@ function onButton(id){sfx('beep');
  if(id==='full'){try{const el=document.documentElement;if(document.fullscreenElement)document.exitFullscreen();else (el.requestFullscreen||el.webkitRequestFullscreen).call(el);}catch(e){}return;}
  if(id==='profile'){state='profile';return;}
  else if(id==='fight'&&pick&&pick.online){enterNetPrep();}
- else if(id==='fight'){enterPrep(()=>{startMatch();if(!pick.ranked)G.diff*=DIFFM[save.opt.diff]*((save.games||0)<3?0.8:1);if(pick.ranked)G.diff=clamp(0.75+((save.rank.oppMmr||1150)-800)/2200,0.75,1.4);});}
+ else if(id==='fight'){enterPrep(()=>{startMatch();if(!pick.ranked)G.diff*=DIFFM[save.opt.diff]*((save.games||0)<3?0.8:1)*botAdapt();if(pick.ranked)G.diff=clamp(0.75+((save.rank.oppMmr||1150)-800)/2200,0.75,1.4);});}
  else if(id==='fight_old'){startMatch();if(!pick.ranked)G.diff*=DIFFM[save.opt.diff];if(pick.ranked)G.diff=clamp(0.75+((save.rank.oppMmr||1150)-800)/2200,0.75,1.4);}
  else if(id==='tour'){startTournament();}
  else if(id==='tfight'){pick={me:T.me,foe:tPair().foe,arena:ARENAS[0]};pick.arena.bg=pick.arena.bg||buildArena(pick.arena);enterPrep(()=>tStartMatch());}

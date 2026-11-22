@@ -20,7 +20,7 @@ function netMsg(m){switch(m.t){
  case 'aborted':if(NET.on)netAbort(m.msg);break;
  case 'left':NET.room=null;if(state==='room')state='online';break;
  case 'pong':NET.ping=Math.round(performance.now()-m.ts);break;
- case 'rank':if(m.seasonEnd)NET.seasonEnd=m.seasonEnd;if(m.name&&(m.rename||!/^Jogador\d*$/.test(m.name)))save.nick=m.name;NET.canRename=!!m.rename;if(m.rename&&!NET.renameAsked){NET.renameAsked=true;setTimeout(()=>askNick(false),300);}if(save.statQ&&save.statQ.length&&m.rank){netSend({t:'stat',list:save.statQ});save.statQ=[];}if(NET.autoJoin){netSend({t:'joincode',code:NET.autoJoin});NET.autoJoin=null;}if(m.rank){save.rank=Object.assign(save.rank||{},m.rank);save.user=m.user||null;persist();}NET.ready=true;if(ACC.pending){netSend(ACC.pending);ACC.pending=null;}break;
+ case 'rank':if(m.seasonEnd)NET.seasonEnd=m.seasonEnd;if(m.name&&(m.rename||!/^Jogador\d*$/.test(m.name)))save.nick=m.name;NET.canRename=!!m.rename;if(m.rename&&!NET.renameAsked){NET.renameAsked=true;setTimeout(()=>askNick(false),300);}if(save.statQ&&save.statQ.length&&m.rank){netSend({t:'stat',list:save.statQ});save.statQ=[];}if(NET.autoJoin){netSend({t:'joincode',code:NET.autoJoin});NET.autoJoin=null;}if(m.rank){save.rank=Object.assign(save.rank||{},m.rank);save.user=m.user||null;persist();seasonEndCheck();}NET.ready=true;if(ACC.pending){netSend(ACC.pending);ACC.pending=null;}break;
  case 'auth':ACC.busy=false;
   if(m.expired){save.user=null;save.ident=null;persist();ACC.err='Sua sessão expirou. Entre na conta de novo.';netSend(helloMsg(save.nick||'Jogador'));break;}
   if(m.err){ACC.err=m.err;ACC.msg='';sfx('beep');break;}
@@ -31,7 +31,7 @@ function netMsg(m){switch(m.t){
   else if(m.ok==='deleted'){save.user=null;save.ident=null;save.rank=null;rankInit();ACC.msg='Pronto: seus dados online foram apagados.';persist();netSend(helloMsg(save.nick||'Jogador'));}
   persist();sfx('go');break;
  case 'rankres':{const k=NET.rkPending;NET.rkPending=null;if(m.void){if(k){k.pending=false;k.void=m.msg;}break;}save.rank=Object.assign(save.rank,m.rank);if(m.out&&m.out.box)save.boxes=(save.boxes||0)+1;persist();if(k){Object.assign(k,m.out,{pending:false,col:rankCol(save.rank)});}break;}
- case 'top':LB.loading=false;LB.list=m.list||[];LB.total=m.total||0;LB.me=m.me;LB.err=m.err||'';break;}}
+ case 'top':LB.loading=false;LB.list=m.list||[];LB.total=m.total||0;LB.me=m.me;LB.err=m.err||'';if(m.me&&m.me.pos){save.lastPos={s:save.rank.season||1,pos:m.me.pos,total:m.total||0};persist();}break;}}
 // sorteio igual para todos (mesma semente)
 function netBeginDraw(S){NET.start=S;NET.on=true;NET.mySlot=S.slots.findIndex(q=>q.pid===NET.id);NET.role=S.host===NET.id?'host':'client';NET.inputs={};NET.prepReady=[];NET.cnt={b:0,c:0,dash:0};
  const picks=withSeed(S.seed,()=>{const arena=ARENAS[Math.floor(Math.random()*ARENAS.length)];const used=new Set();const chars=S.slots.map(()=>drawUnique(used));return {arena,chars,opts:S.ranked?S.slots.map(()=>[drawUnique(used),drawUnique(used),drawUnique(used)]):null};});

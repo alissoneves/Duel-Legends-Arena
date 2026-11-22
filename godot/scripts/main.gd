@@ -218,9 +218,13 @@ func _ready() -> void:
 	randomize()
 	_load_save()
 	Items.load_data()
+	load_i18n()
 	Ranked.init_save(save)
 	Items.init_save(save)
 	opt.merge(save.get("opt", {}), true)
+	if not opt.has("lang"):
+		var ol := OS.get_locale_language()
+		opt["lang"] = "pt" if ol == "pt" else ("es" if ol == "es" else "en")
 	save["opt"] = opt
 	if not save.has("cos"):
 		save["cos"] = {"owned": [], "eq": {"emote": "e_gg"}}
@@ -1012,6 +1016,8 @@ func start_match() -> void:
 		_place(theirs, BX1 + (BX2 - BX1) * 0.84, 1, -1.0)
 		G["all"] = mine + theirs
 	G["diff"] = DIFFM[int(opt["diff"])]
+	if not pick.get("online", false) and not pick.get("ranked", false) and not pick.get("tut", false):
+		G["diff"] *= (0.8 if int(save["games"]) < 3 else 1.0) * bot_adapt()
 	if pick.get("ranked", false):
 		G["diff"] = Ranked.bot_diff(save["rank"])
 	if pick.get("tour", false):
@@ -2249,6 +2255,9 @@ func finish_result() -> void:
 		m_done = miss_track({"win": win, "el": pl.d["el"], "spec": int(stt.get("specials", 0)), "perf": int(stt.get("perfect", 0)), "dodge": int(stt.get("dodges", 0)), "ko": int(stt.get("kos", 0)), "online": pick.get("online", false), "ffa": G.get("ffa", false), "team": not G.get("ffa", false) and G.get("multi", false)})
 	if not pick.get("tut", false):
 		stat_push(win)
+	if not pick.get("online", false) and not pick.get("ranked", false) and not G.get("tour", false) and not pick.get("tut", false):
+		var br := int(save.get("bot_run", 0))
+		save["bot_run"] = maxi(0, br) + 1 if win else mini(0, br) - 1
 	var tut_b := 0
 	if pick.get("tut", false) and not save.get("tut_done", false):
 		save["tut_done"] = true
@@ -2263,6 +2272,7 @@ func finish_result() -> void:
 # =====================================================================
 # DESENHO
 func text(s: String, p: Vector2, size: int, c: String, align := HORIZONTAL_ALIGNMENT_LEFT, outline := "") -> void:
+	s = tr_s(s)
 	var w := font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
 	var x := p.x
 	if align == HORIZONTAL_ALIGNMENT_CENTER:
@@ -2326,6 +2336,7 @@ func _draw() -> void:
 		"room": draw_room()
 		"queue": draw_queue()
 		"streak": draw_streak()
+		"season_end": draw_season_end()
 		"missions": draw_missions()
 		"borders": draw_borders()
 		"ach": draw_ach()
@@ -2377,7 +2388,7 @@ func draw_title() -> void:
 	text("Gemas %d" % int(save["gems"]), Vector2(8, 50), 9, "#4fd1ff", HORIZONTAL_ALIGNMENT_LEFT, "#0b0c14")
 	if int(save["boxes"]) > 0:
 		btn("box", Rect2(W / 2 - 45, 202, 90, 14), "ABRIR CAIXA", "#ff8a3d", "#0b0c14", 7)
-	text("v2.2 Godot", Vector2(W - 6, 248), 8, "#6a6f98", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
+	text("v2.3 Godot", Vector2(W - 6, 248), 8, "#6a6f98", HORIZONTAL_ALIGNMENT_RIGHT, "#0b0c14")
 	var nk: String = str(save["nick"]) if save.has("nick") else "CRIAR NOME"
 	var fixed_nick: bool = save.has("nick") and not net.get("can_rename", false)
 	btn("profile" if fixed_nick else "netnick", Rect2(W - 130, 4, 124, 14), nk, "#2e3358" if save.has("nick") else "#ffd23f", "#ffffff" if save.has("nick") else "#0b0c14", 7)
@@ -3303,6 +3314,7 @@ func draw_options() -> void:
 	btn("full", Rect2(86, 160, 130, 18), "TELA CHEIA", "#2e3358", "#ffffff", 8)
 	btn("opt:vib:0", Rect2(264, 160, 130, 18), "VIBRAR: SIM" if opt.get("vib", true) else "VIBRAR: NÃO", "#2e3358", "#ffffff", 8)
 	btn("privacy", Rect2(W / 2 + 60, 234, 100, 16), "PRIVACIDADE", "#2e3358", "#c9cbe6", 7)
+	btn("lang", Rect2(W / 2 - 170, 234, 110, 16), lang_label(), "#4fd1ff", "#0b0c14", 7)
 	btn("menu", Rect2(W / 2 - 48, 232, 96, 20), "VOLTAR", "#2e3358", "#ffffff", 9)
 
 
@@ -3743,7 +3755,7 @@ func ask_text(title: String, def: String, cb: Callable, secret := false) -> void
 	root.position = Vector2(80, 60)
 	root.size = Vector2(320, 110)
 	var lb := Label.new()
-	lb.text = title
+	lb.text = tr_s(title)
 	lb.position = Vector2(10, 8)
 	lb.size = Vector2(300, 20)
 	root.add_child(lb)
@@ -4251,7 +4263,7 @@ func ident() -> Dictionary:
 
 func hello_msg(n: String) -> Dictionary:
 	var I := ident()
-	return {"t": "hello", "name": n, "ver": "2.2", "pid": I["pid"], "key": I["key"], "title": str(save.get("title", "")), "icon": my_icon()}
+	return {"t": "hello", "name": n, "ver": "2.3", "pid": I["pid"], "key": I["key"], "title": str(save.get("title", "")), "icon": my_icon()}
 
 
 # ---------- conta (usuário e senha) ----------
@@ -4421,6 +4433,7 @@ func draw_account() -> void:
 
 ## rank vindo do servidor: números chegam como float e alguns nomes mudam
 func _rank_from_server(src: Dictionary) -> void:
+	call_deferred("season_end_check")
 	for k in src:
 		var v = src[k]
 		save["rank"][k] = int(v) if typeof(v) == TYPE_FLOAT else v
@@ -4556,6 +4569,9 @@ func net_msg(m: Dictionary) -> void:
 			LB["list"] = m.get("list", [])
 			LB["total"] = int(m.get("total", 0))
 			LB["me"] = m["me"] if m.get("me") is Dictionary else {}
+			if not (LB["me"] as Dictionary).is_empty() and LB["me"].get("pos") != null:
+				save["last_pos"] = {"s": int(save["rank"].get("season", 1)), "pos": int(LB["me"]["pos"]), "total": int(m.get("total", 0))}
+				_persist()
 			LB["err"] = str(m.get("err", ""))
 
 
@@ -6493,6 +6509,32 @@ func open_privacy() -> void:
 
 # ---- botões das novidades ----
 func _v22_button(id: String) -> bool:
+	match id:
+		"lang":
+			var i := 0
+			for k in LANGS.size():
+				if LANGS[k][0] == cur_lang():
+					i = k
+			opt["lang"] = LANGS[(i + 1) % LANGS.size()][0]
+			save["opt"] = opt
+			tr_cache.clear()
+			_persist()
+			return true
+		"seok":
+			var L: Dictionary = save["rank"].get("lastSeason", {})
+			if not L.is_empty():
+				save["season_seen"] = int(L["s"])
+			_persist()
+			state = "title"
+			return true
+		"seshare":
+			var L2: Dictionary = save["rank"].get("lastSeason", {})
+			var lp: Dictionary = save.get("last_pos", {})
+			var pos := (" · %dº no ranking" % int(lp["pos"])) if (not lp.is_empty() and int(lp["s"]) == int(L2.get("s", 0))) else ""
+			DisplayServer.clipboard_set("Temporada %d do Duel Legends Arena: %s%s! Vitórias %d.\nhttps://alissoneves.github.io/Duel-Legends-Arena/" % [int(L2.get("s", 1)), str(L2.get("peakName", "sem elo")), pos, int(L2.get("w", 0))])
+			net["err"] = "Resultado copiado! Cole onde quiser."
+			net["err_t"] = time
+			return true
 	if id.begins_with("rpick:"):
 		if pick.get("choosing", false) and int(net.get("rmy", -1)) < 0:
 			net["rmy"] = int(id.substr(6))
@@ -6546,3 +6588,112 @@ func _v22_button(id: String) -> bool:
 		_:
 			return false
 	return true
+
+
+# ---- idiomas (português, inglês e espanhol) ----
+# Os textos são escritos em português; text() traduz na hora com data/i18n.json (o mesmo da versão web).
+const LANGS := [["pt", "IDIOMA: PORTUGUÊS"], ["en", "LANGUAGE: ENGLISH"], ["es", "IDIOMA: ESPAÑOL"]]
+var i18n_exact := {}
+var i18n_pats: Array = []   # [RegEx, en, es]
+var tr_cache := {}
+
+
+func load_i18n() -> void:
+	var f := FileAccess.open("res://data/i18n.json", FileAccess.READ)
+	if f == null:
+		return
+	var d = JSON.parse_string(f.get_as_text())
+	if not (d is Dictionary):
+		return
+	i18n_exact = d["exact"]
+	for p in d["pats"]:
+		var rx := RegEx.new()
+		if rx.compile(str(p[0])) == OK:
+			i18n_pats.append([rx, str(p[1]), str(p[2])])
+
+
+func cur_lang() -> String:
+	return str(opt.get("lang", "pt"))
+
+
+func lang_label() -> String:
+	for l in LANGS:
+		if l[0] == cur_lang():
+			return l[1]
+	return LANGS[0][1]
+
+
+func _tr_exact(s: String, k: int) -> String:
+	return str(i18n_exact[s][k]) if i18n_exact.has(s) else s
+
+
+func tr_s(s: String) -> String:
+	var L := cur_lang()
+	if L == "pt" or s == "":
+		return s
+	var key := L + "|" + s
+	if tr_cache.has(key):
+		return tr_cache[key]
+	var k := 0 if L == "en" else 1
+	var out := s
+	if i18n_exact.has(s):
+		out = str(i18n_exact[s][k])
+	else:
+		for p in i18n_pats:
+			var m: RegExMatch = (p[0] as RegEx).search(s)
+			if m != null:
+				out = str(p[1 + k])
+				for g in range(m.get_group_count(), 0, -1):
+					out = out.replace("{%d}" % (g - 1), _tr_exact(m.get_string(g), k))
+				break
+	if tr_cache.size() > 4000:
+		tr_cache.clear()
+	tr_cache[key] = out
+	return out
+
+
+# ---- bots que se ajustam ao jogador ----
+# 3 derrotas seguidas contra bots: bot um pouco mais fraco; 3 ou 5 vitórias seguidas: um pouco mais forte
+func bot_adapt() -> float:
+	var r := int(save.get("bot_run", 0))
+	return 0.85 if r <= -3 else (1.15 if r >= 5 else (1.07 if r >= 3 else 1.0))
+
+
+# ---- fim de temporada ----
+func season_end_check() -> void:
+	var L: Dictionary = save["rank"].get("lastSeason", {})
+	if L.is_empty() or int(save.get("season_seen", 0)) == int(L["s"]):
+		return
+	if state in ["title", "online", "rank_lobby"]:
+		state = "season_end"
+
+
+func draw_season_end() -> void:
+	screen_bg()
+	var L: Dictionary = save["rank"].get("lastSeason", {})
+	if L.is_empty():
+		state = "title"
+		return
+	text("FIM DA TEMPORADA %d" % int(L["s"]), Vector2(W / 2, 26), 13, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	text("Obrigado por jogar! Veja como foi sua temporada.", Vector2(W / 2, 40), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
+	panel(Rect2(W / 2 - 150, 50, 300, 170))
+	var f = L.get("f")
+	if f is Dictionary:
+		portrait(W / 2 - 38, 62, 76, f)
+		text("Borda conquistada:", Vector2(W / 2, 156), 8, "#c9cbe6", HORIZONTAL_ALIGNMENT_CENTER)
+		text(frame_name(int(f["t"]), int(f["d"])), Vector2(W / 2, 170), 12, "#ffd23f", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")
+	else:
+		portrait(W / 2 - 38, 62, 76, {})
+		text("Sem elo nesta temporada", Vector2(W / 2, 162), 10, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
+	var pk := str(L.get("peakName", ""))
+	text("Elo máximo: %s" % (pk if pk != "" else "—"), Vector2(W / 2, 188), 9, "#ffffff", HORIZONTAL_ALIGNMENT_CENTER)
+	var lp: Dictionary = save.get("last_pos", {})
+	var wl := "Vitórias %d · Derrotas %d" % [int(L.get("w", 0)), int(L.get("l", 0))]
+	if not lp.is_empty() and int(lp["s"]) == int(L["s"]):
+		wl += " · %dº no ranking" % int(lp["pos"])
+	text(wl, Vector2(W / 2, 202), 9, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER)
+	text("A borda fica no seu perfil para sempre. A nova temporada começa com 5 partidas de colocação.", Vector2(W / 2, 232), 7, "#8a8fb8", HORIZONTAL_ALIGNMENT_CENTER)
+	btn("seshare", Rect2(W / 2 - 150, 244, 140, 20), "COPIAR RESULTADO", "#4fd1ff", "#0b0c14", 7)
+	btn("seok", Rect2(W / 2 + 10, 244, 140, 20), "NOVA TEMPORADA!", "#ffd23f", "#0b0c14", 8)
+	if net["err"] != "" and time - float(net["err_t"]) < 4.0:
+		text(net["err"], Vector2(W / 2, 46), 8, "#8ef0a0", HORIZONTAL_ALIGNMENT_CENTER, "#0b0c14")

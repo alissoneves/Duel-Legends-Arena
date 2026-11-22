@@ -4,7 +4,9 @@ Base do jogo no Godot 4, com a mesma lógica do protótipo do navegador: 110 len
 
 **Novo nesta versão:** modos 1x1, 2x2, 3x3, 5x5 e todos contra todos contra bots; torneio de 16 vagas com chave; telas de Coleção e Perfil com histórico; ajuste fino de dano por personagem (`TUNE`). No torneio, as lutas entre bots são decididas na hora por uma estimativa de vantagem, sem rodar a luta inteira.
 
-**Versão 2.2 (igual à versão web 2.2, menos o replay):**
+**Versão 2.3 (igual à versão web 2.3, menos o replay):**
+- idiomas: português, inglês e espanhol (Opções → IDIOMA);
+- bots que se ajustam ao jogador e tela de fim de temporada;
 - ranqueada com escolha de 1 entre 3 lendas; sorteio em grade nos modos em equipe;
 - fila casual chama um bot depois de 20 s; contador de pessoas online;
 - golpes com mais impacto (pausa, tremida, amassado, vibração, clarão no nocaute);
