@@ -1,7 +1,7 @@
 // ---------- BOTÕES (o que cada toque faz) ----------
 function onButton(id){sfx('beep');
  if(id==='again')id=lastMode==='ranked'?'rankgo':lastMode==='online'?'toroom':'m:'+lastMode;
- if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
+ if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
  if(id.startsWith('m:')){newPick(id.slice(2),false);return;}
  if(id==='ranked'){if(!save.user){modal={title:'RANQUEADA',lines:['Para jogar a ranqueada, crie uma conta.','Assim seu elo fica salvo e ninguém consegue trapacear.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],['mod:x','AGORA NÃO','#c9cbe6']]};return;}state='rankLobby';if(NET.status!=='on')netConnect();return;}
  if(id==='rankgo'){if(!save.user){onButton('ranked');return;}if(NET.status!=='on'){netConnect();NET.err='Conectando ao servidor… toque de novo em instantes.';NET.errT=performance.now();return;}NET.on=false;NET.role=null;NET.rankQ=true;netSend({t:'rankqueue',mmr:save.rank.mmr});return;}
@@ -113,6 +113,7 @@ function onButton(id){sfx('beep');
  else if(id==='tcont'){if(G&&G.res&&G.tour){tAdvance(G.res.win);G.tour=false;state='bracket';}}
  else if(id==='album'){state='album';}
  else if(id.startsWith('alb:')){albSel=+id.slice(4);}
+ else if(id==='menu'&&(state==='modes'||state==='online')){state='play';}
  else if(id==='menu'){state='title';}
  else if(id==='sound'){soundOn=!soundOn;applyVolumes();}
  else if(id==='pause'){paused=!paused;}

@@ -49,23 +49,38 @@ function renderMissions(){screenBg();text('MISSÕES DIÁRIAS',W/2,20,12,'#8ef0a0
  if(MS.msg)text(MS.msg,W/2,252,8,'#8ef0a0','center',null,PS);
  btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);}
 function weekCard(x,y){const L=weekLegend(),w=106,h=100;ctx.fillStyle='rgba(20,22,38,0.92)';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#ffd23f';ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,h-2);
- text('LENDA DA SEMANA',x+w/2,y+11,6,'#ffd23f','center');const gl=0.5+0.5*Math.sin(time*3);ctx.fillStyle=`rgba(255,210,63,${0.12+0.1*gl})`;ctx.beginPath();ctx.arc(x+w/2,y+46,22,0,7);ctx.fill();
+ text('LENDA DA SEMANA',x+w/2,y+11,tr('LENDA DA SEMANA').length*6>w-8?5:6,'#ffd23f','center');ctx.fillStyle='rgba(255,210,63,0.17)';ctx.beginPath();ctx.arc(x+w/2,y+46,22,0,7);ctx.fill();
  drawSprite(L.id,x+w/2,y+66,2,1);text(L.name,x+w/2,y+78,8,'#ffffff','center','#0b0c14',PS);text(`+${Math.round(WEEK_BONUS*100)}% GD · 3x no sorteio`,x+w/2,y+88,7,'#8ef0a0','center',null,PS);text('termina em '+weekLeft(),x+w/2,y+97,6,'#8a8fb8','center',null,PS);
  buttons.push({id:'weekinfo',x,y,w,h});}
 function renderTitle(){if(!titleArena){titleArena=ARENAS[0];titleArena.bg=titleArena.bg||buildArena(titleArena);}
  ctx.drawImage(titleArena.bg,0,0);ctx.fillStyle='rgba(11,12,20,0.55)';ctx.fillRect(0,0,W,H);
- const b=Math.sin(time*4)*2;drawSprite('saci',110,215+b,2,1);drawSprite('iara',370,215-b,2,-1);drawSprite('zeus',60,240,1,1,false,0.6);drawSprite('yeti',420,245,1,-1,false,0.6);
- text('VS',W/2,200,10,'#ff8a3d','center','#0b0c14');
- logo(W/2,34,1.6);
- weekCard(366,42);
- {const n=missClaimable(),M=missToday(),dn=M.list.filter(m=>m.p>=m.n).length;btn('missions',12,104,112,22,`MISSÕES ${dn}/3`,n?'#8ef0a0':'#2e3358',n?'#0b0c14':'#ffffff',7);if(n){const p=0.6+0.4*Math.sin(time*6);ctx.fillStyle=`rgba(255,106,106,${p})`;ctx.beginPath();ctx.arc(122,106,6,0,7);ctx.fill();text(String(n),122,109,7,'#ffffff','center');}if(fixedHero())text('Lenda fixa: '+fixedHero().name,68,136,7,'#4fd1ff','center','#0b0c14',PS);}
- btn('modes',24,148,128,28,'CONTRA BOTS','#ffd23f','#0b0c14',8);btn('online',160,148,128,28,'ONLINE','#4fd1ff','#0b0c14',8);btn('album',296,150,78,24,'COLEÇÃO','#2e3358','#ffffff',6);btn('profile',380,150,78,24,'PERFIL','#2e3358','#ffffff',6);
- btn('shop',W/2-206,180,76,16,'LOJA','#ffd23f','#0b0c14',6);btn('pass',W/2-124,180,76,16,'PASSE','#ffb02e','#0b0c14',6);btn('bag',W/2-42,180,76,16,'MOCHILA','#c77dff','#0b0c14',6);btn('howto',W/2+40,180,84,16,'COMO JOGAR','#2e3358','#ffffff',6);btn('options',W/2+130,180,76,16,'OPÇÕES','#2e3358','#ffffff',6);text(`Gemas ${save.gems||0}`,8,48,9,'#4fd1ff','left','#0b0c14',PS);text(`GD ${save.gd} · Pó ${save.po}${save.boxes?` · ${save.boxes} caixa(s)!`:''}`,8,36,9,'#ffd23f','left','#0b0c14',PS);if(save.boxes>0)btn('box',W/2-40,200,80,14,'ABRIR CAIXA','#ff8a3d','#0b0c14',5);text('v2.4 · teste',W-6,248,8,'#6a6f98','right','#0b0c14',PS);
- text(isTouch?'Joystick à esquerda · A, B, C, DASH e BLOQ à direita · mira automática':'WASD mover · mouse mirar · clique = A · E = B · Q = C · Espaço = dash · Shift ou botão direito = bloquear',W/2,262,9,'#ffe2d0','center','#0b0c14',PS);
- const tot=Object.keys(save.seen).length;text(`Coleção ${tot}/${CHARS.length} · Vitórias ${save.wins}`,8,12,9,'#c9cbe6','left','#0b0c14',PS);text(`Ranqueada online: ${rankLabel(save.rank)}`,8,24,9,rankCol(save.rank),'left','#0b0c14',PS);
+ // status: moedas na cor delas, o resto apagado
+ {ctx.font=`9px ${PS}`;let x=8;for(const [t,c] of [[`GD ${save.gd}`,'#ffd23f'],[`Pó ${save.po}`,'#c77dff'],[`Gemas ${save.gems||0}`,'#4fd1ff']]){text(t,x,12,9,c,'left','#0b0c14',PS);x+=Math.round(ctx.measureText(tr(t)).width)+10;}}
+ const tot=Object.keys(save.seen).length;text(`Coleção ${tot}/${CHARS.length} · Vitórias ${save.wins}`,8,24,8,'#8a8fb8','left','#0b0c14',PS);text(`Ranqueada: ${rankLabel(save.rank)}`,8,35,8,'#8a8fb8','left','#0b0c14',PS);
+ if(save.boxes>0)btn('box',8,72,84,16,save.boxes>1?`ABRIR CAIXA x${save.boxes}`:'ABRIR CAIXA','#8ef0a0','#0b0c14',6);
+ if(fixedHero())text('Lenda fixa: '+fixedHero().name,8,save.boxes>0?100:80,8,'#c9cbe6','left','#0b0c14',PS);
  btn('sound',W-62,4,58,14,soundOn?'SOM ON':'SOM OFF','#2e3358','#ffffff',6);
  const nk=save.nick?save.nick:'CRIAR NOME';ctx.font=`6px ${PX}`;const nw=Math.max(70,ctx.measureText(nk).width+14);btn(save.nick&&!NET.canRename?'profile':'netnick',W-66-nw,4,nw,14,nk,save.nick?'#2e3358':'#ffd23f',save.nick?'#ffffff':'#0b0c14',6);portrait(W-66-nw-24,2,18,null);buttons.push({id:'icons',x:W-66-nw-24,y:2,w:18,h:18});
- drawGoal();{const can=streakInfo().can;btn('streak',130,104,64,22,'DIÁRIO',can?'#8ef0a0':'#2e3358',can?'#0b0c14':'#ffffff',7);}
+ logo(W/2,30,1.6);
+ weekCard(366,42);
+ // o duelo: o momento da tela
+ const b=Math.sin(time*4)*2;drawSprite('zeus',124,150,1,1,false,0.5);drawSprite('yeti',356,150,1,-1,false,0.5);
+ drawSprite('saci',176,148+b,2,1);drawSprite('iara',304,148-b,2,-1);text('VS',W/2,140,10,'#ff8a3d','center','#0b0c14');
+ // ação principal, com o dado do sorteio
+ {const x=150,y=154,w=180,h=30;btn('jogar',x,y,w,h,'',  '#ffd23f','#0b0c14',12);ctx.font=`12px ${PX}`;const tw=Math.round(ctx.measureText(tr('JOGAR')).width),dx=Math.round(x+w/2-(tw+18)/2),dy=y+9;
+  ctx.fillStyle='#0b0c14';ctx.fillRect(dx-1,dy-1,12,12);ctx.fillStyle='#ffffff';ctx.fillRect(dx,dy,10,10);ctx.fillStyle='#e0393e';ctx.fillRect(dx+1,dy+1,3,3);ctx.fillStyle='#0b0c14';ctx.fillRect(dx+6,dy+1,3,3);ctx.fillRect(dx+4,dy+4,2,2);ctx.fillRect(dx+1,dy+6,3,3);ctx.fillRect(dx+6,dy+6,3,3);
+  text('JOGAR',dx+18,y+h/2+5,12,'#0b0c14','left',null,PX);}
+ // progresso
+ {const n=missClaimable(),M=missToday(),dn=M.list.filter(m=>m.p>=m.n).length,can=streakInfo().can,y=190,w=102;
+  btn('missions',27,y,w,22,`MISSÕES ${dn}/3`,n?'#8ef0a0':'#2e3358',n?'#0b0c14':'#ffffff',7);
+  if(n){const p=0.6+0.4*Math.sin(time*6);ctx.fillStyle=`rgba(255,106,106,${p})`;ctx.beginPath();ctx.arc(27+w-3,y+3,6,0,7);ctx.fill();text(String(n),27+w-3,y+6,7,'#ffffff','center');}
+  btn('streak',27+(w+6),y,w,22,'DIÁRIO',can?'#8ef0a0':'#2e3358',can?'#0b0c14':'#ffffff',7);
+  btn('album',27+(w+6)*2,y,w,22,'COLEÇÃO','#2e3358','#ffffff',7);btn('profile',27+(w+6)*3,y,w,22,'PERFIL','#2e3358','#ffffff',7);}
+ // loja e sistema
+ {const y=218;btn('shop',27,y,72,22,'LOJA','#2e3358','#ffffff',7);btn('pass',105,y,72,22,'PASSE','#2e3358','#ffffff',7);btn('bag',183,y,80,22,'MOCHILA','#2e3358','#ffffff',7);
+  btn('howto',279,y,96,22,'COMO JOGAR','#2e3358','#ffffff',7);btn('options',381,y,72,22,'OPÇÕES','#2e3358','#ffffff',7);}
+ text('v2.4 · teste',W-6,264,8,'#6a6f98','right','#0b0c14',PS);
+ drawGoal(248);
  if(!modal&&save.tutDone&&streakInfo().can&&SK.shown!==dayIdx()){SK.shown=dayIdx();SK.spinT=0;SK.msg='';state='streak';}
  if(!save.user&&!save.accAsked&&!modal){save.accAsked=true;save.nickAsked=true;persist();modal={title:save.nick?'NOVIDADE: CONTAS!':'BEM-VINDO À ARENA!',lines:['Com uma conta, seu elo e seu ranking ficam salvos','e você joga com eles em qualquer aparelho.','A conta é obrigatória só na Ranqueada.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],[save.nick?'mod:x':'mod:nick','SEM CONTA','#c9cbe6']]};}
  renderModal();}

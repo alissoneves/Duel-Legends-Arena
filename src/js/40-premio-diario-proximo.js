@@ -36,9 +36,9 @@ function nextGoal(){const d=dayIdx(),M=missToday();
  if(save.user&&r.tier>=0&&r.tier<7){const nx=rankName(Object.assign(fromScore(rankScore(r)+100-r.lp),{lp:0}));return ['online',`Ranqueada: faltam ${100-r.lp} PDL para ${nx}`];}
  const tot=Object.keys(save.seen).length;if(tot<CHARS.length)return ['play',`Coleção ${tot}/${CHARS.length}: jogue para conhecer novas lendas`];
  return ['play','Jogue e suba no ranking!'];}
-function drawGoal(){const [act,t]=nextGoal();const p=0.7+0.3*Math.sin(time*3);ctx.font=`8px ${PS}`;const w=Math.min(380,ctx.measureText(t).width+60),x=W/2-w/2,y=222;
- ctx.fillStyle='rgba(11,12,20,0.85)';ctx.fillRect(x,y,w,18);ctx.strokeStyle=`rgba(255,210,63,${p})`;ctx.lineWidth=1.5;ctx.strokeRect(x+0.5,y+0.5,w-1,17);
- text('PRÓXIMO',x+6,y+12,5,'#ffd23f','left');text(t,x+50,y+12,8,'#ffffff','left',null,PS);buttons.push({id:'goal:'+act,x,y,w,h:18});}
+function drawGoal(y){const [act,t]=nextGoal();y=y||222;ctx.font=`8px ${PS}`;const w=Math.min(340,Math.round(ctx.measureText(tr(t)).width)+28),x=Math.round(W/2-w/2);
+ ctx.fillStyle='rgba(11,12,20,0.85)';ctx.fillRect(x,y,w,16);ctx.strokeStyle='#ffd23f';ctx.lineWidth=1;ctx.strokeRect(x+0.5,y+0.5,w-1,15);
+ text(t,x+10,y+11,8,'#ffffff','left',null,PS);text('>',x+w-9,y+11,8,'#ffd23f','left',null,PS);buttons.push({id:'goal:'+act,x,y,w,h:16});}
 // ---- desafio / revanche ----
 function rivalAdd(names,win){save.rivals=(save.rivals||[]).filter(r=>!names.includes(r.n));for(const n of names)save.rivals.unshift({n,t:Date.now(),w:win});save.rivals=save.rivals.slice(0,6);}
 function rematchBtn(x){const o=oppHuman();if(!o)return;const acc=NET.chal&&NET.chal.from===o,sent=NET.chalTo===o&&!acc;btn('rematch',x,224,104,24,acc?'ACEITAR REVANCHE':sent?'PEDIDO ENVIADO':'REVANCHE',acc?'#46d160':sent?'#2e3358':'#c77dff',acc?'#0b0c14':'#ffffff',6);if(sent&&NET.err&&performance.now()-NET.errT<4000)text('esperando o rival…',x+52,258,7,'#c9cbe6','center',null,PS);}
