@@ -101,6 +101,12 @@ Roteiro + checklist para adicionar uma lenda, com base na 2.1 (Nerojor e Cabeça
 - Layout de referência: extrair quadros dos vídeos atuais (`insta/g01_…mp4`, `insta/01_…mp4`) com o ffmpeg depois da instalação, e copiar o formato (tamanho, faixas de texto, duração).
 - Pode exigir um "modo gravação" acionado por parâmetro na URL (ex.: `?gravar=...`) no código do jogo. Se exigir, essa é a única mudança no jogo, e ela não deve aparecer para jogadores normais.
 
+## Descobertas na etapa 1
+
+- Todas as 110 lendas somam 375 nos atributos, em qualquer raridade. É a regra de equilíbrio; `ferramentas/raridade.js` avisa quando uma proposta foge dela.
+- Legendas: o golpe A tem descrição quando o jogo tem uma (mesma regra de B e C); a chamada tem duas variantes ("Conta aqui nos comentários!" é a padrão, "Conta aqui!" é opcional); 6 posts têm uma origem opcional na linha da raridade.
+- Versão também aparece no `hello` do Godot (`godot/scripts/main.gd`).
+
 ## Ordem de trabalho
 
 1. Etapa 1: `.gitignore`, as três skills, textos do Instagram funcionando.
