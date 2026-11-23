@@ -50,3 +50,14 @@ git commit -m "Versão X.Y: resumo"
 Mensagem em português, no padrão do histórico (`git log --oneline`), com a linha `Co-Authored-By` pedida pelo ambiente.
 
 **Pergunte antes de `git push`.** Se estiver num branch, combine o merge em `main` com o usuário. Depois do push: GitHub Pages atualiza em 1–2 minutos; se o servidor mudou, lembrar o redeploy no Render.
+
+## 6. Zip para o itch.io (sempre, sem esperar pedido)
+
+```
+node ferramentas/zip-itch.js
+```
+
+- Gera `DuelLegendsArena_web_vX.Y.zip` na pasta acima do repositório (fora do git), com a versão do README. Se já existir, é substituído.
+- Contém `index.html`, ícones, `manifest.webmanifest` e `privacidade.html`. Para mudar a lista, edite `ARQUIVOS` no script.
+- Ao terminar, diga ao usuário o caminho do zip para ele subir no itch.io.
+- Gere de novo sempre que o jogo mudar depois do zip, mesmo sem versão nova (ex.: correção na mesma versão).
