@@ -1,392 +1,662 @@
 [
  {
   "dia": "2026-11-23",
-  "lenda": {
+  "09:00": {
+   "tipo": "lenda",
    "n": 2,
    "nome": "Iara",
-   "arquivo": "lenda_do_dia_002.jpg",
+   "arquivo": "lenda_002.jpg",
    "legenda": "LENDA DO DIA #2 ✨\n🌊 Lenda nº 37: Iara!\nÉpico · Água\n\nA · Bolha Afiada\nB · Canto Encantador — puxa o oponente\nC · Maré do Rio — onda que atravessa a arena\n\nATQ 60 · DEF 65 · VEL 70 · ESP 100 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Iara? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   },
-  "reels": {
+  "15:00": {
+   "tipo": "video",
    "arquivo": "01_duelo_1x1.mp4",
    "legenda": "⚔️ DUELO 1x1: você contra uma lenda sorteada. Esquive, bloqueie no tempo certo e solte o especial!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 3,
+   "nome": "Zeus",
+   "arquivo": "lenda_003.jpg",
+   "legenda": "LENDA DO DIA #3 ✨\n☀️ Lenda nº 22: Zeus!\nLendário · Luz\n\nA · Faísca Divina\nB · Nuvem de Tempestade — área com dano contínuo\nC · Raio do Olimpo — raio gigante após 1s de mira\n\nATQ 80 · DEF 70 · VEL 60 · ESP 100 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Zeus? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-11-24",
-  "lenda": {
-   "n": 3,
-   "nome": "Mula sem Cabeça",
-   "arquivo": "lenda_do_dia_003.jpg",
-   "legenda": "LENDA DO DIA #3 ✨\n🔥 Lenda nº 39: Mula sem Cabeça!\nComum · Fogo\n\nA · Coice\nB · Galope — investida\nC · Fogo do Pescoço — cone de fogo\n\nATQ 85 · DEF 80 · VEL 80 · ESP 70 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Mula sem Cabeça? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 4,
+   "nome": "Thor",
+   "arquivo": "lenda_004.jpg",
+   "legenda": "LENDA DO DIA #4 ✨\n⚡ Lenda nº 23: Thor!\nÉpico · Elétrico\n\nA · Martelada\nB · Martelo Bumerangue — vai e volta\nC · Fúria do Trovão — raios em volta dele\n\nATQ 95 · DEF 80 · VEL 60 · ESP 85 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Thor? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "02_duplas_2x2.mp4",
-   "legenda": "🤝 DUPLAS 2x2: você e um parceiro contra outra dupla. Quem combina melhor os poderes?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g01_curupira_vs_medusa.mp4",
+   "legenda": "⚔️ Curupira x Medusa! Quem vence essa luta?\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 5,
+   "nome": "Curupira",
+   "arquivo": "lenda_005.jpg",
+   "legenda": "LENDA DO DIA #5 ✨\n🍃 Lenda nº 36: Curupira!\nRaro · Elfo\n\nA · Tacape\nB · Pegadas Falsas — deixa um rastro-isca\nC · Fúria da Mata — raízes prendem o oponente\n\nATQ 75 · DEF 70 · VEL 85 · ESP 75 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Curupira? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   }
  },
  {
   "dia": "2026-11-25",
-  "lenda": {
-   "n": 4,
-   "nome": "Curupira",
-   "arquivo": "lenda_do_dia_004.jpg",
-   "legenda": "LENDA DO DIA #4 ✨\n🍃 Lenda nº 36: Curupira!\nRaro · Elfo\n\nA · Tacape\nB · Pegadas Falsas — deixa um rastro-isca\nC · Fúria da Mata — raízes prendem o oponente\n\nATQ 75 · DEF 70 · VEL 85 · ESP 75 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Curupira? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 6,
+   "nome": "Mula sem Cabeça",
+   "arquivo": "lenda_006.jpg",
+   "legenda": "LENDA DO DIA #6 ✨\n🔥 Lenda nº 39: Mula sem Cabeça!\nComum · Fogo\n\nA · Coice\nB · Galope — investida\nC · Fogo do Pescoço — cone de fogo\n\nATQ 85 · DEF 80 · VEL 80 · ESP 70 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Mula sem Cabeça? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   },
-  "reels": {
-   "arquivo": "03_trios_3x3.mp4",
-   "legenda": "🔺 TRIOS 3x3: três contra três, cada um com uma lenda diferente. Estratégia de time!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g02_boitatá_vs_poseidon.mp4",
+   "legenda": "⚔️ Boitatá x Poseidon! Fogo contra o deus dos mares!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 7,
+   "nome": "Anúbis",
+   "arquivo": "lenda_007.jpg",
+   "legenda": "LENDA DO DIA #7 ✨\n⛰️ Lenda nº 24: Anúbis!\nRaro · Terra\n\nA · Golpe de Cajado\nB · Areias do Tempo — causa lentidão\nC · Julgamento — dano extra se o oponente tiver menos vida\n\nATQ 75 · DEF 70 · VEL 70 · ESP 90 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Anúbis? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-11-26",
-  "lenda": {
-   "n": 5,
-   "nome": "Boitatá",
-   "arquivo": "lenda_do_dia_005.jpg",
-   "legenda": "LENDA DO DIA #5 ✨\n🔥 Lenda nº 38: Boitatá!\nLendário · Fogo\n\nA · Labareda\nB · Rastro de Fogo\nC · Serpente Flamejante — cobra de fogo que persegue\n\nATQ 90 · DEF 75 · VEL 70 · ESP 90 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Boitatá? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 8,
+   "nome": "Medusa",
+   "arquivo": "lenda_008.jpg",
+   "legenda": "LENDA DO DIA #8 ✨\n🌿 Lenda nº 25: Medusa!\nRaro · Natureza\n\nA · Picada de Serpente\nB · Olhar Paralisante — cone curto que atordoa\nC · Petrificação — vira pedra por 2s quem estiver olhando para ela\n\nATQ 65 · DEF 60 · VEL 70 · ESP 95 · ESQ 85\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Medusa? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "04_equipes_5x5.mp4",
-   "legenda": "🔥 EQUIPES 5x5: 10 lendas sorteadas na mesma arena. Veja a grade sendo revelada e o caos começando!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "02_duplas_2x2.mp4",
+   "legenda": "🤝 DUPLAS 2x2: você e um parceiro contra outra dupla. Quem combina melhor os poderes?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 9,
+   "nome": "Boitatá",
+   "arquivo": "lenda_009.jpg",
+   "legenda": "LENDA DO DIA #9 ✨\n🔥 Lenda nº 38: Boitatá!\nLendário · Fogo\n\nA · Labareda\nB · Rastro de Fogo\nC · Serpente Flamejante — cobra de fogo que persegue\n\nATQ 90 · DEF 75 · VEL 70 · ESP 90 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Boitatá? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   }
  },
  {
   "dia": "2026-11-27",
-  "lenda": {
-   "n": 6,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 10,
    "nome": "Cuca",
-   "arquivo": "lenda_do_dia_006.jpg",
-   "legenda": "LENDA DO DIA #6 ✨\n🌑 Lenda nº 17: Cuca!\nLendário · Trevas · Folclore brasileiro\n\nA · Colherada Mágica\nB · Puxão Hipnótico — puxa e atordoa\nC · Pesadelo da Cuca — arremessa destroços pela arena\n\nATQ 90 · DEF 85 · VEL 55 · ESP 95 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Cuca? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+   "arquivo": "lenda_010.jpg",
+   "legenda": "LENDA DO DIA #10 ✨\n🌑 Lenda nº 17: Cuca!\nLendário · Trevas · Folclore brasileiro\n\nA · Colherada Mágica\nB · Puxão Hipnótico — puxa e atordoa\nC · Pesadelo da Cuca — arremessa destroços pela arena\n\nATQ 90 · DEF 85 · VEL 55 · ESP 95 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Cuca? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   },
-  "reels": {
-   "arquivo": "05_todos_contra_todos.mp4",
-   "legenda": "💥 TODOS CONTRA TODOS: 6 lendas, só uma sai de pé. Você aguenta?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g03_mula_sem_cabeça_vs_thor.mp4",
+   "legenda": "⚔️ Mula Sem Cabeça x Thor! Folclore contra mitologia!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 11,
+   "nome": "Sun Wukong",
+   "arquivo": "lenda_011.jpg",
+   "legenda": "LENDA DO DIA #11 ✨\n⛰️ Lenda nº 26: Sun Wukong!\nLendário · Terra\n\nA · Bastão Extensível\nB · Nuvem Voadora — dash longo\nC · 72 Transformações — três clones atacam juntos\n\nATQ 85 · DEF 60 · VEL 90 · ESP 60 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Sun Wukong? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-11-28",
-  "lenda": {
-   "n": 7,
-   "nome": "Boto-Cor-de-Rosa",
-   "arquivo": "lenda_do_dia_007.jpg",
-   "legenda": "LENDA DO DIA #7 ✨\n🌊 Lenda nº 12: Boto-Cor-de-Rosa!\nÉpico · Água · Folclore brasileiro\n\nA · Golpe de Maré — longo alcance\nB · Mergulho do Rio — se lança até uma parede\nC · Encanto da Festa — +velocidade e +ataque por 6s\n\nATQ 90 · DEF 75 · VEL 75 · ESP 70 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Boto-Cor-de-Rosa? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 12,
+   "nome": "Fênix",
+   "arquivo": "lenda_012.jpg",
+   "legenda": "LENDA DO DIA #12 ✨\n🔥 Lenda nº 41: Fênix!\nLendário · Fogo\n\nA · Pena Flamejante — projétil em leque\nB · Asas de Brasa — dash que deixa fogo no chão\nC · Renascer das Cinzas — se cair nos próximos 5s, volta com 30% da vida\n\nATQ 75 · DEF 60 · VEL 80 · ESP 95 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Fênix? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "06_torneio.mp4",
-   "legenda": "🏆 TORNEIO: 16 lendas no mata-mata. Até onde você chega?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g04_iara_vs_fênix.mp4",
+   "legenda": "⚔️ Iara x Fênix! Água apaga fogo? Comenta aí!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 13,
+   "nome": "Boto-Cor-de-Rosa",
+   "arquivo": "lenda_013.jpg",
+   "legenda": "LENDA DO DIA #13 ✨\n🌊 Lenda nº 12: Boto-Cor-de-Rosa!\nÉpico · Água · Folclore brasileiro\n\nA · Golpe de Maré — longo alcance\nB · Mergulho do Rio — se lança até uma parede\nC · Encanto da Festa — +velocidade e +ataque por 6s\n\nATQ 90 · DEF 75 · VEL 75 · ESP 70 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Boto-Cor-de-Rosa? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   }
  },
  {
   "dia": "2026-11-29",
-  "lenda": {
-   "n": 8,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 14,
    "nome": "Mapinguari",
-   "arquivo": "lenda_do_dia_008.jpg",
-   "legenda": "LENDA DO DIA #8 ✨\n⛰️ Lenda nº 7: Mapinguari!\nÉpico · Terra · Folclore brasileiro\n\nA · Patada Esmagadora\nB · Pisada da Floresta — cai em área e atordoa\nC · Fúria da Mata — cresce e dobra o dano por 5s\n\nATQ 100 · DEF 90 · VEL 60 · ESP 70 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Mapinguari? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+   "arquivo": "lenda_014.jpg",
+   "legenda": "LENDA DO DIA #14 ✨\n⛰️ Lenda nº 7: Mapinguari!\nÉpico · Terra · Folclore brasileiro\n\nA · Patada Esmagadora\nB · Pisada da Floresta — cai em área e atordoa\nC · Fúria da Mata — cresce e dobra o dano por 5s\n\nATQ 100 · DEF 90 · VEL 60 · ESP 70 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Mapinguari? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   },
-  "reels": {
-   "arquivo": "07_ranqueada_1_de_3.mp4",
-   "legenda": "🎯 RANQUEADA: aqui você escolhe 1 entre 3 lendas sorteadas. As escolhas aparecem juntas. Suba do Ferro ao Desafiante!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "03_trios_3x3.mp4",
+   "legenda": "🔺 TRIOS 3x3: três contra três, cada um com uma lenda diferente. Estratégia de time!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 15,
+   "nome": "Kraken",
+   "arquivo": "lenda_015.jpg",
+   "legenda": "LENDA DO DIA #15 ✨\n🌊 Lenda nº 47: Kraken!\nÉpico · Água\n\nA · Tentáculo — golpe de longo alcance\nB · Tinta Negra — nuvem que esconde quem está nela\nC · Abraço do Abismo — prende e esmaga\n\nATQ 90 · DEF 95 · VEL 50 · ESP 80 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Kraken? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-11-30",
-  "lenda": {
-   "n": 9,
-   "nome": "Matinta Pereira",
-   "arquivo": "lenda_do_dia_009.jpg",
-   "legenda": "LENDA DO DIA #9 ✨\n⚔️ Lenda nº 4: Matinta Pereira!\nÉpico · Humano · Folclore brasileiro\n\nA · Pena Bumerangue — vai e volta, acerta duas vezes\nB · Assobio Agourento — invisível por 2s\nC · Voo Noturno — some e reaparece atrás do oponente\n\nATQ 70 · DEF 70 · VEL 70 · ESP 70 · ESQ 95\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Matinta Pereira? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 16,
+   "nome": "Poseidon",
+   "arquivo": "lenda_016.jpg",
+   "legenda": "LENDA DO DIA #16 ✨\n🌊 Lenda nº 46: Poseidon!\nLendário · Água\n\nA · Golpe de Tridente\nB · Onda — empurra o oponente\nC · Tsunami — onda gigante que cruza a arena\n\nATQ 85 · DEF 80 · VEL 60 · ESP 95 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Poseidon? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "08_sorteio.mp4",
-   "legenda": "🎲 Você não escolhe o lutador: a arena sorteia! A lenda, o rival e até o elemento da arena.\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g05_cuca_vs_merlin.mp4",
+   "legenda": "⚔️ Cuca x Merlin! Duelo de feiticeiros!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 17,
+   "nome": "Matinta Pereira",
+   "arquivo": "lenda_017.jpg",
+   "legenda": "LENDA DO DIA #17 ✨\n⚔️ Lenda nº 4: Matinta Pereira!\nÉpico · Humano · Folclore brasileiro\n\nA · Pena Bumerangue — vai e volta, acerta duas vezes\nB · Assobio Agourento — invisível por 2s\nC · Voo Noturno — some e reaparece atrás do oponente\n\nATQ 70 · DEF 70 · VEL 70 · ESP 70 · ESQ 95\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Matinta Pereira? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   }
  },
  {
   "dia": "2026-12-01",
-  "lenda": {
-   "n": 10,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 18,
    "nome": "Caipora",
-   "arquivo": "lenda_do_dia_010.jpg",
-   "legenda": "LENDA DO DIA #10 ✨\n🌿 Lenda nº 64: Caipora!\nRaro · Natureza\n\nA · Arco de Caça\nB · Montaria — investida no porco-do-mato\nC · Proteção da Mata — cura e espinhos em volta\n\nATQ 75 · DEF 65 · VEL 85 · ESP 75 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Caipora? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
+   "arquivo": "lenda_018.jpg",
+   "legenda": "LENDA DO DIA #18 ✨\n🌿 Lenda nº 64: Caipora!\nRaro · Natureza\n\nA · Arco de Caça\nB · Montaria — investida no porco-do-mato\nC · Proteção da Mata — cura e espinhos em volta\n\nATQ 75 · DEF 65 · VEL 85 · ESP 75 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Caipora? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   },
-  "reels": {
-   "arquivo": "09_premio_diario.mp4",
-   "legenda": "🎁 PRÊMIO DIÁRIO: entre todo dia. No 7º dia, uma roleta sorteia uma lenda fixa por 24 horas!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g06_folclore_vs_mitologia.mp4",
+   "legenda": "⚔️ Folclore x Mitologia! Saci e Curupira contra o Egito e a Grécia!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 19,
+   "nome": "Raijin",
+   "arquivo": "lenda_019.jpg",
+   "legenda": "LENDA DO DIA #19 ✨\n⚡ Lenda nº 59: Raijin!\nLendário · Elétrico\n\nA · Tambor do Trovão\nB · Relâmpago em Cadeia — pula entre alvos\nC · Fúria de Raijin — raios caem sem parar por 4s\n\nATQ 90 · DEF 70 · VEL 75 · ESP 90 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Raijin? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-02",
-  "lenda": {
-   "n": 11,
-   "nome": "Corpo-Seco",
-   "arquivo": "lenda_do_dia_011.jpg",
-   "legenda": "LENDA DO DIA #11 ✨\n🌑 Lenda nº 13: Corpo-Seco!\nRaro · Trevas · Folclore brasileiro\n\nA · Facão Velho\nB · Corte Seco — onda de energia\nC · Maldição da Terra — sequência de cortes sombrios\n\nATQ 85 · DEF 65 · VEL 80 · ESP 75 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Corpo-Seco? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 20,
+   "nome": "Hades",
+   "arquivo": "lenda_020.jpg",
+   "legenda": "LENDA DO DIA #20 ✨\n🌑 Lenda nº 76: Hades!\nLendário · Trevas\n\nA · Bidente\nB · Cão de Três Cabeças — invoca um ajudante\nC · Portões do Submundo — área que drena vida\n\nATQ 80 · DEF 85 · VEL 55 · ESP 100 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Hades? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "10_especial_e_bonus.mp4",
-   "legenda": "🔴 Viu o anel vermelho? É o especial chegando. Bloqueie na hora certa e pegue o bônus no centro da arena!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "04_equipes_5x5.mp4",
+   "legenda": "🔥 EQUIPES 5x5: 10 lendas sorteadas na mesma arena. Veja a grade sendo revelada e o caos começando!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 21,
+   "nome": "Corpo-Seco",
+   "arquivo": "lenda_021.jpg",
+   "legenda": "LENDA DO DIA #21 ✨\n🌑 Lenda nº 13: Corpo-Seco!\nRaro · Trevas · Folclore brasileiro\n\nA · Facão Velho\nB · Corte Seco — onda de energia\nC · Maldição da Terra — sequência de cortes sombrios\n\nATQ 85 · DEF 65 · VEL 80 · ESP 75 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Corpo-Seco? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   }
  },
  {
   "dia": "2026-12-03",
-  "lenda": {
-   "n": 12,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 22,
    "nome": "Pisadeira",
-   "arquivo": "lenda_do_dia_012.jpg",
-   "legenda": "LENDA DO DIA #12 ✨\n⚔️ Lenda nº 14: Pisadeira!\nComum · Humano · Folclore brasileiro\n\nA · Brasa da Lamparina — quica pelo chão\nB · Pisão — salta e cai em área\nC · Pesadelo — fica enorme por 5s\n\nATQ 70 · DEF 70 · VEL 75 · ESP 75 · ESQ 85\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Pisadeira? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+   "arquivo": "lenda_022.jpg",
+   "legenda": "LENDA DO DIA #22 ✨\n⚔️ Lenda nº 14: Pisadeira!\nComum · Humano · Folclore brasileiro\n\nA · Brasa da Lamparina — quica pelo chão\nB · Pisão — salta e cai em área\nC · Pesadelo — fica enorme por 5s\n\nATQ 70 · DEF 70 · VEL 75 · ESP 75 · ESQ 85\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Pisadeira? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   },
-  "reels": {
-   "arquivo": "01_duelo_1x1.mp4",
-   "legenda": "⚔️ DUELO 1x1: você contra uma lenda sorteada. Esquive, bloqueie no tempo certo e solte o especial!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g07_lobisomem_vs_drácula.mp4",
+   "legenda": "⚔️ Lobisomem x Drácula! Noite de lua cheia!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 23,
+   "nome": "Rá",
+   "arquivo": "lenda_023.jpg",
+   "legenda": "LENDA DO DIA #23 ✨\n☀️ Lenda nº 72: Rá!\nLendário · Luz\n\nA · Raio Solar\nB · Olho de Rá — revela e marca o oponente\nC · Sol do Meio-Dia — área gigante de luz\n\nATQ 85 · DEF 75 · VEL 60 · ESP 100 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Rá? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-04",
-  "lenda": {
-   "n": 13,
-   "nome": "Benzedeira",
-   "arquivo": "lenda_do_dia_013.jpg",
-   "legenda": "LENDA DO DIA #13 ✨\n⚔️ Lenda nº 9: Benzedeira!\nComum · Humano · Cultura popular brasileira\n\nA · Raminho de Arruda\nB · Benzimento — bloqueia o poder B do oponente por 3s\nC · Anjo da Guarda — espírito de luz que empurra e protege\n\nATQ 60 · DEF 60 · VEL 70 · ESP 95 · ESQ 90\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Benzedeira? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 24,
+   "nome": "Hércules",
+   "arquivo": "lenda_024.jpg",
+   "legenda": "LENDA DO DIA #24 ✨\n⚔️ Lenda nº 21: Hércules!\nRaro · Humano\n\nA · Soco Titânico\nB · Arremesso de Rocha\nC · Doze Trabalhos — 12 golpes rápidos seguidos\n\nATQ 100 · DEF 85 · VEL 65 · ESP 60 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Hércules? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "02_duplas_2x2.mp4",
-   "legenda": "🤝 DUPLAS 2x2: você e um parceiro contra outra dupla. Quem combina melhor os poderes?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g08_raijin_vs_zeus.mp4",
+   "legenda": "⚔️ Raijin x Zeus! Quem manda no trovão?\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 25,
+   "nome": "Benzedeira",
+   "arquivo": "lenda_025.jpg",
+   "legenda": "LENDA DO DIA #25 ✨\n⚔️ Lenda nº 9: Benzedeira!\nComum · Humano · Cultura popular brasileira\n\nA · Raminho de Arruda\nB · Benzimento — bloqueia o poder B do oponente por 3s\nC · Anjo da Guarda — espírito de luz que empurra e protege\n\nATQ 60 · DEF 60 · VEL 70 · ESP 95 · ESQ 90\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Benzedeira? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   }
  },
  {
   "dia": "2026-12-05",
-  "lenda": {
-   "n": 14,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 26,
    "nome": "Tatu Trovão",
-   "arquivo": "lenda_do_dia_014.jpg",
-   "legenda": "LENDA DO DIA #14 ✨\n⚡ Lenda nº 10: Tatu Trovão!\nComum · Elétrico · Criação original\n\nA · Choque — faísca de médio alcance\nB · Tatu-Bola — dash rolando que causa dano\nC · Trovoada do Cerrado — raios caem pela arena\n\nATQ 70 · DEF 50 · VEL 95 · ESP 85 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Tatu Trovão? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+   "arquivo": "lenda_026.jpg",
+   "legenda": "LENDA DO DIA #26 ✨\n⚡ Lenda nº 10: Tatu Trovão!\nComum · Elétrico · Criação original\n\nA · Choque — faísca de médio alcance\nB · Tatu-Bola — dash rolando que causa dano\nC · Trovoada do Cerrado — raios caem pela arena\n\nATQ 70 · DEF 50 · VEL 95 · ESP 85 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Tatu Trovão? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "03_trios_3x3.mp4",
-   "legenda": "🔺 TRIOS 3x3: três contra três, cada um com uma lenda diferente. Estratégia de time!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "05_todos_contra_todos.mp4",
+   "legenda": "💥 TODOS CONTRA TODOS: 6 lendas, só uma sai de pé. Você aguenta?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 27,
+   "nome": "Valquíria",
+   "arquivo": "lenda_027.jpg",
+   "legenda": "LENDA DO DIA #27 ✨\n☀️ Lenda nº 3: Valquíria!\nLendário · Luz · Mitologia nórdica\n\nA · Combo de Lança — três golpes curtos\nB · Voo de Valhala — reaparece ao lado do alvo\nC · Lança da Aurora — feixe que fica mais forte quanto mais carrega\n\nATQ 85 · DEF 60 · VEL 75 · ESP 100 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Valquíria? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-06",
-  "lenda": {
-   "n": 15,
-   "nome": "Calango Brasa",
-   "arquivo": "lenda_do_dia_015.jpg",
-   "legenda": "LENDA DO DIA #15 ✨\n🔥 Lenda nº 11: Calango Brasa!\nRaro · Fogo · Criação original\n\nA · Cuspe de Brasa\nB · Rabada — corte em arco\nC · Sol do Sertão — cone de fogo contínuo\n\nATQ 90 · DEF 70 · VEL 70 · ESP 85 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Calango Brasa? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 28,
+   "nome": "Minotauro",
+   "arquivo": "lenda_028.jpg",
+   "legenda": "LENDA DO DIA #28 ✨\n⛰️ Lenda nº 69: Minotauro!\nRaro · Terra\n\nA · Machado\nB · Investida com Chifres\nC · Labirinto — paredes prendem o oponente\n\nATQ 95 · DEF 85 · VEL 70 · ESP 65 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Minotauro? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "04_equipes_5x5.mp4",
-   "legenda": "🔥 EQUIPES 5x5: 10 lendas sorteadas na mesma arena. Veja a grade sendo revelada e o caos começando!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g09_anúbis_vs_hades.mp4",
+   "legenda": "⚔️ Anúbis x Hades! Os senhores do submundo!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 29,
+   "nome": "Calango Brasa",
+   "arquivo": "lenda_029.jpg",
+   "legenda": "LENDA DO DIA #29 ✨\n🔥 Lenda nº 11: Calango Brasa!\nRaro · Fogo · Criação original\n\nA · Cuspe de Brasa\nB · Rabada — corte em arco\nC · Sol do Sertão — cone de fogo contínuo\n\nATQ 90 · DEF 70 · VEL 70 · ESP 85 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Calango Brasa? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-07",
-  "lenda": {
-   "n": 16,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 30,
    "nome": "Ipupiara",
-   "arquivo": "lenda_do_dia_016.jpg",
-   "legenda": "LENDA DO DIA #16 ✨\n🌊 Lenda nº 48: Ipupiara!\nRaro · Água · Folclore brasileiro\n\nA · Mordida\nB · Mergulho — fica submerso e imune por 1s\nC · Frenesi do Mar — ataques mais rápidos por 5s\n\nATQ 95 · DEF 70 · VEL 80 · ESP 55 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Ipupiara? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+   "arquivo": "lenda_030.jpg",
+   "legenda": "LENDA DO DIA #30 ✨\n🌊 Lenda nº 48: Ipupiara!\nRaro · Água · Folclore brasileiro\n\nA · Mordida\nB · Mergulho — fica submerso e imune por 1s\nC · Frenesi do Mar — ataques mais rápidos por 5s\n\nATQ 95 · DEF 70 · VEL 80 · ESP 55 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Ipupiara? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   },
-  "reels": {
-   "arquivo": "05_todos_contra_todos.mp4",
-   "legenda": "💥 TODOS CONTRA TODOS: 6 lendas, só uma sai de pé. Você aguenta?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g10_fogo_vs_gelo.mp4",
+   "legenda": "⚔️ Fogo x Gelo! Time do fogo contra o time do gelo!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 31,
+   "nome": "Atlas",
+   "arquivo": "lenda_031.jpg",
+   "legenda": "LENDA DO DIA #31 ✨\n⛰️ Lenda nº 67: Atlas!\nÉpico · Terra\n\nA · Golpe Titânico\nB · Erguer o Mundo — escudo que bloqueia tudo\nC · Peso do Céu — área que esmaga\n\nATQ 95 · DEF 95 · VEL 55 · ESP 70 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Atlas? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-08",
-  "lenda": {
-   "n": 17,
-   "nome": "Boiúna",
-   "arquivo": "lenda_do_dia_017.jpg",
-   "legenda": "LENDA DO DIA #17 ✨\n🌊 Lenda nº 50: Boiúna!\nComum · Água · Folclore brasileiro\n\nA · Bolha do Rio\nB · Rabo Giratório — golpe em volta\nC · Redemoinho da Boiúna — puxa tudo para o centro\n\nATQ 60 · DEF 65 · VEL 80 · ESP 90 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Boiúna? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 32,
+   "nome": "Apolo",
+   "arquivo": "lenda_032.jpg",
+   "legenda": "LENDA DO DIA #32 ✨\n☀️ Lenda nº 71: Apolo!\nÉpico · Luz\n\nA · Flecha Solar\nB · Lira Curativa — recupera vida\nC · Carruagem do Sol — atravessa a arena queimando\n\nATQ 80 · DEF 65 · VEL 75 · ESP 95 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Apolo? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
+  "15:00": {
+   "tipo": "video",
    "arquivo": "06_torneio.mp4",
    "legenda": "🏆 TORNEIO: 16 lendas no mata-mata. Até onde você chega?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 33,
+   "nome": "Boiúna",
+   "arquivo": "lenda_033.jpg",
+   "legenda": "LENDA DO DIA #33 ✨\n🌊 Lenda nº 50: Boiúna!\nComum · Água · Folclore brasileiro\n\nA · Bolha do Rio\nB · Rabo Giratório — golpe em volta\nC · Redemoinho da Boiúna — puxa tudo para o centro\n\nATQ 60 · DEF 65 · VEL 80 · ESP 90 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Boiúna? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   }
  },
  {
   "dia": "2026-12-09",
-  "lenda": {
-   "n": 18,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 34,
    "nome": "Poraquê",
-   "arquivo": "lenda_do_dia_018.jpg",
-   "legenda": "LENDA DO DIA #18 ✨\n⚡ Lenda nº 60: Poraquê!\nComum · Elétrico\n\nA · Choque\nB · Descarga em Área\nC · Campo Elétrico — zona que causa dano contínuo\n\nATQ 70 · DEF 60 · VEL 80 · ESP 85 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Poraquê? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
+   "arquivo": "lenda_034.jpg",
+   "legenda": "LENDA DO DIA #34 ✨\n⚡ Lenda nº 60: Poraquê!\nComum · Elétrico\n\nA · Choque\nB · Descarga em Área\nC · Campo Elétrico — zona que causa dano contínuo\n\nATQ 70 · DEF 60 · VEL 80 · ESP 85 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Poraquê? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   },
-  "reels": {
-   "arquivo": "07_ranqueada_1_de_3.mp4",
-   "legenda": "🎯 RANQUEADA: aqui você escolhe 1 entre 3 lendas sorteadas. As escolhas aparecem juntas. Suba do Ferro ao Desafiante!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g11_kraken_vs_boiúna.mp4",
+   "legenda": "⚔️ Kraken x Boiúna! Monstros das águas!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 35,
+   "nome": "Esfinge",
+   "arquivo": "lenda_035.jpg",
+   "legenda": "LENDA DO DIA #35 ✨\n🎲 Lenda nº 106: Esfinge!\nÉpico · Neutro\n\nA · Garra\nB · Enigma — bloqueia os poderes do oponente por 2s\nC · Maldição do Enigma — oponente fica lento até acertar um golpe\n\nATQ 75 · DEF 85 · VEL 60 · ESP 90 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Esfinge? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-10",
-  "lenda": {
-   "n": 19,
-   "nome": "Lobisomem",
-   "arquivo": "lenda_do_dia_019.jpg",
-   "legenda": "LENDA DO DIA #19 ✨\n🌑 Lenda nº 40: Lobisomem!\nComum · Trevas\n\nA · Garra\nB · Uivo — reduz o ataque do oponente\nC · Lua Cheia — transforma, +velocidade e +ataque\n\nATQ 95 · DEF 75 · VEL 80 · ESP 50 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Lobisomem? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 36,
+   "nome": "Quimera",
+   "arquivo": "lenda_036.jpg",
+   "legenda": "LENDA DO DIA #36 ✨\n🎲 Lenda nº 107: Quimera!\nLendário · Neutro\n\nA · Mordida Tripla\nB · Sopro Aleatório — fogo, gelo ou veneno\nC · Fúria das Três Cabeças — três ataques ao mesmo tempo\n\nATQ 90 · DEF 80 · VEL 70 · ESP 85 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Quimera? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "08_sorteio.mp4",
-   "legenda": "🎲 Você não escolhe o lutador: a arena sorteia! A lenda, o rival e até o elemento da arena.\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g12_yeti_vs_ifrit.mp4",
+   "legenda": "⚔️ Yeti x Ifrit! Gelo contra fogo puro!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 37,
+   "nome": "Lobisomem",
+   "arquivo": "lenda_037.jpg",
+   "legenda": "LENDA DO DIA #37 ✨\n🌑 Lenda nº 40: Lobisomem!\nComum · Trevas\n\nA · Garra\nB · Uivo — reduz o ataque do oponente\nC · Lua Cheia — transforma, +velocidade e +ataque\n\nATQ 95 · DEF 75 · VEL 80 · ESP 50 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Lobisomem? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   }
  },
  {
   "dia": "2026-12-11",
-  "lenda": {
-   "n": 20,
+  "09:00": {
+   "tipo": "lenda",
+   "n": 38,
    "nome": "Capoeirista",
-   "arquivo": "lenda_do_dia_020.jpg",
-   "legenda": "LENDA DO DIA #20 ✨\n🎲 Lenda nº 101: Capoeirista!\nComum · Neutro · Cultura brasileira\n\nA · Martelo — chute rápido\nB · Meia-Lua de Compasso — acerta em volta\nC · Roda de Capoeira — sequência de 8 golpes\n\nATQ 85 · DEF 70 · VEL 80 · ESP 60 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Capoeirista? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
+   "arquivo": "lenda_038.jpg",
+   "legenda": "LENDA DO DIA #38 ✨\n🎲 Lenda nº 101: Capoeirista!\nComum · Neutro · Cultura brasileira\n\nA · Martelo — chute rápido\nB · Meia-Lua de Compasso — acerta em volta\nC · Roda de Capoeira — sequência de 8 golpes\n\nATQ 85 · DEF 70 · VEL 80 · ESP 60 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Capoeirista? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   },
-  "reels": {
-   "arquivo": "09_premio_diario.mp4",
-   "legenda": "🎁 PRÊMIO DIÁRIO: entre todo dia. No 7º dia, uma roleta sorteia uma lenda fixa por 24 horas!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "07_ranqueada_1_de_3.mp4",
+   "legenda": "🎯 RANQUEADA: aqui você escolhe 1 entre 3 lendas sorteadas. As escolhas aparecem juntas. Suba do Ferro ao Desafiante!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 39,
+   "nome": "Ymir",
+   "arquivo": "lenda_039.jpg",
+   "legenda": "LENDA DO DIA #39 ✨\n❄️ Lenda nº 53: Ymir!\nÉpico · Gelo\n\nA · Pisada Glacial\nB · Muralha de Gelo\nC · Era do Gelo — a arena congela e todos escorregam\n\nATQ 95 · DEF 95 · VEL 50 · ESP 85 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Ymir? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-12",
-  "lenda": {
-   "n": 21,
-   "nome": "Zeus",
-   "arquivo": "lenda_do_dia_021.jpg",
-   "legenda": "LENDA DO DIA #21 ✨\n☀️ Lenda nº 22: Zeus!\nLendário · Luz\n\nA · Faísca Divina\nB · Nuvem de Tempestade — área com dano contínuo\nC · Raio do Olimpo — raio gigante após 1s de mira\n\nATQ 80 · DEF 70 · VEL 60 · ESP 100 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Zeus? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 40,
+   "nome": "Ifrit",
+   "arquivo": "lenda_040.jpg",
+   "legenda": "LENDA DO DIA #40 ✨\n🔥 Lenda nº 42: Ifrit!\nRaro · Fogo\n\nA · Punho de Magma\nB · Coluna de Fogo — pilar que sobe do chão\nC · Erupção — área explosiva em volta\n\nATQ 90 · DEF 75 · VEL 65 · ESP 85 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Ifrit? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "10_especial_e_bonus.mp4",
-   "legenda": "🔴 Viu o anel vermelho? É o especial chegando. Bloqueie na hora certa e pegue o bônus no centro da arena!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g13_sun_wukong_vs_hércules.mp4",
+   "legenda": "⚔️ Sun Wukong x Hércules! O Rei Macaco contra o semideus!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 41,
+   "nome": "Rasga-Mortalha",
+   "arquivo": "lenda_041.jpg",
+   "legenda": "LENDA DO DIA #41 ✨\n🌑 Lenda nº 78: Rasga-Mortalha!\nRaro · Trevas · Folclore brasileiro\n\nA · Bicada Rápida\nB · Revoada Noturna\nC · Mau Agouro — mais dano quanto menos vida tiver\n\nATQ 80 · DEF 60 · VEL 80 · ESP 70 · ESQ 85\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Rasga-Mortalha? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro #culturabrasileira"
   }
  },
  {
   "dia": "2026-12-13",
-  "lenda": {
-   "n": 22,
-   "nome": "Thor",
-   "arquivo": "lenda_do_dia_022.jpg",
-   "legenda": "LENDA DO DIA #22 ✨\n⚡ Lenda nº 23: Thor!\nÉpico · Elétrico\n\nA · Martelada\nB · Martelo Bumerangue — vai e volta\nC · Fúria do Trovão — raios em volta dele\n\nATQ 95 · DEF 80 · VEL 60 · ESP 85 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Thor? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 42,
+   "nome": "Chupa-Cabra",
+   "arquivo": "lenda_042.jpg",
+   "legenda": "LENDA DO DIA #42 ✨\n🦇 Lenda nº 86: Chupa-Cabra!\nRaro · Vampiro\n\nA · Mordida\nB · Salto Noturno\nC · Drenar — suga vida do oponente\n\nATQ 85 · DEF 65 · VEL 85 · ESP 60 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Chupa-Cabra? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #folclorebrasileiro"
   },
-  "reels": {
-   "arquivo": "01_duelo_1x1.mp4",
-   "legenda": "⚔️ DUELO 1x1: você contra uma lenda sorteada. Esquive, bloqueie no tempo certo e solte o especial!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g14_nerojor_vs_minotauro.mp4",
+   "legenda": "⚔️ Nerojor x Minotauro! O cavaleiro entra na arena!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 43,
+   "nome": "Hécate",
+   "arquivo": "lenda_043.jpg",
+   "legenda": "LENDA DO DIA #43 ✨\n🌑 Lenda nº 20: Hécate!\nLendário · Trevas · Mitologia grega\n\nA · Rajada Lunar\nB · Encruzilhada — inverte os controles do oponente por 2s\nC · Noite das Tochas — muda a arena por 6s\n\nATQ 70 · DEF 55 · VEL 70 · ESP 100 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Hécate? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-14",
-  "lenda": {
-   "n": 23,
-   "nome": "Anúbis",
-   "arquivo": "lenda_do_dia_023.jpg",
-   "legenda": "LENDA DO DIA #23 ✨\n⛰️ Lenda nº 24: Anúbis!\nRaro · Terra\n\nA · Golpe de Cajado\nB · Areias do Tempo — causa lentidão\nC · Julgamento — dano extra se o oponente tiver menos vida\n\nATQ 75 · DEF 70 · VEL 70 · ESP 90 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Anúbis? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 44,
+   "nome": "Talos",
+   "arquivo": "lenda_044.jpg",
+   "legenda": "LENDA DO DIA #44 ✨\n⚙️ Lenda nº 97: Talos!\nÉpico · Máquina\n\nA · Punho de Bronze\nB · Arremesso de Rocha\nC · Metal Derretido — poça que queima\n\nATQ 85 · DEF 100 · VEL 55 · ESP 75 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Talos? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "02_duplas_2x2.mp4",
-   "legenda": "🤝 DUPLAS 2x2: você e um parceiro contra outra dupla. Quem combina melhor os poderes?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "08_sorteio.mp4",
+   "legenda": "🎲 Você não escolhe o lutador: a arena sorteia! A lenda, o rival e até o elemento da arena.\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 45,
+   "nome": "Baba Yaga",
+   "arquivo": "lenda_045.jpg",
+   "legenda": "LENDA DO DIA #45 ✨\n🌑 Lenda nº 79: Baba Yaga!\nComum · Trevas\n\nA · Caldeirão — poça venenosa\nB · Casa com Pernas de Galinha — invoca e pisoteia\nC · Maldição — reduz todos os status do oponente\n\nATQ 60 · DEF 65 · VEL 70 · ESP 95 · ESQ 85\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Baba Yaga? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-15",
-  "lenda": {
-   "n": 24,
-   "nome": "Medusa",
-   "arquivo": "lenda_do_dia_024.jpg",
-   "legenda": "LENDA DO DIA #24 ✨\n🌿 Lenda nº 25: Medusa!\nRaro · Natureza\n\nA · Picada de Serpente\nB · Olhar Paralisante — cone curto que atordoa\nC · Petrificação — vira pedra por 2s quem estiver olhando para ela\n\nATQ 65 · DEF 60 · VEL 70 · ESP 95 · ESQ 85\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Medusa? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 46,
+   "nome": "Yuki-Onna",
+   "arquivo": "lenda_046.jpg",
+   "legenda": "LENDA DO DIA #46 ✨\n❄️ Lenda nº 15: Yuki-Onna!\nÉpico · Gelo · Folclore japonês\n\nA · Estilhaço de Gelo\nB · Muro de Neve — bloqueia a passagem\nC · Sopro Eterno — área que congela e causa lentidão\n\nATQ 65 · DEF 75 · VEL 60 · ESP 100 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Yuki-Onna? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "03_trios_3x3.mp4",
-   "legenda": "🔺 TRIOS 3x3: três contra três, cada um com uma lenda diferente. Estratégia de time!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g15_cabeça_de_cuia_vs_iara.mp4",
+   "legenda": "⚔️ Cabeça De Cuia x Iara! Lenda do Piauí contra a Iara!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 47,
+   "nome": "Golem",
+   "arquivo": "lenda_047.jpg",
+   "legenda": "LENDA DO DIA #47 ✨\n⛰️ Lenda nº 66: Golem!\nRaro · Terra\n\nA · Soco de Pedra\nB · Muralha de Pedra\nC · Avalanche de Rochas\n\nATQ 85 · DEF 100 · VEL 50 · ESP 70 · ESQ 70\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Golem? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-16",
-  "lenda": {
-   "n": 25,
-   "nome": "Sun Wukong",
-   "arquivo": "lenda_do_dia_025.jpg",
-   "legenda": "LENDA DO DIA #25 ✨\n⛰️ Lenda nº 26: Sun Wukong!\nLendário · Terra\n\nA · Bastão Extensível\nB · Nuvem Voadora — dash longo\nC · 72 Transformações — três clones atacam juntos\n\nATQ 85 · DEF 60 · VEL 90 · ESP 60 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Sun Wukong? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 48,
+   "nome": "Oberon",
+   "arquivo": "lenda_048.jpg",
+   "legenda": "LENDA DO DIA #48 ✨\n🍃 Lenda nº 88: Oberon!\nÉpico · Elfo\n\nA · Pó de Fada\nB · Sono Encantado — adormece o oponente por 1s\nC · Corte Feérica — fadas atacam em área\n\nATQ 65 · DEF 65 · VEL 75 · ESP 95 · ESQ 75\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Oberon? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "04_equipes_5x5.mp4",
-   "legenda": "🔥 EQUIPES 5x5: 10 lendas sorteadas na mesma arena. Veja a grade sendo revelada e o caos começando!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g16_batalha_vs_elétrica.mp4",
+   "legenda": "⚔️ Batalha x Elétrica! 6 lendas do raio, só uma fica de pé!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 49,
+   "nome": "Kappa",
+   "arquivo": "lenda_049.jpg",
+   "legenda": "LENDA DO DIA #49 ✨\n🌊 Lenda nº 2: Kappa!\nRaro · Água · Folclore japonês\n\nA · Jato d'Água — projétil reto\nB · Fechar o Casco — bloqueia todo dano por 1,5s\nC · Prato Transbordante — dois feixes longos e potentes\n\nATQ 75 · DEF 100 · VEL 50 · ESP 85 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Kappa? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-17",
-  "lenda": {
-   "n": 26,
-   "nome": "Fênix",
-   "arquivo": "lenda_do_dia_026.jpg",
-   "legenda": "LENDA DO DIA #26 ✨\n🔥 Lenda nº 41: Fênix!\nLendário · Fogo\n\nA · Pena Flamejante — projétil em leque\nB · Asas de Brasa — dash que deixa fogo no chão\nC · Renascer das Cinzas — se cair nos próximos 5s, volta com 30% da vida\n\nATQ 75 · DEF 60 · VEL 80 · ESP 95 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Fênix? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 50,
+   "nome": "Tanuki",
+   "arquivo": "lenda_050.jpg",
+   "legenda": "LENDA DO DIA #50 ✨\n🎲 Lenda nº 108: Tanuki!\nRaro · Neutro\n\nA · Folha Cortante\nB · Transformação — vira um objeto e fica imune por 1s\nC · Barriga Tambor — onda de choque em volta\n\nATQ 65 · DEF 70 · VEL 80 · ESP 80 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Tanuki? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "05_todos_contra_todos.mp4",
-   "legenda": "💥 TODOS CONTRA TODOS: 6 lendas, só uma sai de pé. Você aguenta?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "09_premio_diario.mp4",
+   "legenda": "🎁 PRÊMIO DIÁRIO: entre todo dia. No 7º dia, uma roleta sorteia uma lenda fixa por 24 horas!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 51,
+   "nome": "Puck",
+   "arquivo": "lenda_051.jpg",
+   "legenda": "LENDA DO DIA #51 ✨\n🍃 Lenda nº 89: Puck!\nComum · Elfo\n\nA · Travessura\nB · Teleporte Brincalhão\nC · Confusão — cria ilusões de si mesmo\n\nATQ 65 · DEF 55 · VEL 90 · ESP 75 · ESQ 90\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Puck? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-18",
-  "lenda": {
-   "n": 27,
-   "nome": "Kraken",
-   "arquivo": "lenda_do_dia_027.jpg",
-   "legenda": "LENDA DO DIA #27 ✨\n🌊 Lenda nº 47: Kraken!\nÉpico · Água\n\nA · Tentáculo — golpe de longo alcance\nB · Tinta Negra — nuvem que esconde quem está nela\nC · Abraço do Abismo — prende e esmaga\n\nATQ 90 · DEF 95 · VEL 50 · ESP 80 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Kraken? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 52,
+   "nome": "Merlin",
+   "arquivo": "lenda_052.jpg",
+   "legenda": "LENDA DO DIA #52 ✨\n🍃 Lenda nº 29: Merlin!\nRaro · Elfo\n\nA · Orbe Arcano\nB · Teleporte\nC · Metamorfose — vira dragão por 5s\n\nATQ 55 · DEF 60 · VEL 65 · ESP 100 · ESQ 95\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Merlin? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "06_torneio.mp4",
-   "legenda": "🏆 TORNEIO: 16 lendas no mata-mata. Até onde você chega?\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g17_matinta_vs_baba_yaga.mp4",
+   "legenda": "⚔️ Matinta x Baba Yaga! Bruxas de dois continentes!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 53,
+   "nome": "Anansi",
+   "arquivo": "lenda_053.jpg",
+   "legenda": "LENDA DO DIA #53 ✨\n🌿 Lenda nº 8: Anansi!\nRaro · Natureza · Folclore africano\n\nA · Fio de Teia — projétil que causa lentidão\nB · Armadilha de Teia — prende o oponente por 1s\nC · Esperteza de Aranha — esquiva automática + contra-ataque por 4s\n\nATQ 65 · DEF 55 · VEL 85 · ESP 70 · ESQ 100\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Anansi? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-19",
-  "lenda": {
-   "n": 28,
-   "nome": "Poseidon",
-   "arquivo": "lenda_do_dia_028.jpg",
-   "legenda": "LENDA DO DIA #28 ✨\n🌊 Lenda nº 46: Poseidon!\nLendário · Água\n\nA · Golpe de Tridente\nB · Onda — empurra o oponente\nC · Tsunami — onda gigante que cruza a arena\n\nATQ 85 · DEF 80 · VEL 60 · ESP 95 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Poseidon? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 54,
+   "nome": "Huldra",
+   "arquivo": "lenda_054.jpg",
+   "legenda": "LENDA DO DIA #54 ✨\n🍃 Lenda nº 93: Huldra!\nÉpico · Elfo · Folclore nórdico\n\nA · Lâminas de Casca\nB · Névoa da Floresta — fica invisível por 2s\nC · Canto da Mata — corte em área gigante\n\nATQ 85 · DEF 60 · VEL 85 · ESP 85 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Huldra? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "07_ranqueada_1_de_3.mp4",
-   "legenda": "🎯 RANQUEADA: aqui você escolhe 1 entre 3 lendas sorteadas. As escolhas aparecem juntas. Suba do Ferro ao Desafiante!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g18_capoeirista_vs_sun_wukong.mp4",
+   "legenda": "⚔️ Capoeirista x Sun Wukong! Ginga contra kung fu!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 55,
+   "nome": "Rei Arthur",
+   "arquivo": "lenda_055.jpg",
+   "legenda": "LENDA DO DIA #55 ✨\n☀️ Lenda nº 28: Rei Arthur!\nÉpico · Luz\n\nA · Golpe de Espada\nB · Escudo Real — bloqueia dano frontal\nC · Excalibur Desperta — onda de luz\n\nATQ 85 · DEF 90 · VEL 60 · ESP 80 · ESQ 60\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Rei Arthur? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-20",
-  "lenda": {
-   "n": 29,
-   "nome": "Raijin",
-   "arquivo": "lenda_do_dia_029.jpg",
-   "legenda": "LENDA DO DIA #29 ✨\n⚡ Lenda nº 59: Raijin!\nLendário · Elétrico\n\nA · Tambor do Trovão\nB · Relâmpago em Cadeia — pula entre alvos\nC · Fúria de Raijin — raios caem sem parar por 4s\n\nATQ 90 · DEF 70 · VEL 75 · ESP 90 · ESQ 50\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Raijin? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 56,
+   "nome": "Drácula",
+   "arquivo": "lenda_056.jpg",
+   "legenda": "LENDA DO DIA #56 ✨\n🦇 Lenda nº 30: Drácula!\nÉpico · Vampiro\n\nA · Garras\nB · Enxame de Morcegos\nC · Sede de Sangue — cada acerto recupera vida por 6s\n\nATQ 85 · DEF 70 · VEL 75 · ESP 80 · ESQ 65\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Drácula? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "08_sorteio.mp4",
-   "legenda": "🎲 Você não escolhe o lutador: a arena sorteia! A lenda, o rival e até o elemento da arena.\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "10_especial_e_bonus.mp4",
+   "legenda": "🔴 Viu o anel vermelho? É o especial chegando. Bloqueie na hora certa e pegue o bônus no centro da arena!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 57,
+   "nome": "Jiangshi",
+   "arquivo": "lenda_057.jpg",
+   "legenda": "LENDA DO DIA #57 ✨\n🦇 Lenda nº 85: Jiangshi!\nComum · Vampiro · Folclore chinês\n\nA · Golpe Rígido\nB · Talismã — voa e fica difícil de acertar\nC · Sopro Vital — recupera vida\n\nATQ 60 · DEF 75 · VEL 70 · ESP 80 · ESQ 90\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Jiangshi? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-21",
-  "lenda": {
-   "n": 30,
-   "nome": "Hades",
-   "arquivo": "lenda_do_dia_030.jpg",
-   "legenda": "LENDA DO DIA #30 ✨\n🌑 Lenda nº 76: Hades!\nLendário · Trevas\n\nA · Bidente\nB · Cão de Três Cabeças — invoca um ajudante\nC · Portões do Submundo — área que drena vida\n\nATQ 80 · DEF 85 · VEL 55 · ESP 100 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Hades? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 58,
+   "nome": "Snegurochka",
+   "arquivo": "lenda_058.jpg",
+   "legenda": "LENDA DO DIA #58 ✨\n❄️ Lenda nº 54: Snegurochka!\nRaro · Gelo · Folclore russo\n\nA · Floco Cortante\nB · Deslize na Neve — rasteira\nC · Abraço de Inverno — congela quem acertar\n\nATQ 80 · DEF 65 · VEL 80 · ESP 70 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Snegurochka? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "09_premio_diario.mp4",
-   "legenda": "🎁 PRÊMIO DIÁRIO: entre todo dia. No 7º dia, uma roleta sorteia uma lenda fixa por 24 horas!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g19_valquíria_vs_rá.mp4",
+   "legenda": "⚔️ Valquíria x Rá! Asgard contra o Egito!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 59,
+   "nome": "Robin Hood",
+   "arquivo": "lenda_059.jpg",
+   "legenda": "LENDA DO DIA #59 ✨\n🌿 Lenda nº 27: Robin Hood!\nComum · Natureza\n\nA · Flecha\nB · Flecha Tripla\nC · Chuva de Flechas — área grande\n\nATQ 80 · DEF 55 · VEL 80 · ESP 65 · ESQ 95\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Robin Hood? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  },
  {
   "dia": "2026-12-22",
-  "lenda": {
-   "n": 31,
-   "nome": "Rá",
-   "arquivo": "lenda_do_dia_031.jpg",
-   "legenda": "LENDA DO DIA #31 ✨\n☀️ Lenda nº 72: Rá!\nLendário · Luz\n\nA · Raio Solar\nB · Olho de Rá — revela e marca o oponente\nC · Sol do Meio-Dia — área gigante de luz\n\nATQ 85 · DEF 75 · VEL 60 · ESP 100 · ESQ 55\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Rá? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
+  "09:00": {
+   "tipo": "lenda",
+   "n": 60,
+   "nome": "Gênio da Lâmpada",
+   "arquivo": "lenda_060.jpg",
+   "legenda": "LENDA DO DIA #60 ✨\n🔥 Lenda nº 34: Gênio da Lâmpada!\nÉpico · Fogo\n\nA · Fumaça Mágica\nB · Desejo — bônus aleatório\nC · Três Desejos — três efeitos seguidos\n\nATQ 60 · DEF 65 · VEL 70 · ESP 100 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Gênio da Lâmpada? Conta aqui nos comentários! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   },
-  "reels": {
-   "arquivo": "10_especial_e_bonus.mp4",
-   "legenda": "🔴 Viu o anel vermelho? É o especial chegando. Bloqueie na hora certa e pegue o bônus no centro da arena!\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  "15:00": {
+   "tipo": "video",
+   "arquivo": "g20_mapinguari_vs_golem.mp4",
+   "legenda": "⚔️ Mapinguari x Golem! Os gigantes se enfrentam!\nQuem você acha que vence? Comenta aí 👇\n\n🎮 Jogue grátis no navegador: link na bio\n\n#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame #folclorebrasileiro"
+  },
+  "18:00": {
+   "tipo": "lenda",
+   "n": 61,
+   "nome": "Troll da Ponte",
+   "arquivo": "lenda_061.jpg",
+   "legenda": "LENDA DO DIA #61 ✨\n⛰️ Lenda nº 68: Troll da Ponte!\nComum · Terra · Folclore nórdico\n\nA · Pancada\nB · Pedágio da Ponte — cone que atordoa\nC · Rugido da Montanha — empurra todos\n\nATQ 90 · DEF 85 · VEL 60 · ESP 60 · ESQ 80\n\nNo Duel Legends Arena você não escolhe: o lutador é sorteado. Já tirou Troll da Ponte? Conta aqui! 👇\n🎮 Jogue no navegador: link na bio\n\n#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro #mitologia #lendas"
   }
  }
 ]
