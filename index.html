@@ -358,7 +358,7 @@ function musicTick(){if(!AC||!MUSG)return;const want=(state==='fight'||state==='
 function thud(vol,len,freq){if(!AC||!NOISE||!soundOn)return;try{const t=AC.currentTime,s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();s.buffer=NOISE;s.playbackRate.value=0.8+Math.random()*0.4;f.type='lowpass';f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+len);s.connect(f);f.connect(g);g.connect(SFXG);s.start(t);s.stop(t+len+0.02);}catch(e){}}
 function buzz(ms){try{if(save.opt.vib!==false&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function sfx(type){if(type==='hit')thud(0.16,0.09,1400);else if(type==='big')thud(0.28,0.22,900);else if(type==='ko')thud(0.35,0.4,600);if(!AC||!soundOn)return;try{const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(SFXG);
- const S={shoot:['square',520,260,0.05,0.04],hit:['square',180,80,0.08,0.06],big:['sawtooth',120,40,0.25,0.09],dash:['triangle',300,700,0.08,0.05],special:['sawtooth',220,880,0.3,0.06],beep:['square',660,660,0.08,0.05],go:['square',990,990,0.18,0.06],reveal:['triangle',520,1040,0.2,0.06],ko:['sawtooth',400,60,0.6,0.08],win:['triangle',523,1046,0.5,0.07]}[type];
+ const S={shoot:['square',520,260,0.05,0.04],hit:['square',180,80,0.08,0.06],big:['sawtooth',120,40,0.25,0.09],dash:['triangle',300,700,0.08,0.05],special:['sawtooth',220,880,0.3,0.06],beep:['square',660,660,0.08,0.05],go:['square',990,990,0.18,0.06],reveal:['triangle',520,1040,0.2,0.06],ko:['sawtooth',400,60,0.6,0.08],win:['triangle',523,1046,0.5,0.07],nope:['square',196,110,0.16,0.05]}[type];
  if(!S)return;o.type=S[0];const pv=type==='hit'?0.85+Math.random()*0.3:1;o.frequency.setValueAtTime(S[1]*pv,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,S[2]),t+S[3]);g.gain.setValueAtTime(S[4],t);g.gain.exponentialRampToValueAtTime(0.0001,t+S[3]);o.start(t);o.stop(t+S[3]+0.02);}catch(e){}}
 
 // ---------- SAVE ----------
@@ -614,7 +614,7 @@ function askNick(first,then){askText(first?'BEM-VINDO!':'SEU NOME',NET.canRename
   else if(first&&!save.nick){save.nick='Jogador'+Math.floor(Math.random()*900+100);persist();}
   if(then)then();},{max:16,ph:'Ex.: Alisson',check:v=>cleanNick(v).length<3?'Use pelo menos 3 letras ou números.':badName(v)?'Esse nome não é permitido. Escolha outro.':null});}
 function ident(){if(!save.ident||!save.ident.pid){const h=n=>{const a=new Uint8Array(n);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach((v,i)=>a[i]=Math.random()*256|0);return [...a].map(v=>v.toString(16).padStart(2,'0')).join('');};save.ident={pid:h(12),key:h(16)};persist();}return save.ident;}
-function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.5.2',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
+function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.5.3',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
 // ---------- CONTAS (cadastro, login, exclusão) ----------
 let LB={list:[],total:0,me:null,page:0,loading:false,err:''};
 let ACC={msg:'',err:'',busy:false};
@@ -936,7 +936,8 @@ cv.addEventListener('pointerdown',e=>{if(askOpen())return;ensureAudio();activePt
  if(e.button===2){if(state==='fight')mouse.right=true;return;}
  if(e.button===0){if(state==='fight'&&!paused&&!hitUI(p))mouse.down=true;else uiClick(p);}
 });
-cv.addEventListener('pointermove',e=>{const p=toLogical(e);if(e.pointerType==='mouse'){mouse.x=p.x;mouse.y=p.y;}
+cv.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')mouse.out=true;});
+cv.addEventListener('pointermove',e=>{const p=toLogical(e);if(e.pointerType==='mouse'){mouse.x=p.x;mouse.y=p.y;mouse.out=false;isTouch=false;}
  if(touch.joy===e.pointerId){let dx=p.x-touch.joyO.x,dy=p.y-touch.joyO.y;const l=Math.hypot(dx,dy),m=28;if(l>m){dx=dx/l*m;dy=dy/l*m;}touch.joyV={x:dx/m,y:dy/m};}});
 function resetTouch(){touch.joy=null;touch.joyV={x:0,y:0};touch.aHeld=null;touch.blk=null;mouse.down=false;mouse.right=false;activePtrs.clear();}
 function endPtr(e){activePtrs.delete(e.pointerId);if(e.pointerType==='mouse'&&e.button===0)mouse.down=false;if(e.pointerType==='mouse'&&e.button===2)mouse.right=false;if(touch.blk===e.pointerId)touch.blk=null;if(touch.joy===e.pointerId){touch.joy=null;touch.joyV={x:0,y:0};}if(touch.aHeld===e.pointerId)touch.aHeld=null;}
@@ -954,16 +955,25 @@ const ICONS={
  opcoes:['...##...','.#.##.#.','..####..','###..###','###..###','..####..','.#.##.#.','...##...']};
 function icon(n,x,y,col,s){const m=ICONS[n];s=s||2;ctx.fillStyle=col;for(let j=0;j<8;j++)for(let i=0;i<8;i++)if(m[j][i]==='#')ctx.fillRect(x+i*s,y+j*s,s,s);}
 // aba da barra de baixo: ícone + rótulo, bolinha quando há algo para fazer
-function tab(id,x,y,w,h,ic,label,dot){buttons.push({id,x,y,w,h});ctx.fillStyle='#141626';ctx.fillRect(x,y,w,h);icon(ic,Math.round(x+w/2-8),y+5,'#c9cbe6',2);text(label,x+w/2,y+h-6,7,'#ffffff','center');
+function tab(id,x,y,w,h,ic,label,dot){buttons.push({id,x,y,w,h});x+=wiggle(id);ctx.fillStyle='#141626';ctx.fillRect(x,y,w,h);icon(ic,Math.round(x+w/2-8),y+5,'#c9cbe6',2);text(label,x+w/2,y+h-6,7,'#ffffff','center');
  if(dot){ctx.fillStyle='#0b0c14';ctx.fillRect(x+w/2+8,y+3,8,8);ctx.fillStyle='#ff6a6a';ctx.fillRect(x+w/2+9,y+4,6,6);}}
 let buttons=[];
-function btn(id,x,y,w,h,label,col,fg,size){buttons.push({id,x,y,w,h});
+function btn(id,x,y,w,h,label,col,fg,size){buttons.push({id,x,y,w,h});x+=wiggle(id);
  ctx.fillStyle='#0b0c14';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle=col;ctx.fillRect(x,y,w,h);ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(x,y+h-3,w,3);
  text(label,x+w/2,y+h/2+(size||8)/2-1,size||8,fg||'#0b0c14','center',null,PX);}
 function hitUI(p){return buttons.some(b=>p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h);}
 function uiClick(p){let b=null;for(let i=buttons.length-1;i>=0;i--){const q=buttons[i];if(modal&&!String(q.id).startsWith('mod:'))continue;if(p.x>=q.x&&p.x<=q.x+q.w&&p.y>=q.y&&p.y<=q.y+q.h){b=q;break;}}if(b){pressFx={id:b.id,x:b.x,y:b.y,w:b.w,h:b.h,t:performance.now()};onButton(b.id);}}
 // resposta visual do toque: o botão tocado clareia por um instante (com o jogo lento, mostra que o clique chegou)
 let pressFx=null;
+// botão indisponível: som de "não" e balança por um instante
+let nopeFx=null;
+function nope(id){sfx('nope');nopeFx={id,t:performance.now()};pressFx=null;}
+function wiggle(id){if(!nopeFx||nopeFx.id!==id)return 0;const e=(performance.now()-nopeFx.t)/1000;if(e>0.3){nopeFx=null;return 0;}return Math.round(Math.sin(e*60)*3*(1-e/0.3));}
+// mouse em cima de um botão: clareia e o cursor vira mãozinha (deixa claro o que é clicável)
+let curCursor='';
+function setCursor(c){if(c!==curCursor){curCursor=c;cv.style.cursor=c;}}
+function hoverBtn(){if(isTouch||mouse.out)return null;for(let i=buttons.length-1;i>=0;i--){const q=buttons[i];if(modal&&!String(q.id).startsWith('mod:'))continue;if(mouse.x>=q.x&&mouse.x<=q.x+q.w&&mouse.y>=q.y&&mouse.y<=q.y+q.h)return q;}return null;}
+function drawHoverFx(){const b=hoverBtn();setCursor(b?'pointer':'');if(!b)return;ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(b.x+wiggle(b.id),b.y,b.w,b.h);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillRect(b.x+wiggle(b.id),b.y+b.h-1,b.w,1);}
 function drawPressFx(){const f=pressFx;if(!f)return;const a=1-(performance.now()-f.t)/160;if(a<=0){pressFx=null;return;}if(!buttons.some(b=>b.id===f.id&&b.x===f.x&&b.y===f.y))return;ctx.fillStyle=`rgba(255,255,255,${0.4*a})`;ctx.fillRect(f.x,f.y,f.w,f.h);}
 function uiKey(){if(state==='bracket'&&T&&T.alive&&!T.champion){onButton('tfight');return;}if(state==='result'&&G&&G.tour&&resultT>1){onButton('tcont');return;}if(state==='title')onButton('play');else if(state==='draw'&&drawT>5.2)onButton('fight');else if(state==='prep')onButton('ready');else if(state==='result'&&resultT>1)onButton('again');}
 
@@ -1025,7 +1035,7 @@ let MS={spinT:0,spinId:null,msg:''};
 function weightedPick(){const pool=CHARS.map(c=>{const inR=CHARS.filter(x=>x.rar===c.rar).length;const bonus=(1+0.1*gemOf(save.mastery[c.id]||0))*(c.id===weekLegend().id?3:1);return {c,w:RAR[c.rar].p/inR*bonus};});
  let tot=pool.reduce((a,b)=>a+b.w,0),r=Math.random()*tot;for(const p of pool){r-=p.w;if(r<=0)return p.c;}return pool[0].c;}
 // ---------- BOTÕES (o que cada toque faz) ----------
-function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;sfx('beep');// com aviso aberto, só os botões dele funcionam
+function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;if(id.startsWith('gem:')&&!GEM_SHOP){nope(id);return;}sfx('beep');// com aviso aberto, só os botões dele funcionam
  if(id==='again')id=lastMode==='ranked'?'rankgo':lastMode==='online'?'toroom':'m:'+lastMode;
  if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
  if(id.startsWith('m:')){newPick(id.slice(2),false);return;}
@@ -1616,7 +1626,7 @@ function renderAlbum(){const bg=ARENAS[6];bg.bg=bg.bg||buildArena(bg);ctx.drawIm
 // o aviso (modal) bloqueia todos os botões, então precisa aparecer em qualquer tela
 let modalDrawn=false;
 function render(){buttons=[];modalDrawn=false;ctx.setTransform(K,0,0,K,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#0b0c14';ctx.fillRect(0,0,W,H);
- if(state==='title')renderTitle();else if(state==='play')renderPlay();else if(state==='draw')renderDraw();else if(state==='bracket')renderBracket();else if(state==='album')renderAlbum();else if(state==='modes')renderModes();else if(state==='howto')renderHowto();else if(state==='shop')renderShop();else if(state==='bag')renderBag();else if(state==='box')renderBox();else if(state==='pass')renderPass();else if(state==='online')renderOnline();else if(state==='lobby')renderLobby();else if(state==='room')renderRoom();else if(state==='queue')renderQueue();else if(state==='prep')renderPrep();else if(state==='options')renderOptions();else if(state==='rankLobby')renderRankLobby();else if(state==='leader')renderLeader();else if(state==='account')renderAccount();else if(state==='missions')renderMissions();else if(state==='borders')renderBorders();else if(state==='ach')renderAch();else if(state==='icons')renderIcons();else if(state==='profile')renderProfile();else if(state==='streak')renderStreak();else if(state==='seasonEnd')renderSeasonEnd();else{renderGame();if(G&&G.flashT>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(0.55,G.flashT*3)})`;ctx.fillRect(0,0,W,H);G.flashT-=1/60;}if(state==='countdown')renderCountdown();if(state==='result')renderResult();if(paused)renderPause();if(G&&G.tut&&(state==='fight'||state==='countdown'))drawTut();}if(modal&&!modalDrawn)renderModal();drawPressFx();drawAchToast();drawChal();}
+ if(state==='title')renderTitle();else if(state==='play')renderPlay();else if(state==='draw')renderDraw();else if(state==='bracket')renderBracket();else if(state==='album')renderAlbum();else if(state==='modes')renderModes();else if(state==='howto')renderHowto();else if(state==='shop')renderShop();else if(state==='bag')renderBag();else if(state==='box')renderBox();else if(state==='pass')renderPass();else if(state==='online')renderOnline();else if(state==='lobby')renderLobby();else if(state==='room')renderRoom();else if(state==='queue')renderQueue();else if(state==='prep')renderPrep();else if(state==='options')renderOptions();else if(state==='rankLobby')renderRankLobby();else if(state==='leader')renderLeader();else if(state==='account')renderAccount();else if(state==='missions')renderMissions();else if(state==='borders')renderBorders();else if(state==='ach')renderAch();else if(state==='icons')renderIcons();else if(state==='profile')renderProfile();else if(state==='streak')renderStreak();else if(state==='seasonEnd')renderSeasonEnd();else{renderGame();if(G&&G.flashT>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(0.55,G.flashT*3)})`;ctx.fillRect(0,0,W,H);G.flashT-=1/60;}if(state==='countdown')renderCountdown();if(state==='result')renderResult();if(paused)renderPause();if(G&&G.tut&&(state==='fight'||state==='countdown'))drawTut();}if(modal&&!modalDrawn)renderModal();drawHoverFx();drawPressFx();drawAchToast();drawChal();}
 function logo(cx,y,s){const sc=s||1;
  // dado
  ctx.save();ctx.translate(cx-82*sc,y+10*sc);ctx.rotate(-0.2);const d=22*sc;ctx.fillStyle='#0b0c14';ctx.fillRect(-d/2-2,-d/2-2,d+4,d+4);ctx.fillStyle='#ffffff';ctx.fillRect(-d/2,-d/2,d,d);ctx.fillStyle='#c9cbe6';ctx.fillRect(-d/2,d/2-3*sc,d,3*sc);

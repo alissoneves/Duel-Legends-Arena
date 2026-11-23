@@ -1,5 +1,5 @@
 // ---------- BOTÕES (o que cada toque faz) ----------
-function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;sfx('beep');// com aviso aberto, só os botões dele funcionam
+function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;if(id.startsWith('gem:')&&!GEM_SHOP){nope(id);return;}sfx('beep');// com aviso aberto, só os botões dele funcionam
  if(id==='again')id=lastMode==='ranked'?'rankgo':lastMode==='online'?'toroom':'m:'+lastMode;
  if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
  if(id.startsWith('m:')){newPick(id.slice(2),false);return;}

@@ -8,6 +8,7 @@
 | 1.3 | Contas com usuário e senha (scrypt), até 5 aparelhos | 1.3 |
 | 1.4 | Boas-vindas (Criar / Entrar / Sem conta), ranqueada exige conta | 1.3 |
 | 1.5 | Lenda da semana, missões diárias, herói de fim de semana, bordas de elo e temporadas, convite por código, conquistas, tutorial, replay vertical | 1.4 |
+| 2.5.3 | Resposta visual nos botões: com o mouse em cima, o botão clareia e o cursor vira mãozinha (o que não é botão fica com o cursor normal); botão indisponível (Gemas) dá som de "não" e balança | 2.1 |
 | 2.5.2 | Correção: jogador novo podia ficar preso no sorteio (PREPARAR! não respondia) por causa de um aviso aberto que não aparecia na tela; agora os avisos aparecem em qualquer tela e, com aviso aberto, só os botões dele funcionam; botões clareiam por um instante ao serem tocados; subtítulo do sorteio 1x1 não encosta mais nos rótulos | 2.1 |
 | 2.5.1 | Segurança: links com ?server= de fora não trocam mais o servidor (protege login e senha); servidor com páginas internas protegidas por chave, limites de tentativas pelo endereço real, estatísticas só de lendas que existem e, na ranqueada, quem sai no meio perde | 2.1 |
 | 2.5 | Visual mais limpo (unslop) em todas as telas: tela inicial com botão JOGAR e barra de abas (Loja, Coleção, Missões, Perfil), tela JOGAR (Contra Bots / Online), títulos e botões padronizados, plurais certos, coleção mostrando 110 lendas no resultado; imagem nítida na resolução real da tela; sombra e luz nos sprites das lendas | 2.0 |

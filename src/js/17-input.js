@@ -25,7 +25,8 @@ cv.addEventListener('pointerdown',e=>{if(askOpen())return;ensureAudio();activePt
  if(e.button===2){if(state==='fight')mouse.right=true;return;}
  if(e.button===0){if(state==='fight'&&!paused&&!hitUI(p))mouse.down=true;else uiClick(p);}
 });
-cv.addEventListener('pointermove',e=>{const p=toLogical(e);if(e.pointerType==='mouse'){mouse.x=p.x;mouse.y=p.y;}
+cv.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')mouse.out=true;});
+cv.addEventListener('pointermove',e=>{const p=toLogical(e);if(e.pointerType==='mouse'){mouse.x=p.x;mouse.y=p.y;mouse.out=false;isTouch=false;}
  if(touch.joy===e.pointerId){let dx=p.x-touch.joyO.x,dy=p.y-touch.joyO.y;const l=Math.hypot(dx,dy),m=28;if(l>m){dx=dx/l*m;dy=dy/l*m;}touch.joyV={x:dx/m,y:dy/m};}});
 function resetTouch(){touch.joy=null;touch.joyV={x:0,y:0};touch.aHeld=null;touch.blk=null;mouse.down=false;mouse.right=false;activePtrs.clear();}
 function endPtr(e){activePtrs.delete(e.pointerId);if(e.pointerType==='mouse'&&e.button===0)mouse.down=false;if(e.pointerType==='mouse'&&e.button===2)mouse.right=false;if(touch.blk===e.pointerId)touch.blk=null;if(touch.joy===e.pointerId){touch.joy=null;touch.joyV={x:0,y:0};}if(touch.aHeld===e.pointerId)touch.aHeld=null;}
