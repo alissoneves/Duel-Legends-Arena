@@ -5,7 +5,7 @@ class Fighter{
   const m=arenaMod(arena,def.el);this.mod=m;this.st={atk:def.atk*m,def:def.def*m,vel:def.vel*m,esp:def.esp*m,esq:def.esq*m};
   this.guardMax=this.st.def*3;this.guard=this.guardMax;this.blocking=false;this.blockStart=-9;this.guardRegen=0;this.speed=(70+0.7*this.st.vel)*(def.melee?BAL.meleeSpeed:1)*BAL.move;this.dashCd=6-this.st.esq/25;this.ai={strafe:1,strafeT:0,react:0,thinkB:rnd(1,3)};}
 }
-function startMatch(silent){if(!silent)resetTouch();if(!silent)recReset();const a=pick.arena;setWorld(silent?'1x1':(pick.mode||'1x1'));
+function startMatch(silent){if(!silent){resetTouch();fev('f_start',1);}if(!silent)recReset();const a=pick.arena;setWorld(silent?'1x1':(pick.mode||'1x1'));
  G={arena:a,p:new Fighter(pick.me,BX1+(BX2-BX1)*0.3,(BY1+BY2)/2,false,a),b:new Fighter(pick.foe,BX1+(BX2-BX1)*0.7,(BY1+BY2)/2-10,true,a),proj:[],zones:[],parts:[],pops:[],slashes:[],time:120,shake:0,hitstop:0,over:false,koT:0,winner:null,
     zone:{x1:BX1,y1:BY1,x2:BX2,y2:BY2},zt:{x1:BX1,y1:BY1,x2:BX2,y2:BY2},shrinkT:40,pickT:20,pk:null,hz:buildHazards(a),decoys:[]};
  G.p.foe=G.b;G.b.foe=G.p;G.diff=1;G.tour=false;G.p.team=0;G.b.team=1;G.all=[G.p,G.b];

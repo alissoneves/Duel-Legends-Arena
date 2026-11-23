@@ -6,7 +6,7 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '2.1';
+const VERSION = '2.2';
 const MIN_VER = 2.1;   // 110 lendas: versões antigas sorteiam diferente
 const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
@@ -252,6 +252,64 @@ function retPage() {
 <table><tr><th>Dia</th><th>Ativos</th><th>Novos</th><th>D1 dos novos</th><th>D7 dos novos</th><th>Min. por jogador</th><th>Partidas</th></tr>${tr}</table></body></html>`;
 }
 
+// ---------- funil (anônimo): em que etapa os jogadores novos desistem ----------
+// O jogo manda por sendBeacon (POST /ev), mesmo sem estar no online. Uma linha por aparelho, etapa e dia.
+const EVS = new Set(['new', 'open', 'tut', 'tut_skip', 'f_start', 'f_end', 'g5']);
+const fun = new Map();   // 'pid|ev|dia' -> { pid, ev, day, dirty }
+let funLimpo = -1;
+async function funLoad() {
+  if (!useDb) return;
+  try { for (const r of await (await sb('funnel?select=pid,ev,day&day=gte.' + (dayNow() - 60) + '&limit=200000')).json()) fun.set(r.pid + '|' + r.ev + '|' + r.day, { ...r, dirty: false }); console.log('funil: ' + fun.size + ' linhas'); }
+  catch (e) { console.error('funnel (rodou o SQL da tabela funnel?)', e.message); }
+}
+function funAdd(pid, ev) { const d = dayNow(), k = pid + '|' + ev + '|' + d; if (!fun.has(k)) fun.set(k, { pid, ev, day: d, dirty: true }); }
+async function funFlush() {
+  const velho = dayNow() - 60; for (const [k, e] of fun) if (e.day < velho && !e.dirty) fun.delete(k);
+  if (!useDb) return;
+  // a política de privacidade promete no máximo 60 dias: apaga do banco uma vez por dia
+  if (funLimpo !== dayNow()) { funLimpo = dayNow(); sb('funnel?day=lt.' + velho, { method: 'DELETE' }).catch(e => console.error('funnel limpeza', e.message)); }
+  const rows = [...fun.values()].filter(e => e.dirty); if (!rows.length) return;
+  try { await sb('funnel', { method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates' }, body: JSON.stringify(rows.map(e => ({ pid: e.pid, ev: e.ev, day: e.day }))) }); rows.forEach(e => e.dirty = false); }
+  catch (e) { console.error('funFlush', e.message); }
+}
+setInterval(funFlush, 5 * 60000);
+const evHits = new Map();   // limite por endereço: 120 envios a cada 10 min
+setInterval(() => evHits.clear(), 10 * 60000);
+function evReq(req, res) {
+  const fim = code => { res.writeHead(code, { 'access-control-allow-origin': '*' }); res.end(); };
+  const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',').pop().trim();
+  const n = (evHits.get(ip) || 0) + 1; evHits.set(ip, n); if (n > 120) { req.resume(); return fim(429); }
+  let body = '', grande = false;
+  req.on('data', d => { body += d; if (body.length > 8192) { grande = true; req.destroy(); } });
+  req.on('end', () => {
+    if (grande) return;
+    let o; try { o = JSON.parse(body); } catch (e) { return fim(400); }
+    const pid = String(o.p || '');
+    if (!/^[a-f0-9]{16,40}$/.test(pid)) return fim(400);
+    if (EVS.has(o.e)) funAdd(pid, o.e);
+    if (Array.isArray(o.err)) for (const x of o.err.slice(0, 10)) if (x && typeof x === 'object') errAdd(x, '');
+    fim(204);
+  });
+}
+function funPage() {
+  const today = dayNow(), byPid = new Map();
+  for (const e of fun.values()) { let m = byPid.get(e.pid); if (!m) byPid.set(e.pid, m = {}); (m[e.ev] = m[e.ev] || []).push(e.day); }
+  const novos = [...byPid.entries()].filter(([, m]) => m.new).map(([pid, m]) => ({ pid, d: Math.min(...m.new), m }));
+  const tem = (m, ev) => !!m[ev], voltou = (m, d, k) => (m.open || []).includes(d + k);
+  const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+  const dateOf = d => new Date(d * DAYMS + BRT).toISOString().slice(5, 10).split('-').reverse().join('/');
+  const linha = (lab, L, d1ok, d7ok) => { const n = L.length, c = ev => L.filter(x => tem(x.m, ev)).length;
+    const r1 = d1ok ? L.filter(x => x.d + 1 <= today) : [], r7 = d7ok ? L.filter(x => x.d + 7 <= today) : [];
+    return `<tr><td>${lab}</td><td>${n}</td><td>${pct(c('f_start'), n)}</td><td>${pct(c('f_end'), n)}</td><td>${pct(c('g5'), n)}</td><td>${pct(c('tut_skip'), c('tut'))}</td><td>${r1.length ? pct(r1.filter(x => voltou(x.m, x.d, 1)).length, r1.length) : '…'}</td><td>${r7.length ? pct(r7.filter(x => voltou(x.m, x.d, 7)).length, r7.length) : '…'}</td></tr>`; };
+  let tr = linha('<b>Total</b>', novos, true, true);
+  for (let d = today; d > today - 21; d--) { const L = novos.filter(x => x.d === d); if (L.length) tr += linha(dateOf(d), L, true, true); }
+  const abriram = new Set([...fun.values()].filter(e => e.ev === 'open' && e.day === today).map(e => e.pid)).size;
+  return `<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Funil · Duel Legends Arena</title>
+<style>body{font-family:system-ui,sans-serif;background:#0b0c14;color:#e8e8f4;margin:16px}h1{color:#ffd23f;font-size:20px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid #2e3358;text-align:left}th{color:#ffd23f;background:#141626}p{color:#c9cbe6;font-size:13px}</style></head>
+<body><h1>Funil de jogadores novos</h1><p>Conta todos os aparelhos novos, com ou sem online (desde a versão 2.5.4). Hoje ${abriram} aparelho(s) abriram o jogo. Cada linha é o grupo que abriu o jogo pela primeira vez naquele dia; as porcentagens são desse grupo.</p>
+<table><tr><th>Primeiro dia</th><th>Novos</th><th>Começou a 1ª luta</th><th>Terminou a 1ª</th><th>Chegou à 5ª</th><th>Pulou o tutorial</th><th>Voltou no dia seguinte</th><th>Voltou após 7 dias</th></tr>${tr}</table></body></html>`;
+}
+
 // ---------- contas (usuário e senha) ----------
 const USER_RE = /^[a-z0-9_.]{3,16}$/;
 function hashPass(pass, salt) { salt = salt || crypto.randomBytes(16).toString('hex'); return salt + ':' + crypto.scryptSync(String(pass), salt, 32).toString('hex'); }
@@ -301,7 +359,8 @@ async function deleteAccount(c, pass) {
   }
   p.deleted = true; players.delete(p.pid); topCache = null;
   for (const k of [...act.keys()]) if (k.startsWith(p.pid + '|')) act.delete(k);
-  if (useDb) { await sb('players?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }); await sb('activity?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }); }
+  for (const k of [...fun.keys()]) if (k.startsWith(p.pid + '|')) fun.delete(k);
+  if (useDb) { await sb('players?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }); await sb('activity?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }); await sb('funnel?pid=eq.' + encodeURIComponent(p.pid), { method: 'DELETE' }).catch(e => console.error('funnel delete', e.message)); }
   for (const o of clients.values()) if (o.player === p) { o.player = null; if (o !== c) send(o, { t: 'auth', expired: true }); }
   console.log('conta excluída', p.login || '(sem login)');
   send(c, { t: 'auth', ok: 'deleted' });
@@ -679,6 +738,8 @@ function handle(c, m) {
 
 // ---------- HTTP + upgrade ----------
 const server = http.createServer((req, res) => {
+  if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'POST', 'access-control-allow-headers': 'content-type' }); res.end(); return; }
+  if (req.method === 'POST' && req.url.split('?')[0] === '/ev') { evReq(req, res); return; }
   if (req.url === '/status') {
     res.writeHead(200, { 'content-type': 'application/json', 'access-control-allow-origin': '*' });
     res.end(JSON.stringify({ ok: true, ver: VERSION, players: clients.size, rooms: rooms.size, db: useDb }));
@@ -686,7 +747,7 @@ const server = http.createServer((req, res) => {
   }
   // páginas internas: só com ?k=<ADMIN_KEY> (variável no Render). Sem a variável, ficam desligadas.
   const rota = req.url.split('?')[0];
-  if (['/erros', '/retencao', '/balanceamento'].includes(rota)) {
+  if (['/erros', '/retencao', '/balanceamento', '/funil'].includes(rota)) {
     const k = new URL(req.url, 'http://x').searchParams.get('k') || '';
     const ADMIN = process.env.ADMIN_KEY || '';
     const kb = Buffer.from(k), ab = Buffer.from(ADMIN);
@@ -701,6 +762,7 @@ const server = http.createServer((req, res) => {
     actFlush().finally(() => { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(retPage()); });
     return;
   }
+  if (rota === '/funil') { funFlush().finally(() => { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(funPage()); }); return; }
   if (req.url.split('?')[0] === '/balanceamento') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(balPage());
@@ -729,5 +791,5 @@ setInterval(() => {
     try { c.sock.write(Buffer.from([0x89, 0])); } catch (e) { close(c); }
   }
 }, 30000);
-server.listen(PORT, () => { console.log(`Duel Legends Arena — servidor v${VERSION} na porta ${PORT}`); balLoad(); actLoad(); errLoad(); });
-process.on('SIGTERM', () => { Promise.all([balFlush(), actFlush(), errFlush()]).finally(() => process.exit(0)); });
+server.listen(PORT, () => { console.log(`Duel Legends Arena — servidor v${VERSION} na porta ${PORT}`); balLoad(); actLoad(); errLoad(); funLoad(); });
+process.on('SIGTERM', () => { Promise.all([balFlush(), actFlush(), errFlush(), funFlush()]).finally(() => process.exit(0)); });

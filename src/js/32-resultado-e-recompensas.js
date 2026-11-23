@@ -1,5 +1,5 @@
 // ---------- RESULTADO E RECOMPENSAS ----------
-function finishResult(){const win=G.winner.team===G.p.team,id=G.p.def.id;const before=save.mastery[id]||0;const gain=win?(G.ffa?15:pick.ranked?12:10):3;save.mastery[id]=before+gain;save.games++;if(win)save.wins++;
+function finishResult(){const win=G.winner.team===G.p.team,id=G.p.def.id;const before=save.mastery[id]||0;const gain=win?(G.ffa?15:pick.ranked?12:10):3;save.mastery[id]=before+gain;save.games++;fev('f_end',1);if(save.games>=5)fev('g5',1);if(win)save.wins++;
  let rk=null;if(pick.ranked&&!G.tour){if(pick.online&&NET.status==='on'){rk={pending:true,d:0};NET.rkPending=rk;netSend({t:'rres',win});}else rk=rankedResult(win);}
  const mode=G.tour?'Torneio · '+ROUNDS[T.r]:pick.ranked?'Ranqueada':pick.online?'Online · '+MODES[pick.mode||'1x1'].lab:MODES[pick.mode||'1x1'].lab;const opp=G.ffa?(G.all.length-1)+' rivais':isMulti()?pick.foes.map(c=>c.name).join(', '):pick.foe.name;
  save.hist=save.hist||[];save.hist.unshift({m:mode,c:id,o:opp,w:win,t:Date.now(),g:gain,r:rk&&!rk.placement?rk.d:null});if(save.hist.length>30)save.hist.length=30;persist();

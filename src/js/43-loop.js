@@ -1,6 +1,8 @@
 // ---------- LOOP ----------
 let last=performance.now();
-function loop(now){try{musicTick();}catch(e){}if(window.__frozen){last=now;requestAnimationFrame(loop);return;}const dt=Math.min(0.05,(now-last)/1000);last=now;try{update(dt);render();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+let lentoT=0,perfOk=0;
+function perfWatch(ms){if(document.hidden||ms>250)return;if(ms>25){lentoT+=ms;perfOk=0;}else if(++perfOk>120)lentoT=0;if(lentoT>3000&&K>2.01){kMax=Math.max(2,Math.floor(K-0.01));lentoT=0;fit();}}
+function loop(now){try{musicTick();}catch(e){}if(window.__frozen){last=now;requestAnimationFrame(loop);return;}const dt=Math.min(0.05,(now-last)/1000);perfWatch(now-last);last=now;try{update(dt);render();}catch(e){console.error(e);}requestAnimationFrame(loop);}
 const ready=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load(`8px ${PX}`),document.fonts.load(`10px ${PS}`)]),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
 ready.then(()=>requestAnimationFrame(loop));
 // instalar como app (só na página própria)

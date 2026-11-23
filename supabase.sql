@@ -54,3 +54,12 @@ alter table client_errors enable row level security;
 
 -- para ver as denúncias mais recentes:
 -- select at, reporter_name, target_name, reason from reports order by at desc limit 50;
+
+-- v2.5.4: funil anônimo (em que etapa os jogadores novos desistem)
+create table if not exists funnel (
+  pid text not null,
+  ev text not null,
+  day int not null,
+  primary key (pid, ev, day)
+);
+alter table funnel enable row level security;

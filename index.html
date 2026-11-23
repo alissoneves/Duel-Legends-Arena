@@ -44,7 +44,9 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 // K = pixels reais por pixel do jogo. Inteiro quando possível (pixels iguais); fracionário só se o inteiro encolher a tela mais de 15%.
 let K=1;
-function fit(){const dpr=window.devicePixelRatio||1,dMax=Math.min(innerWidth/W,innerHeight/H)*dpr,kI=Math.floor(dMax);let d=kI>=1&&kI/dMax>=0.85?kI:dMax;d=Math.max(1,Math.min(6,d));
+// resolução adaptativa: kMax desce um degrau quando o jogo fica lento (aparelho fraco ou tela 4K)
+let kMax=6;
+function fit(){const dpr=window.devicePixelRatio||1,dMax=Math.min(innerWidth/W,innerHeight/H)*dpr,kI=Math.floor(dMax);let d=kI>=1&&kI/dMax>=0.85?kI:dMax;d=Math.max(1,Math.min(kMax,d));
  const bw=Math.round(W*d),bh=Math.round(H*d);if(cv.width!==bw||cv.height!==bh){cv.width=bw;cv.height=bh;}K=bw/W;ctx.imageSmoothingEnabled=false;cv.style.width=(bw/dpr)+'px';cv.style.height=(bh/dpr)+'px';}
 addEventListener('resize',fit);fit();
 const PX='"Press Start 2P", monospace', PS='"Pixelify Sans", sans-serif';
@@ -614,7 +616,22 @@ function askNick(first,then){askText(first?'BEM-VINDO!':'SEU NOME',NET.canRename
   else if(first&&!save.nick){save.nick='Jogador'+Math.floor(Math.random()*900+100);persist();}
   if(then)then();},{max:16,ph:'Ex.: Alisson',check:v=>cleanNick(v).length<3?'Use pelo menos 3 letras ou números.':badName(v)?'Esse nome não é permitido. Escolha outro.':null});}
 function ident(){if(!save.ident||!save.ident.pid){const h=n=>{const a=new Uint8Array(n);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach((v,i)=>a[i]=Math.random()*256|0);return [...a].map(v=>v.toString(16).padStart(2,'0')).join('');};save.ident={pid:h(12),key:h(16)};persist();}return save.ident;}
-function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.5.3',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
+function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.5.4',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
+// ---------- FUNIL (anônimo): em que etapa os jogadores novos desistem ----------
+// Etapas: abriu o jogo (por dia), jogador novo, começou/terminou a 1ª luta, 5ª partida, tutorial.
+// Vai por sendBeacon: funciona sem o online ligado e não atrasa o jogo. Só o identificador aleatório do aparelho.
+function evUrl(){return serverUrl().replace(/^ws/,'http').replace(/\/+$/,'')+'/ev';}
+function evSend(o){try{const b=JSON.stringify(Object.assign({p:ident().pid},o));if(navigator.sendBeacon&&navigator.sendBeacon(evUrl(),b))return;fetch(evUrl(),{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(()=>{});}catch(x){}}
+function hojeBR(){return new Date(Date.now()-3*3600e3).toISOString().slice(0,10);}
+// once: só uma vez na vida do aparelho; sem once: uma vez por dia
+function fev(e,once){try{save.fev=save.fev||{};if(once?save.fev[e]:save.fev[e]===hojeBR())return;save.fev[e]=once?1:hojeBR();persist();evSend({e});}catch(x){}}
+(function funilInicio(){try{save.fev=save.fev||{};
+ // quem já jogava antes do funil existir não conta como jogador novo nem como "1ª luta"
+ if(!save.fev.new){if((save.games||0)>0){save.fev.new='antigo';save.fev.f_start=1;save.fev.f_end=1;if(save.games>=5)save.fev.g5=1;persist();}else fev('new',1);}
+ fev('open');}catch(x){}})();
+// erros de quem nunca entra no online também chegam (ao sair ou esconder a aba)
+addEventListener('visibilitychange',()=>{try{if(document.hidden&&ERRQ.length&&NET.status!=='on')evSend({err:ERRQ.splice(0)});}catch(x){}});
+
 // ---------- CONTAS (cadastro, login, exclusão) ----------
 let LB={list:[],total:0,me:null,page:0,loading:false,err:''};
 let ACC={msg:'',err:'',busy:false};
@@ -1037,7 +1054,7 @@ function weightedPick(){const pool=CHARS.map(c=>{const inR=CHARS.filter(x=>x.rar
 // ---------- BOTÕES (o que cada toque faz) ----------
 function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;if(id.startsWith('gem:')&&!GEM_SHOP){nope(id);return;}sfx('beep');// com aviso aberto, só os botões dele funcionam
  if(id==='again')id=lastMode==='ranked'?'rankgo':lastMode==='online'?'toroom':'m:'+lastMode;
- if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
+ if((id==='jogar'||id==='play'&&state==='title')&&!save.tutAsked&&!(save.games>0)){save.tutAsked=true;save.howto=true;persist();startTutorial();return;}if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
  if(id.startsWith('m:')){newPick(id.slice(2),false);return;}
  if(id==='ranked'){if(!save.user){modal={title:'RANQUEADA',lines:['Para jogar a ranqueada, crie uma conta.','Assim seu elo fica salvo e ninguém consegue trapacear.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],['mod:x','AGORA NÃO','#c9cbe6']]};return;}state='rankLobby';if(NET.status!=='on')netConnect();return;}
  if(id==='rankgo'){if(!save.user){onButton('ranked');return;}if(NET.status!=='on'){netConnect();NET.err='Conectando ao servidor… toque de novo em instantes.';NET.errT=performance.now();return;}NET.on=false;NET.role=null;NET.rankQ=true;netSend({t:'rankqueue',mmr:save.rank.mmr});return;}
@@ -1053,7 +1070,7 @@ function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;if(id.star
  if(id.startsWith('rep:')){REPT=+id.slice(4);const q=NET.room&&NET.room.slots.find(x=>x&&x.pid===REPT);modal={title:'DENUNCIAR '+(q?q.name:'JOGADOR'),lines:['Qual é o problema?','Denúncias falsas podem bloquear a sua conta.'],btns:[['mod:rep:nome','NOME','#ff9a9a'],['mod:rep:trapaca','TRAPAÇA','#ff9a9a'],['mod:rep:comport','ATITUDE','#ff9a9a'],['mod:x','CANCELAR','#c9cbe6']]};return;}
  if(id==='repopp'){const o=(NET.start&&NET.start.slots||[]).filter(x=>x&&!x.bot&&x.pid!==NET.id);if(o.length===1)onButton('rep:'+o[0].pid);return;}
  if(id==='replay'){recExport();return;}
- if(id==='tutskip'){if(G&&G.tut){G.tut.step=TUT.length-1;TUT[TUT.length-1].go();}return;}
+ if(id==='tutskip'){fev('tut_skip',1);if(G&&G.tut){G.tut.step=TUT.length-1;TUT[TUT.length-1].go();}return;}
  if(id==='tutstart'){startTutorial();return;}
  if(id==='invite'){inviteFriend();return;}
  if(id==='joincode'){askText('ENTRAR COM CÓDIGO','Digite o código da sala que seu amigo mandou.','',v=>{if(v)netSend({t:'joincode',code:v});},{max:8,ph:'ex.: K7Q2X'});return;}
@@ -1172,7 +1189,7 @@ class Fighter{
   const m=arenaMod(arena,def.el);this.mod=m;this.st={atk:def.atk*m,def:def.def*m,vel:def.vel*m,esp:def.esp*m,esq:def.esq*m};
   this.guardMax=this.st.def*3;this.guard=this.guardMax;this.blocking=false;this.blockStart=-9;this.guardRegen=0;this.speed=(70+0.7*this.st.vel)*(def.melee?BAL.meleeSpeed:1)*BAL.move;this.dashCd=6-this.st.esq/25;this.ai={strafe:1,strafeT:0,react:0,thinkB:rnd(1,3)};}
 }
-function startMatch(silent){if(!silent)resetTouch();if(!silent)recReset();const a=pick.arena;setWorld(silent?'1x1':(pick.mode||'1x1'));
+function startMatch(silent){if(!silent){resetTouch();fev('f_start',1);}if(!silent)recReset();const a=pick.arena;setWorld(silent?'1x1':(pick.mode||'1x1'));
  G={arena:a,p:new Fighter(pick.me,BX1+(BX2-BX1)*0.3,(BY1+BY2)/2,false,a),b:new Fighter(pick.foe,BX1+(BX2-BX1)*0.7,(BY1+BY2)/2-10,true,a),proj:[],zones:[],parts:[],pops:[],slashes:[],time:120,shake:0,hitstop:0,over:false,koT:0,winner:null,
     zone:{x1:BX1,y1:BY1,x2:BX2,y2:BY2},zt:{x1:BX1,y1:BY1,x2:BX2,y2:BY2},shrinkT:40,pickT:20,pk:null,hz:buildHazards(a),decoys:[]};
  G.p.foe=G.b;G.b.foe=G.p;G.diff=1;G.tour=false;G.p.team=0;G.b.team=1;G.all=[G.p,G.b];
@@ -1466,7 +1483,7 @@ const TUT=[
  {t:'Especial (C)',d:()=>isTouch?'A barra encheu! Toque em C':'A barra encheu! Aperte Q',ok:T=>T.c>=1,go:()=>{G.p.charge=100;}},
  {t:'Agora derrote o rival!',d:()=>'Use tudo o que aprendeu',ok:()=>false,go:()=>{G.b.dummy=false;G.b.hp=Math.min(G.b.hp,350);G.time=60;}},
 ];
-function startTutorial(){const me=CHARS.find(c=>c.id==='saci')||CHARS[0],foe=CHARS.find(c=>c.name==='Golem')||CHARS[1];const arena=ARENAS.find(a=>a.id==='coliseu')||ARENAS[0];arena.bg=arena.bg||buildArena(arena);
+function startTutorial(){fev('tut',1);const me=CHARS.find(c=>c.id==='saci')||CHARS[0],foe=CHARS.find(c=>c.name==='Golem')||CHARS[1];const arena=ARENAS.find(a=>a.id==='coliseu')||ARENAS[0];arena.bg=arena.bg||buildArena(arena);
  pick={me,allies:[],foes:[foe],foe,arena,mode:'1x1',ranked:false,tut:true};lastMode='1x1';startMatch();
  G.tut={step:0,a:0,b:0,c:0,dash:0,blk:0,sx:G.p.x,sy:G.p.y,okT:0};G.tips.on=false;G.b.dummy=true;G.time=999;G.shrinkT=99999;cdT=1;}
 function tutEv(f,k){if(G&&G.tut&&f===G.p)G.tut[k]=(G.tut[k]||0)+1;}
@@ -1474,10 +1491,11 @@ function updateTut(dt){const T=G.tut,S=TUT[T.step];if(!S)return;if(G.p.blocking)
  if(T.okT>0){T.okT-=dt;if(T.okT<=0){T.step++;const N=TUT[T.step];if(N&&N.go)N.go();T.sx=G.p.x;T.sy=G.p.y;}return;}
  if(S.ok(T)){T.okT=0.7;sfx('go');popup(G.p.x,G.p.y-40,'BOA!','#8ef0a0','',8);}}
 function drawTut(){const T=G.tut;if(!T||G.over)return;const S=TUT[Math.min(T.step,TUT.length-1)];
- ctx.fillStyle='rgba(11,12,20,0.85)';ctx.fillRect(W/2-120,40,240,34);ctx.strokeStyle='#ffd23f';ctx.lineWidth=1.5;ctx.strokeRect(W/2-120,40,240,34);
- text(`TUTORIAL ${Math.min(T.step+1,TUT.length)}/${TUT.length} · ${S.t}`,W/2,52,7,T.okT>0?'#8ef0a0':'#ffd23f','center');text(S.d(),W/2,66,8,'#ffffff','center',null,PS);
+ ctx.fillStyle='rgba(11,12,20,0.85)';ctx.fillRect(W/2-150,40,300,34);ctx.strokeStyle='#ffd23f';ctx.lineWidth=1.5;ctx.strokeRect(W/2-150,40,300,34);
+ const tt=`TUTORIAL ${Math.min(T.step+1,TUT.length)}/${TUT.length} · ${S.t}`;let ts=7;ctx.font=`${ts}px ${PX}`;const tw=ctx.measureText(tr(tt)).width;if(tw>288)ts=Math.max(5,Math.floor(7*288/tw));// o texto cabe na caixa em qualquer idioma
+ text(tt,W/2,52,ts,T.okT>0?'#8ef0a0':'#ffd23f','center');text(S.d(),W/2,66,8,'#ffffff','center',null,PS);
  for(let i=0;i<TUT.length;i++){ctx.fillStyle=i<T.step?'#8ef0a0':i===T.step?'#ffd23f':'#3a3f66';ctx.fillRect(W/2-46+i*14,77,10,3);}
- btn('tutskip',W/2+124,44,40,14,'PULAR','#2e3358','#ffffff',5);}
+ btn('tutskip',W/2+156,44,40,14,'PULAR','#2e3358','#ffffff',5);}
 // ---------- ATUALIZAÇÃO DA PARTIDA ----------
 function update(dt){
  time+=dt;
@@ -1545,7 +1563,7 @@ function updateTips(dt){const T2=G.tips;if(!T2||!T2.on)return;const p=G.p,ft=(G.
  if(G.zt.x1>BX1+1)tip('zone','A arena está fechando: fique longe da área vermelha');
  if(!T2.cur&&T2.q.length)T2.cur=T2.q.shift();if(T2.cur){T2.cur.t+=dt;if(T2.cur.t>3.6)T2.cur=null;}}
 // ---------- RESULTADO E RECOMPENSAS ----------
-function finishResult(){const win=G.winner.team===G.p.team,id=G.p.def.id;const before=save.mastery[id]||0;const gain=win?(G.ffa?15:pick.ranked?12:10):3;save.mastery[id]=before+gain;save.games++;if(win)save.wins++;
+function finishResult(){const win=G.winner.team===G.p.team,id=G.p.def.id;const before=save.mastery[id]||0;const gain=win?(G.ffa?15:pick.ranked?12:10):3;save.mastery[id]=before+gain;save.games++;fev('f_end',1);if(save.games>=5)fev('g5',1);if(win)save.wins++;
  let rk=null;if(pick.ranked&&!G.tour){if(pick.online&&NET.status==='on'){rk={pending:true,d:0};NET.rkPending=rk;netSend({t:'rres',win});}else rk=rankedResult(win);}
  const mode=G.tour?'Torneio · '+ROUNDS[T.r]:pick.ranked?'Ranqueada':pick.online?'Online · '+MODES[pick.mode||'1x1'].lab:MODES[pick.mode||'1x1'].lab;const opp=G.ffa?(G.all.length-1)+' rivais':isMulti()?pick.foes.map(c=>c.name).join(', '):pick.foe.name;
  save.hist=save.hist||[];save.hist.unshift({m:mode,c:id,o:opp,w:win,t:Date.now(),g:gain,r:rk&&!rk.placement?rk.d:null});if(save.hist.length>30)save.hist.length=30;persist();
@@ -1844,7 +1862,7 @@ function renderTitle(){if(!titleArena){titleArena=ARENAS[0];titleArena.bg=titleA
   const T=[['shop','loja','LOJA',false],['album','colecao','COLEÇÃO',false],['missions','missoes',`MISSÕES ${missToday().list.filter(m=>m.p>=m.n).length}/3`,n>0],['profile','perfil','PERFIL',false]];
   const w=Math.floor((W-2*(T.length+1))/T.length);T.forEach((t,i)=>tab(t[0],2+i*(w+2),y,w,h,t[1],t[2],t[3]));}
  if(!modal&&save.tutDone&&streakInfo().can&&SK.shown!==dayIdx()){SK.shown=dayIdx();SK.spinT=0;SK.msg='';state='streak';}
- if(!save.user&&!save.accAsked&&!modal){save.accAsked=true;save.nickAsked=true;persist();modal={title:save.nick?'NOVIDADE: CONTAS!':'BEM-VINDO À ARENA!',lines:['Com uma conta, seu elo e seu ranking ficam salvos','e você joga com eles em qualquer aparelho.','A conta é obrigatória só na Ranqueada.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],[save.nick?'mod:x':'mod:nick','SEM CONTA','#c9cbe6']]};}
+ if(!save.user&&!save.accAsked&&!modal&&(save.games||0)>=1){save.accAsked=true;save.nickAsked=true;persist();modal={title:save.nick?'NOVIDADE: CONTAS!':'BEM-VINDO À ARENA!',lines:['Com uma conta, seu elo e seu ranking ficam salvos','e você joga com eles em qualquer aparelho.','A conta é obrigatória só na Ranqueada.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],[save.nick?'mod:x':'mod:nick','SEM CONTA','#c9cbe6']]};}
  renderModal();}
 // ---------- TELAS DO SORTEIO ----------
 function card(c,x,y,w,h,showStats){const rc=RAR[c.rar].col;ctx.fillStyle='#0b0c14';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle='#141626';ctx.fillRect(x,y,w,h);ctx.strokeStyle=rc;ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,h-2);
@@ -2139,7 +2157,9 @@ function renderPause(){ctx.fillStyle='rgba(11,12,20,0.75)';ctx.fillRect(0,0,W,H)
 
 // ---------- LOOP ----------
 let last=performance.now();
-function loop(now){try{musicTick();}catch(e){}if(window.__frozen){last=now;requestAnimationFrame(loop);return;}const dt=Math.min(0.05,(now-last)/1000);last=now;try{update(dt);render();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+let lentoT=0,perfOk=0;
+function perfWatch(ms){if(document.hidden||ms>250)return;if(ms>25){lentoT+=ms;perfOk=0;}else if(++perfOk>120)lentoT=0;if(lentoT>3000&&K>2.01){kMax=Math.max(2,Math.floor(K-0.01));lentoT=0;fit();}}
+function loop(now){try{musicTick();}catch(e){}if(window.__frozen){last=now;requestAnimationFrame(loop);return;}const dt=Math.min(0.05,(now-last)/1000);perfWatch(now-last);last=now;try{update(dt);render();}catch(e){console.error(e);}requestAnimationFrame(loop);}
 const ready=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load(`8px ${PX}`),document.fonts.load(`10px ${PS}`)]),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
 ready.then(()=>requestAnimationFrame(loop));
 // instalar como app (só na página própria)

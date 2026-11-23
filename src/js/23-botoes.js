@@ -1,7 +1,7 @@
 // ---------- BOTÕES (o que cada toque faz) ----------
 function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;if(id.startsWith('gem:')&&!GEM_SHOP){nope(id);return;}sfx('beep');// com aviso aberto, só os botões dele funcionam
  if(id==='again')id=lastMode==='ranked'?'rankgo':lastMode==='online'?'toroom':'m:'+lastMode;
- if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
+ if((id==='jogar'||id==='play'&&state==='title')&&!save.tutAsked&&!(save.games>0)){save.tutAsked=true;save.howto=true;persist();startTutorial();return;}if(id==='jogar'){state='play';return;}if(id==='play')id='m:1x1';if(id==='duo')id='m:2x2';
  if(id.startsWith('m:')){newPick(id.slice(2),false);return;}
  if(id==='ranked'){if(!save.user){modal={title:'RANQUEADA',lines:['Para jogar a ranqueada, crie uma conta.','Assim seu elo fica salvo e ninguém consegue trapacear.'],btns:[['mod:accreg','CRIAR CONTA','#ffd23f'],['mod:acclog','ENTRAR','#4fd1ff'],['mod:x','AGORA NÃO','#c9cbe6']]};return;}state='rankLobby';if(NET.status!=='on')netConnect();return;}
  if(id==='rankgo'){if(!save.user){onButton('ranked');return;}if(NET.status!=='on'){netConnect();NET.err='Conectando ao servidor… toque de novo em instantes.';NET.errT=performance.now();return;}NET.on=false;NET.role=null;NET.rankQ=true;netSend({t:'rankqueue',mmr:save.rank.mmr});return;}
@@ -17,7 +17,7 @@ function onButton(id){if(modal&&!String(id).startsWith('mod:'))return;if(id.star
  if(id.startsWith('rep:')){REPT=+id.slice(4);const q=NET.room&&NET.room.slots.find(x=>x&&x.pid===REPT);modal={title:'DENUNCIAR '+(q?q.name:'JOGADOR'),lines:['Qual é o problema?','Denúncias falsas podem bloquear a sua conta.'],btns:[['mod:rep:nome','NOME','#ff9a9a'],['mod:rep:trapaca','TRAPAÇA','#ff9a9a'],['mod:rep:comport','ATITUDE','#ff9a9a'],['mod:x','CANCELAR','#c9cbe6']]};return;}
  if(id==='repopp'){const o=(NET.start&&NET.start.slots||[]).filter(x=>x&&!x.bot&&x.pid!==NET.id);if(o.length===1)onButton('rep:'+o[0].pid);return;}
  if(id==='replay'){recExport();return;}
- if(id==='tutskip'){if(G&&G.tut){G.tut.step=TUT.length-1;TUT[TUT.length-1].go();}return;}
+ if(id==='tutskip'){fev('tut_skip',1);if(G&&G.tut){G.tut.step=TUT.length-1;TUT[TUT.length-1].go();}return;}
  if(id==='tutstart'){startTutorial();return;}
  if(id==='invite'){inviteFriend();return;}
  if(id==='joincode'){askText('ENTRAR COM CÓDIGO','Digite o código da sala que seu amigo mandou.','',v=>{if(v)netSend({t:'joincode',code:v});},{max:8,ph:'ex.: K7Q2X'});return;}
