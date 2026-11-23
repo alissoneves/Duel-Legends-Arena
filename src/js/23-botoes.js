@@ -64,6 +64,7 @@ function onButton(id){sfx('beep');
  if(id.startsWith('ceq:')){const c=cosFind(id.slice(4));if(save.cos.eq[c.k]===c.id)delete save.cos.eq[c.k];else save.cos.eq[c.k]=c.id;persist();sfx('beep');return;}
  if(id.startsWith('cbuyc:')){const c=cosFind(id.slice(6));if((save.gems||0)<c.price){modal={title:'GEMAS INSUFICIENTES',lines:[`Faltam ${c.price-(save.gems||0)} gemas para ${c.n}.`],btns:[['mod:gems','VER GEMAS','#4fd1ff'],['mod:x','FECHAR','#c9cbe6']],onOk:null};return;}
   modal={title:'CONFIRMAR COMPRA',lines:[`${c.n} por ${c.price} gemas?`,'Visual, sem vantagem em luta.'],btns:[['mod:ok','COMPRAR','#4fd1ff'],['mod:x','CANCELAR','#c9cbe6']],onOk:()=>{save.gems-=c.price;save.cos.owned.push(c.id);save.cos.eq[c.k]=c.id;persist();shopMsg=msgSet('Novo visual: '+c.n,'#4fd1ff');sfx('win');}};return;}
+ if(id.startsWith('gem:')&&!GEM_SHOP)return;
  if(id.startsWith('gem:')){const pk=GEM_PACKS[+id.slice(4)];modal={title:'PAGAMENTO DE DEMONSTRAÇÃO',lines:[`${pk.g+pk.b} gemas por ${pk.brl}`,'No jogo real, abre a Steam ou a Google Play.','Receber as gemas de graça para testar?'],btns:[['mod:ok','RECEBER (TESTE)','#46d160'],['mod:x','CANCELAR','#c9cbe6']],onOk:()=>{save.gems=(save.gems||0)+pk.g+pk.b;persist();shopMsg=msgSet(`+${pk.g+pk.b} gemas (teste)`,'#4fd1ff');sfx('win');}};return;}
  if(id==='emote'){if(G&&G.p&&!G.p.dead)doEmote(G.p);return;}
  if(id==='pass'){state='pass';return;}

@@ -1,0 +1,12 @@
+{
+  "name": "dla-insta",
+  "private": true,
+  "description": "Ferramentas de mídia do Instagram do Duel Legends Arena (não é o servidor).",
+  "scripts": {
+    "video": "node video.mjs"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "playwright-core": "^1.48.2"
+  }
+}

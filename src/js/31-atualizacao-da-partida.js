@@ -14,7 +14,7 @@ for(const k of ['x1','y1','x2','y2'])G.zone[k]=lerp(G.zone[k],G.zt[k],clamp(dt*0
  if(G.tut)updateTut(dt);
  for(const f of G.all){f.emoteT=Math.max(0,(f.emoteT||0)-dt);f.emoteCd=Math.max(0,(f.emoteCd||0)-dt);f.revealT=Math.max(0,(f.revealT||0)-dt);f.cover=-1;if(f.dead)continue;for(let i=0;i<G.covers.length;i++){const c=G.covers[i];if(Math.hypot(f.x-c.x,(f.y-4)-c.y)<c.r-2){f.cover=i;break;}}}
  for(const f of G.all){if(f.dead)continue;const en=enemiesOf(f);if(en.length){const vis=en.filter(e=>seenBy(e,f.team));const pool=vis.length?vis:en;let best=pool[0],bd=1e9;for(const e of pool){const dd=Math.hypot(e.x-f.x,e.y-f.y);if(dd<bd){bd=dd;best=e;}}f.foe=best;f.blind=!vis.length;}}
- {let fo=G.p;if(G.p.dead){fo=G.all.find(x=>!x.dead&&x.team===G.p.team)||G.p.foe||G.p;}const tx=clamp(fo.x-W/2,-8,WW-W+8),ty=clamp(fo.y-H/2-10,-46,WH-H+34);G.cam.x=lerp(G.cam.x,tx,clamp(dt*6,0,1));G.cam.y=lerp(G.cam.y,ty,clamp(dt*6,0,1));}
+ {let fo=G.p;if(G.p.dead){fo=G.all.find(x=>!x.dead&&x.team===G.p.team)||G.p.foe||G.p;}const gm=window.__gravar&&G.p.foe&&!G.p.foe.dead&&!G.p.dead,fx=gm?(G.p.x+G.p.foe.x)/2:fo.x,fy=gm?(G.p.y+G.p.foe.y)/2:fo.y;const tx=gm?clamp(fx-W/2,0,Math.max(0,WW-W)):clamp(fx-W/2,-8,WW-W+8),ty=gm?clamp(fy-H/2-10,0,Math.max(0,WH-H)):clamp(fy-H/2-10,-46,WH-H+34);G.cam.x=lerp(G.cam.x,tx,clamp(dt*6,0,1));G.cam.y=lerp(G.cam.y,ty,clamp(dt*6,0,1));}
  for(const f of G.all)if(!f.dead)updateFighter(f,dt);
  // separar personagens
  for(let i=0;i<G.all.length;i++)for(let j=i+1;j<G.all.length;j++){const a=G.all[i],b=G.all[j];if(a.dead||b.dead)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1;if(d<14&&a.dashT<=0&&b.dashT<=0){const push=(14-d)/2;a.x-=dx/d*push;a.y-=dy/d*push;b.x+=dx/d*push;b.y+=dy/d*push;}}

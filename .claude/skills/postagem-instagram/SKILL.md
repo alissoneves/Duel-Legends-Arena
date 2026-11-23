@@ -50,7 +50,12 @@ Para gravar no calendário, gere o JSON com Node (`JSON.stringify(calendario, nu
 
 ## Mídias
 
-- Card da lenda (1080×1350) e vídeos: ferramentas da etapa 2, em `ferramentas/insta/` (`card.js`, `video.js`). **Enquanto não existirem**, liste para o usuário quais `lenda_NNN.jpg` e `.mp4` do calendário ainda faltam em `insta/`.
+- Vídeos (1080×1920, 30 fps, sem áudio, ~16 s): `ferramentas/insta/video.mjs`, gerados quadro a quadro pelo próprio jogo. Antes, `node build.js` na raiz e, na primeira vez, `npm i` dentro de `ferramentas/insta`. Rode de dentro de `ferramentas/insta`:
+  - Confronto: `node video.mjs confronto Curupira Medusa --saida ../../insta/g21_curupira_vs_medusa.mp4`
+  - Recurso: `node video.mjs recurso Saci Iara --titulo "DUELO 1x1" --sub "Você contra uma lenda" --frases "Sua lenda é sorteada|Esquive e bloqueie na hora certa|Carregue o especial|Derrube o rival" --saida ../../insta/01_duelo_1x1.mp4`
+  - `--seed N` troca a luta (mesma semente = mesma luta); `--arena N` fixa a arena. Se não houver nocaute em 150 s, ele pede outra semente.
+  - Confira 2 ou 3 quadros antes de entregar. Sem `--saida`, o vídeo vai para `ferramentas/insta/tmp/` (fora do git).
+- Card da lenda (1080×1350): `card.js` ainda não existe. **Enquanto não existir**, liste para o usuário quais `lenda_NNN.jpg` do calendário ainda faltam em `insta/`.
 - Para conferir o que falta:
   ```
   node -e "const fs=require('fs');const C=JSON.parse(fs.readFileSync('insta/calendario.json','utf8'));for(const d of C)for(const h of ['09:00','15:00','18:00'])if(!fs.existsSync('insta/'+d[h].arquivo))console.log(d.dia,h,d[h].arquivo)"

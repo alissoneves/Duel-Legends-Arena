@@ -1,4 +1,6 @@
 // ---------- MONETIZAÇÃO: Gemas só para visuais e Passe (sem vantagem e sem sorte paga) ----------
+// compra de Gemas com dinheiro: desligada até haver pagamento de verdade (true para religar)
+const GEM_SHOP=false;
 const GEM_PACKS=[{g:100,b:0,brl:'R$ 4,90'},{g:450,b:50,brl:'R$ 19,90'},{g:950,b:150,brl:'R$ 39,90'},{g:2000,b:400,brl:'R$ 79,90'}];
 const COS={
  aura:{n:'Auras',items:[['a_fogo','Aura de Fogo','#ff6a13',250],['a_gelo','Aura de Gelo','#7fe0ff',250],['a_sombra','Aura Sombria','#8a5cff',300],['a_ouro','Aura Dourada','#ffd23f',450],['a_arco','Aura Arco-íris','rainbow',600]]},
@@ -25,7 +27,7 @@ function renderCosShop(){const cats=Object.keys(COS);cats.forEach((k,i)=>btn('cc
   else btn('cbuyc:'+c[0],x+64,y+50,74,16,`${c[3]} GEMAS`,(save.gems||0)>=c[3]?'#4fd1ff':'#3a3f66',(save.gems||0)>=c[3]?'#0b0c14':'#8a8fb8',6);});}
 function renderGems(){text('GEMAS',W/2,58,10,'#4fd1ff','center','#0b0c14');text('Use em visuais e no Passe de Temporada. Nada de vantagem em luta.',W/2,72,9,'#c9cbe6','center',null,PS);
  GEM_PACKS.forEach((pk,i)=>{const x=12+i*114,y=82,w=108,h=120;panel(x,y,w,h);for(let k=0;k<Math.min(5,i+2);k++){ctx.fillStyle='#4fd1ff';const gx=x+w/2-12+((k%3)-1)*14,gy=y+30-Math.floor(k/3)*10;ctx.beginPath();ctx.moveTo(gx,gy-7);ctx.lineTo(gx+6,gy);ctx.lineTo(gx,gy+7);ctx.lineTo(gx-6,gy);ctx.closePath();ctx.fill();ctx.fillStyle='#ffffff';ctx.fillRect(gx-1,gy-4,2,3);}
-  text(`${pk.g} gemas`,x+w/2,y+62,10,'#ffffff','center',null,PS);if(pk.b)text(`+${pk.b} de bônus`,x+w/2,y+74,8,'#46d160','center',null,PS);btn('gem:'+i,x+10,y+88,w-20,20,pk.brl,'#46d160','#0b0c14',7);});
- text('Protótipo: o pagamento não está ligado. No jogo real abre a Steam ou a Google Play.',W/2,216,8,'#ff8a3d','center',null,PS);}
+  text(`${pk.g} gemas`,x+w/2,y+62,10,'#ffffff','center',null,PS);if(pk.b)text(`+${pk.b} de bônus`,x+w/2,y+74,8,'#46d160','center',null,PS);if(GEM_SHOP)btn('gem:'+i,x+10,y+88,w-20,20,pk.brl,'#46d160','#0b0c14',7);else{ctx.fillStyle='#262a46';ctx.fillRect(x+10,y+88,w-20,20);text('EM BREVE',x+w/2,y+101,7,'#8a8fb8','center');}});
+ if(!GEM_SHOP)text('A compra de Gemas ainda não está disponível.',W/2,216,8,'#8a8fb8','center',null,PS);}
 function renderModal(){if(!modal)return;ctx.fillStyle='rgba(11,12,20,0.8)';ctx.fillRect(0,0,W,H);panel(90,70,300,120);text(modal.title,W/2,92,9,'#ffd23f','center');modal.lines.forEach((l,i)=>text(l,W/2,112+i*12,9,'#ffffff','center',null,PS));
  const n=modal.btns.length,bw=Math.min(104,(284-(n-1)*8)/n);modal.btns.forEach((b,i)=>btn(b[0],W/2-((n*(bw+8)-8)/2)+i*(bw+8),160,bw,20,b[1],b[2],'#0b0c14',6));}
