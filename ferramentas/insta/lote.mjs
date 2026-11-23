@@ -2,7 +2,7 @@
 // Uso (de dentro de ferramentas/insta): node lote.mjs [pasta-saida] [filtro]
 //   pasta-saida: padrão tmp/lote (depois de conferir, copie para ../../insta/)
 //   filtro: só gera linhas cujo arquivo contém esse texto (ex.: g0)
-// Se uma luta não tiver nocaute, tenta as sementes 2 a 6.
+// Se uma luta não tiver nocaute, tenta as sementes 2 a 6. Sem --arena na linha, alterna as arenas.
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -15,10 +15,12 @@ fs.mkdirSync(saida, { recursive: true });
 const dividir = s => (s.match(/"[^"]*"|\S+/g) || []).map(t => t.replace(/^"|"$/g, ''));
 const linhas = fs.readFileSync(path.join(aqui, 'lote.txt'), 'utf8').split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
 const falhas = [];
-for (const l of linhas) {
+for (const [i, l] of linhas.entries()) {
   const [arq, resto] = l.split('|').map(s => s.trim());
   if (filtro && !arq.includes(filtro)) continue;
   const base = dividir(resto);
+  // sem --arena, alterna as 7 arenas pela posição da linha (senão a mesma semente cai sempre na mesma arena)
+  if (!base.includes('--arena')) base.push('--arena', String(i % 7));
   const temSeed = base.includes('--seed');
   let ok = false;
   for (const seed of temSeed ? [null] : [1, 2, 3, 4, 5, 6]) {
