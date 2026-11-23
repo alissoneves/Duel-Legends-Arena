@@ -117,13 +117,14 @@ const total = await pagina.evaluate(async (R) => {
 
   // janela do jogo
   // área segura do Reels: o Instagram cobre ~200 px no topo e ~360 px embaixo
-  const JY = 440, JH = 1000, ASP = JH / W;
+  const JY = 420, JH = H - 420, ASP = JH / W; // a luta vai até o fim da tela; a frase fica sobre ela, na área segura
   let cam = null;
-  const janela = async (i, zoomExtra = 1, rapido = false) => {
+  const janela = async (i, zoomExtra = 1, rapido = false, noPerdedor = false) => {
     const q = V.quadros[Math.max(0, Math.min(V.quadros.length - 1, i))];
-    const mx = (q.px + q.fx) / 2, my = (q.py + q.fy) / 2 - 10;
+    const pd = V.venceu === 'A' ? [q.fx, q.fy] : [q.px, q.py];
+    const mx = noPerdedor ? pd[0] : (q.px + q.fx) / 2, my = (noPerdedor ? pd[1] - 30 : (q.py + q.fy) / 2 - 10);
     const dx = Math.abs(q.px - q.fx), dy = Math.abs(q.py - q.fy);
-    let cw = Math.max(dx * 1.25 + 70, (dy * 1.3 + 90) / ASP); cw = Math.max(100, Math.min(220, cw)) * zoomExtra;
+    let cw = Math.max(dx * 1.25 + 70, (dy * 1.3 + 90) / ASP); cw = Math.max(96, Math.min(270 / ASP, cw)) * zoomExtra;
     if (!cam) cam = { x: mx, y: my, w: cw };
     const k = rapido ? 0.25 : 0.1; cam.x += (mx - cam.x) * k; cam.y += (my - cam.y) * k; cam.w += (cw - cam.w) * k;
     const w = cam.w, h = w * ASP;
@@ -150,7 +151,7 @@ const total = await pagina.evaluate(async (R) => {
     txt('x', W / 2, Y0 + 90, 40, COR.apagado, 'center', PX, false);
     txt(V.arena, W / 2, Y0 + 225, 30, COR.apagado, 'center', PS, false);
   };
-  const legenda = (s, cor = COR.texto, tam = 56, fonte = PS) => { x.fillStyle = COR.fundo; x.fillRect(0, JY + JH, W, H - JY - JH); if (s) txt(s, W / 2, JY + JH + 110, tam, cor, 'center', fonte); };
+  const legenda = (s, cor = COR.texto, tam = 56, fonte = PS) => { if (!s) return; x.fillStyle = 'rgba(11,12,20,0.78)'; x.fillRect(0, 1404, W, 136); x.fillStyle = 'rgba(255,255,255,0.08)'; x.fillRect(0, 1404, W, 2); txt(s, W / 2, 1492, tam, cor, 'center', fonte); };
   const saida = [];
   const emitir = () => saida.push(c.toDataURL('image/jpeg', 0.92));
 
@@ -165,8 +166,8 @@ const total = await pagina.evaluate(async (R) => {
   for (let f = 0; f < 48; f++) {
     const t = f / 48;
     x.fillStyle = COR.fundo; x.fillRect(0, 0, W, H);
-    x.globalAlpha = 0.16; x.fillStyle = V.A.corEl; x.beginPath(); x.moveTo(0, 200); x.lineTo(W, 200); x.lineTo(0, 1480); x.closePath(); x.fill();
-    x.fillStyle = V.B.corEl; x.beginPath(); x.moveTo(W, 200); x.lineTo(W, 1480); x.lineTo(0, 1480); x.closePath(); x.fill(); x.globalAlpha = 1;
+    x.globalAlpha = 0.16; x.fillStyle = V.A.corEl; x.beginPath(); x.moveTo(0, 0); x.lineTo(W, 0); x.lineTo(0, H); x.closePath(); x.fill();
+    x.fillStyle = V.B.corEl; x.beginPath(); x.moveTo(W, 0); x.lineTo(W, H); x.lineTo(0, H); x.closePath(); x.fill(); x.globalAlpha = 1;
     if (R.modo === 'recurso') {
       txt(R.titulo, W / 2, 420, 84, COR.acao);
       if (R.sub) txt(R.sub, W / 2, 510, 44, COR.sec, 'center', PS);
@@ -191,7 +192,7 @@ const total = await pagina.evaluate(async (R) => {
     const lento = i >= lentoIni && i < lentoFim;
     const perto = i >= lentoIni - 30 && i < lentoFim + 20;
     x.fillStyle = COR.fundo; x.fillRect(0, 0, W, H);
-    const q = await janela(i, perto ? 0.78 : 1, perto);
+    const q = await janela(i, perto ? 0.78 : 1, perto, i >= ko - 6);
     placar(q);
     if (i < ko) legenda(frase(tLuta));
     else legenda(`${venc.nome.toUpperCase()} VENCE`, COR.acao, 50, PX);
@@ -204,7 +205,7 @@ const total = await pagina.evaluate(async (R) => {
   for (let f = 0; f < 42; f++) {
     const t = ease(f / 12);
     x.fillStyle = COR.fundo; x.fillRect(0, 0, W, H);
-    const q = await janela(ult, 0.78);
+    const q = await janela(ult, 0.78, false, true);
     placar(q);
     x.fillStyle = `rgba(11,12,20,${0.6 * t})`; x.fillRect(0, JY, W, JH);
     x.globalAlpha = t; spr(vencSpr, W / 2, JY + 820, 16, 1);
@@ -217,10 +218,10 @@ const total = await pagina.evaluate(async (R) => {
     const t = ease(f / 12);
     x.fillStyle = COR.fundo; x.fillRect(0, 0, W, H);
     x.globalAlpha = t;
-    const lw = 900, lh = lb.h * lw / lb.w; x.imageSmoothingEnabled = false; x.drawImage(logo, lb.x0, lb.y0, lb.w, lb.h, (W - lw) / 2, 300, lw, lh);
-    txt('110 lendas, sorteadas', W / 2, 300 + lh + 160, 56, COR.sec, 'center', PS, false);
-    txt('a cada luta', W / 2, 300 + lh + 236, 56, COR.sec, 'center', PS, false);
-    const by = 300 + lh + 360, bw = 760, bh = 130, bx = (W - bw) / 2;
+    const lw = 900, lh = lb.h * lw / lb.w; x.imageSmoothingEnabled = false; x.drawImage(logo, lb.x0, lb.y0, lb.w, lb.h, (W - lw) / 2, 440, lw, lh);
+    txt('110 lendas, sorteadas', W / 2, 440 + lh + 160, 56, COR.sec, 'center', PS, false);
+    txt('a cada luta', W / 2, 440 + lh + 236, 56, COR.sec, 'center', PS, false);
+    const by = 440 + lh + 360, bw = 760, bh = 130, bx = (W - bw) / 2;
     x.fillStyle = COR.escuro; x.fillRect(bx - 6, by - 6, bw + 12, bh + 12); x.fillStyle = COR.acao; x.fillRect(bx, by, bw, bh); x.fillStyle = 'rgba(0,0,0,0.25)'; x.fillRect(bx, by + bh - 10, bw, 10);
     dado(bx + 56, by + 35, 5); txt('JOGUE GRÁTIS', bx + bw / 2 + 50, by + 84, 46, COR.escuro, 'center', PX, false);
     txt('link na bio', W / 2, by + bh + 110, 50, COR.texto, 'center', PS, false);

@@ -1,0 +1,19 @@
+# Vídeos do calendário gerados por video.mjs (uma linha por vídeo: arquivo | argumentos)
+01_duelo_1x1.mp4 | recurso Saci Iara --titulo "DUELO 1x1" --sub "Você contra uma lenda" --frases "Sua lenda é sorteada|Esquive e bloqueie na hora certa|Carregue o especial|Derrube o rival" --seed 7
+g01_curupira_vs_medusa.mp4 | confronto Curupira Medusa
+g02_boitatá_vs_poseidon.mp4 | confronto Boitatá Poseidon
+g03_mula_sem_cabeça_vs_thor.mp4 | confronto "Mula Sem Cabeça" Thor
+g04_iara_vs_fênix.mp4 | confronto Iara Fênix
+g05_cuca_vs_merlin.mp4 | confronto Cuca Merlin
+g07_lobisomem_vs_drácula.mp4 | confronto Lobisomem Drácula
+g08_raijin_vs_zeus.mp4 | confronto Raijin Zeus
+g09_anúbis_vs_hades.mp4 | confronto Anúbis Hades
+g11_kraken_vs_boiúna.mp4 | confronto Kraken Boiúna
+g12_yeti_vs_ifrit.mp4 | confronto Yeti Ifrit
+g13_sun_wukong_vs_hércules.mp4 | confronto "Sun Wukong" Hércules
+g14_nerojor_vs_minotauro.mp4 | confronto Nerojor Minotauro
+g15_cabeça_de_cuia_vs_iara.mp4 | confronto "Cabeça De Cuia" Iara
+g17_matinta_vs_baba_yaga.mp4 | confronto Matinta "Baba Yaga"
+g18_capoeirista_vs_sun_wukong.mp4 | confronto Capoeirista "Sun Wukong"
+g19_valquíria_vs_rá.mp4 | confronto Valquíria Rá
+g20_mapinguari_vs_golem.mp4 | confronto Mapinguari Golem
