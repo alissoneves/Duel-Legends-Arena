@@ -1,5 +1,5 @@
 // Duel Legends Arena: funciona sem internet nos modos contra bots e sempre busca a versão nova quando há conexão
-const CACHE = 'dla-v251';
+const CACHE = 'dla-v252';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });

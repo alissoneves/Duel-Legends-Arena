@@ -9,7 +9,7 @@ function card(c,x,y,w,h,showStats){const rc=RAR[c.rar].col;ctx.fillStyle='#0b0c1
   st.forEach((s,i)=>{const yy=y+108+i*9;text(s[0],x+6,yy+6,6,'#c9cbe6','left');bar(x+30,yy+1,w-58,5,(s[1]-40)/60,s[2]);text(String(s[1]),x+w-6,yy+6,6,'#ffffff','right');});}}
 function roulette(x,y,w,h,list,t,drawFn){const i=Math.floor(t*(14-t*3))%list.length;drawFn(list[(i+list.length)%list.length],x,y,w,h);}
 function renderDraw(){if(pick.choosing)return renderRankPick();if(isMulti())return renderDrawGrid();const a=pick.arena;ctx.drawImage(a.bg,0,0);ctx.fillStyle='rgba(11,12,20,0.78)';ctx.fillRect(0,0,W,H);
- text('SORTEIO',W/2,22,10,'#ffd23f','center','#0b0c14');if(pick.mode)text(pick.ranked?`Ranqueada 1x1 · rival: ${pick.oppName?pick.oppName:save.rank.placed<5?'colocação':rankName(Object.assign({},fromScore((save.rank.oppMmr||1150)-400),{lp:0}))}`:MODES[pick.mode].lab,W/2,34,9,'#c9cbe6','center','#0b0c14',PS);
+ text('SORTEIO',W/2,18,10,'#ffd23f','center','#0b0c14');if(pick.mode)text(pick.ranked?`Ranqueada 1x1 · rival: ${pick.oppName?pick.oppName:save.rank.placed<5?'colocação':rankName(Object.assign({},fromScore((save.rank.oppMmr||1150)-400),{lp:0}))}`:MODES[pick.mode].lab,W/2,30,9,'#c9cbe6','center','#0b0c14',PS);
  // jogador
  text('VOCÊ',88,44,8,'#8ef0a0','center','#0b0c14');
  if(revealed[0]&&pick.fixed){ctx.fillStyle='#4fd1ff';ctx.fillRect(22,240,132,26);ctx.strokeStyle='#0b0c14';ctx.lineWidth=2;ctx.strokeRect(22,240,132,26);text(dayHeroActive()?'LENDA FIXA DO DIA':'LENDA DO FIM DE SEMANA',88,251,6,'#0b0c14','center');text('escolhida na roleta',88,261,8,'#0b0c14','center',null,PS);}

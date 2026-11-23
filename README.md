@@ -2,7 +2,7 @@
 
 Jogue: https://alissoneves.github.io/Duel-Legends-Arena/
 
-Versão atual: **2.5.1** (servidor 2.1). Veja o [histórico](CHANGELOG.md).
+Versão atual: **2.5.2** (servidor 2.1). Veja o [histórico](CHANGELOG.md).
 
 ## Como editar o jogo
 
