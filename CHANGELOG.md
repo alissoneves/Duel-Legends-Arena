@@ -8,6 +8,7 @@
 | 1.3 | Contas com usuário e senha (scrypt), até 5 aparelhos | 1.3 |
 | 1.4 | Boas-vindas (Criar / Entrar / Sem conta), ranqueada exige conta | 1.3 |
 | 1.5 | Lenda da semana, missões diárias, herói de fim de semana, bordas de elo e temporadas, convite por código, conquistas, tutorial, replay vertical | 1.4 |
+| 2.5 | Visual mais limpo (unslop) em todas as telas: tela inicial com botão JOGAR e barra de abas (Loja, Coleção, Missões, Perfil), tela JOGAR (Contra Bots / Online), títulos e botões padronizados, plurais certos, coleção mostrando 110 lendas no resultado; imagem nítida na resolução real da tela; sombra e luz nos sprites das lendas | 2.0 |
 | 2.4 | Tradução completa dos nomes de itens (238) e golpes das lendas (330) para inglês e espanhol; Godot junto | 2.0 |
 | 2.3 | Idiomas: português, inglês e espanhol (Opções → IDIOMA; dicionário em `src/js/16a-idiomas.js` e `godot/data/i18n.json`); bots que se ajustam à sequência de vitórias/derrotas; tela de fim de temporada com borda, elo máximo e posição; Godot atualizado junto | 2.0 |
 | 2.2 | Política de Privacidade (`privacidade.html`); excluir conta / apagar dados online no jogo; erros do jogo enviados ao servidor (página `/erros`); opção de vibração; código dividido em `src/` com `build.js`; lenda renomeada para Nerojor, The Knight (nome curto "Nerojor" onde falta espaço) | 1.9 |
