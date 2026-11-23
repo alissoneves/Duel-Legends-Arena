@@ -2,7 +2,8 @@
 // O dono da sala simula a luta e manda o estado ~20x por segundo; os outros mandam só os comandos.
 const NET={on:false,ws:null,status:'off',id:null,rooms:[],room:null,chat:[],quick:[],start:null,role:null,mySlot:-1,inputs:{},snapT:0,inT:0,newPops:[],ping:0,prepReady:[],queued:false,err:null,cnt:{b:0,c:0,dash:0},lastSnap:null};
 const DEFAULT_SERVER='wss://duel-legends-arena.onrender.com';
-function serverUrl(){try{const q=new URLSearchParams(location.search).get('server');if(q)return q;}catch(e){}return (save.opt&&save.opt.server)||DEFAULT_SERVER;}
+// ?server= só vale para servidor local (testes): um link com servidor de fora poderia capturar login e senha
+function serverUrl(){try{const q=new URLSearchParams(location.search).get('server');if(q&&/^wss?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/i.test(q))return q;}catch(e){}return (save.opt&&save.opt.server)||DEFAULT_SERVER;}
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function withSeed(seed,fn){const r=Math.random;Math.random=mulberry32(seed);try{return fn();}finally{Math.random=r;}}
 function netSend(o){if(NET.ws&&NET.ws.readyState===1)NET.ws.send(JSON.stringify(o));}
@@ -49,4 +50,4 @@ function askNick(first,then){askText(first?'BEM-VINDO!':'SEU NOME',NET.canRename
   else if(first&&!save.nick){save.nick='Jogador'+Math.floor(Math.random()*900+100);persist();}
   if(then)then();},{max:16,ph:'Ex.: Alisson',check:v=>cleanNick(v).length<3?'Use pelo menos 3 letras ou números.':badName(v)?'Esse nome não é permitido. Escolha outro.':null});}
 function ident(){if(!save.ident||!save.ident.pid){const h=n=>{const a=new Uint8Array(n);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach((v,i)=>a[i]=Math.random()*256|0);return [...a].map(v=>v.toString(16).padStart(2,'0')).join('');};save.ident={pid:h(12),key:h(16)};persist();}return save.ident;}
-function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.5',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}
+function helloMsg(name){const I=ident();return {t:'hello',name,ver:'2.5.1',pid:I.pid,key:I.key,title:save.title||'',icon:save.icon||idOf('Saci')||''};}

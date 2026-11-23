@@ -1,0 +1,14 @@
+Duel Legends Arena
+Copyright (c) 2026 alissoneves. Todos os direitos reservados. / All rights reserved.
+
+O código-fonte deste repositório está visível apenas para consulta. Não é permitido
+copiar, modificar, distribuir, publicar ou hospedar o jogo, seu código, artes, nomes
+ou demais conteúdos, no todo ou em parte, sem autorização por escrito do autor.
+
+The source code in this repository is visible for reference only. You may not copy,
+modify, distribute, publish or host the game, its code, art, names or other content,
+in whole or in part, without the author's written permission.
+
+Exceção: a pasta .claude/skills/unslop/ é adaptada do projeto "unslop" de Damir
+Sokolovsky (https://github.com/heydamir/unslop) e segue a licença CC BY 4.0
+descrita em .claude/skills/unslop/LICENSE.

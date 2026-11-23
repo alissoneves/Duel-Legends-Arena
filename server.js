@@ -6,7 +6,7 @@ const http = require('http');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const VERSION = '2.0';
+const VERSION = '2.1';
 const MIN_VER = 2.1;   // 110 lendas: versões antigas sorteiam diferente
 const RPICK_TIME = 15000;
 const MAX = { '1x1': 2, '2x2': 4, '3x3': 6, '5x5': 10, 'ffa': 8 };
@@ -175,8 +175,14 @@ async function balLoad() {
   try { for (const r of await (await sb('legend_stats?select=legend,mode,games,wins&limit=5000')).json()) bal.set(r.legend + '|' + r.mode, { ...r, dirty: false }); console.log('balanceamento: ' + bal.size + ' linhas'); }
   catch (e) { console.error('legend_stats', e.message); }
 }
+// só aceita lendas e modos que existem no jogo (senão qualquer um enche a tabela com nomes inventados)
+const MODES = new Set(['bots_1x1', 'online_1x1', 'ranked', 'equipe', 'ffa']);
+let LEGENDS = null;
+try { LEGENDS = new Set(require('./ferramentas/dados').carregarLendas().map(l => l.n)); console.log('lendas conhecidas: ' + LEGENDS.size); }
+catch (e) { console.error('lista de lendas indisponível; usando só o limite de tamanho', e.message); }
 function balAdd(legend, mode, win) {
-  if (!/^[\p{L}\p{N} .'-]{1,30}$/u.test(legend) || !/^[a-z0-9_]{1,16}$/.test(mode)) return;
+  if (!/^[\p{L}\p{N} .,'-]{1,40}$/u.test(legend) || !MODES.has(mode)) return;
+  if (LEGENDS ? !LEGENDS.has(legend) : bal.size >= 1000) return;
   const k = legend + '|' + mode; const e = bal.get(k) || { legend, mode, games: 0, wins: 0 };
   e.games++; if (win) e.wins++; e.dirty = true; bal.set(k, e);
 }
@@ -253,6 +259,8 @@ function checkPass(pass, stored) { if (!stored) return false; const [salt, h] = 
 const tries = new Map();   // limite de tentativas por endereço e por usuário
 function tooMany(k) { const now = Date.now(); const t = (tries.get(k) || []).filter(x => now - x < 10 * 60000); tries.set(k, t); return t.length >= 8; }
 function failed(k) { (tries.get(k) || tries.set(k, []).get(k)).push(Date.now()); }
+// limpa as tentativas antigas (senão o mapa só cresce)
+setInterval(() => { const now = Date.now(); for (const [k, t] of tries) if (!t.some(x => now - x < 10 * 60000)) tries.delete(k); }, 10 * 60000);
 async function register(c, user, pass) {
   const p = c.player; if (!p) return send(c, { t: 'auth', err: 'Conecte de novo e tente outra vez.' });
   if (p.login) return send(c, { t: 'auth', err: 'Este jogador já tem conta: ' + p.login });
@@ -307,6 +315,7 @@ async function errLoad() {
 }
 function errAdd(x, ver) {
   const msg = String(x.m || '').slice(0, 200); if (!msg) return;
+  if (!errs.has(msg) && errs.size >= 300) return;   // limite: no máximo 300 erros diferentes guardados
   const e = errs.get(msg) || { msg, stack: '', ver: '', state: '', n: 0, first: Date.now() };
   e.n += Math.max(1, Math.min(50, x.n | 0)); e.stack = String(x.s || '').slice(0, 800); e.ver = String(ver || '').slice(0, 8); e.state = String(x.w || '').slice(0, 20); e.last = Date.now(); e.dirty = true; errs.set(msg, e);
 }
@@ -354,7 +363,13 @@ function rankReport(c, win) {
 }
 async function settle(M) {
   if (M.done) return; M.done = true; clearTimeout(M.timer); matches.delete(M.id);
-  const [a, b] = Object.keys(M.mmr); const ok = a in M.rep && b in M.rep && M.rep[a] !== M.rep[b];
+  const [a, b] = Object.keys(M.mmr); let ok = a in M.rep && b in M.rep && M.rep[a] !== M.rep[b];
+  // sem resultado combinado e só um saiu da partida: quem saiu perde (senão bastava fechar o jogo para nunca perder PDL)
+  // (se quem ficou já informou o resultado, vale o dele: o vencedor pode fechar o jogo logo depois de vencer)
+  if (!ok && M.left && !!M.left[a] !== !!M.left[b]) {
+    const fled = M.left[a] ? a : b, stay = fled === a ? b : a, stayWon = stay in M.rep ? M.rep[stay] : true;
+    M.rep = { [stay]: stayWon, [fled]: !stayWon }; ok = true;
+  }
   for (const pid of [a, b]) {
     const c = M.conns[pid]; if (c) c.match = null;
     if (!ok) { if (c && !c.closed) send(c, { t: 'rankres', void: true, msg: 'Resultado não confirmado: partida sem PDL.' }); continue; }
@@ -403,7 +418,7 @@ function onData(c, chunk) {
     }
     c.buf = c.buf.subarray(need);
     if (op === 0x8) { close(c); return; }
-    if (op === 0x9) { try { c.sock.write(Buffer.concat([Buffer.from([0x8a, payload.length]), payload])); } catch (e) {} continue; }
+    if (op === 0x9) { if (payload.length > 125) continue; try { c.sock.write(Buffer.concat([Buffer.from([0x8a, payload.length]), payload])); } catch (e) {} continue; }
     if (op === 0x1) {
       let msg; try { msg = JSON.parse(payload.toString('utf8')); } catch (e) { continue; }
       try { handle(c, msg); } catch (e) { console.error('erro ao tratar mensagem', e); }
@@ -418,7 +433,7 @@ function close(c) {
   clients.delete(c.id);
   quickQueue = quickQueue.filter(q => q !== c);
   rankQueue = rankQueue.filter(q => q.c !== c);
-  if (c.match && !c.match.done) { const M = c.match; clearTimeout(M.timer); M.timer = setTimeout(() => settle(M), 20000); }
+  if (c.match && !c.match.done) { const M = c.match; if (c.player) M.left[c.player.pid] = true; clearTimeout(M.timer); M.timer = setTimeout(() => settle(M), 20000); }
   leaveRoom(c);
 }
 
@@ -481,7 +496,7 @@ function startRoom(r) {
   if (r.ranked) {
     const people = r.slots.filter(s => s && s.player);
     if (people.length === 2) {
-      const M = { id: r.id + ':' + r.seed, mmr: {}, rep: {}, conns: {}, done: false };
+      const M = { id: r.id + ':' + r.seed, mmr: {}, rep: {}, conns: {}, left: {}, done: false };
       for (const s of people) { M.mmr[s.player.pid] = s.player.rank.mmr; M.conns[s.player.pid] = s; s.match = M; }
       M.timer = setTimeout(() => settle(M), 15 * 60000);
       matches.set(M.id, M);
@@ -528,7 +543,8 @@ function handle(c, m) {
       const r = rooms.get(m.id);
       if (!r) return send(c, { t: 'error', msg: 'Sala não existe mais' });
       if (r.status !== 'lobby') return send(c, { t: 'error', msg: 'A partida já começou' });
-      if (r.pass && r.pass !== String(m.pass || '')) return send(c, { t: 'error', msg: 'Senha errada' });
+      if (r.pass && tooMany('rp:' + c.ip)) return send(c, { t: 'error', msg: 'Muitas tentativas. Espere alguns minutos.' });
+      if (r.pass && r.pass !== String(m.pass || '')) { failed('rp:' + c.ip); return send(c, { t: 'error', msg: 'Senha errada' }); }
       joinRoom(c, r);
       break;
     }
@@ -668,6 +684,15 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({ ok: true, ver: VERSION, players: clients.size, rooms: rooms.size, db: useDb }));
     return;
   }
+  // páginas internas: só com ?k=<ADMIN_KEY> (variável no Render). Sem a variável, ficam desligadas.
+  const rota = req.url.split('?')[0];
+  if (['/erros', '/retencao', '/balanceamento'].includes(rota)) {
+    const k = new URL(req.url, 'http://x').searchParams.get('k') || '';
+    const ADMIN = process.env.ADMIN_KEY || '';
+    const kb = Buffer.from(k), ab = Buffer.from(ADMIN);
+    const ok = ab.length >= 12 && kb.length === ab.length && crypto.timingSafeEqual(kb, ab);
+    if (!ok) { res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }); res.end('Não encontrado'); return; }
+  }
   if (req.url.split('?')[0] === '/erros') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(errPage());
     return;
@@ -689,7 +714,8 @@ server.on('upgrade', (req, sock) => {
   if (!key || (req.headers.upgrade || '').toLowerCase() !== 'websocket') { sock.destroy(); return; }
   sock.write('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ' + wsAccept(key) + '\r\n\r\n');
   sock.setNoDelay(true);
-  const c = { id: nextId++, ip: String(req.headers['x-forwarded-for'] || sock.remoteAddress || '').split(',')[0].trim(), sock, buf: Buffer.alloc(0), name: 'Jogador', room: null, slot: -1, closed: false, alive: true };
+  // o proxy do Render acrescenta o endereço real no FIM do X-Forwarded-For; o começo pode ser escrito pelo próprio cliente
+  const c = { id: nextId++, ip: String(req.headers['x-forwarded-for'] || sock.remoteAddress || '').split(',').pop().trim(), sock, buf: Buffer.alloc(0), name: 'Jogador', room: null, slot: -1, closed: false, alive: true };
   clients.set(c.id, c);
   sock.on('data', d => { c.alive = true; onData(c, d); });
   sock.on('close', () => close(c));
