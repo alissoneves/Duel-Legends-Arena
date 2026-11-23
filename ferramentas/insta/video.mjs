@@ -109,6 +109,9 @@ const total = await pagina.evaluate(async (R) => {
 
   const ease = t => 1 - Math.pow(1 - Math.max(0, Math.min(1, t)), 3);
   const txt = (s, X, Y, tam, cor, al = 'center', fonte = PX, contorno = true) => { x.font = `${tam}px ${fonte}`; x.textAlign = al; x.textBaseline = 'alphabetic'; if (contorno) { x.fillStyle = COR.escuro; const o = Math.max(2, Math.round(tam / 12)); for (const [dx, dy] of [[-o, 0], [o, 0], [0, -o], [0, o], [o, o], [-o, -o], [o, -o], [-o, o]]) x.fillText(s, X + dx, Y + dy); } x.fillStyle = cor; x.fillText(s, X, Y); };
+  // nome curto ("Nerojor, The Knight" -> "Nerojor") e tamanho que cabe na largura
+  const curto = s => String(s).split(',')[0].toUpperCase();
+  const cabe = (s, tam, max, fonte = PX) => { x.font = `${tam}px ${fonte}`; const w = x.measureText(s).width; return w > max ? Math.floor(tam * max / w) : tam; };
   const caixaTexto = (s, X, Y, tam, fonte = PS) => { x.font = `${tam}px ${fonte}`; return x.measureText(s).width; };
   const spr = (im, cx, base, esc, vira = 1) => { x.save(); x.imageSmoothingEnabled = false; x.translate(Math.round(cx), Math.round(base)); x.scale(vira, 1); x.drawImage(im, Math.round(-im.width * esc / 2), -im.height * esc, im.width * esc, im.height * esc); x.restore(); };
   const tag = (s, X, Y, cor, tam = 30) => { x.font = `${tam}px ${PS}`; const w = x.measureText(s).width + 24; x.fillStyle = cor; x.fillRect(X, Y, w, tam + 12); x.fillStyle = COR.escuro; x.textAlign = 'left'; x.fillText(s, X + 12, Y + tam + 2); return w; };
@@ -143,7 +146,7 @@ const total = await pagina.evaluate(async (R) => {
       const bx = esq ? 40 : W - 40 - 130;
       x.fillStyle = COR.painel; x.fillRect(bx, Y0, 130, 150); spr(im, bx + 65, Y0 + 135, 6, esq ? 1 : -1);
       const tx = esq ? 196 : W - 196, al = esq ? 'left' : 'right';
-      txt(L.nome.toUpperCase().slice(0, 14), tx, Y0 + 46, 34, COR.texto, al);
+      { const nm = curto(L.nome); txt(nm, tx, Y0 + 46, cabe(nm, 34, W / 2 - 50 - 196), COR.texto, al); }
       x.font = `28px ${PS}`; const tw = x.measureText(L.el).width + 24; tag(L.el, esq ? tx : tx - tw, Y0 + 66, L.corEl, 28);
       const bw = 300, bxx = esq ? tx : tx - bw; x.fillStyle = COR.escuro; x.fillRect(bxx - 3, Y0 + 122, bw + 6, 34); x.fillStyle = '#262a46'; x.fillRect(bxx, Y0 + 125, bw, 28);
       const pc = Math.max(0, Math.min(1, hp / 1000)), pw = Math.round(bw * pc); x.fillStyle = corVida(pc); x.fillRect(esq ? bxx : bxx + bw - pw, Y0 + 125, pw, 28);
@@ -177,8 +180,8 @@ const total = await pagina.evaluate(async (R) => {
     const esc = R.modo === 'recurso' ? 12 : 16;
     spr(sprA, -300 + ea * 600, yA, esc, 1); spr(sprB, W + 300 - eb * 600, yB, esc, -1);
     if (R.modo === 'confronto') {
-      txt(V.A.nome.toUpperCase(), 300 * ea + (1 - ea) * -300, yA + 90, 48, COR.texto, 'center');
-      txt(V.B.nome.toUpperCase(), W - 300 * eb - (1 - eb) * -300, yB + 90, 48, COR.texto, 'center');
+      txt(curto(V.A.nome), 300 * ea + (1 - ea) * -300, yA + 90, cabe(curto(V.A.nome), 48, 540), COR.texto, 'center');
+      txt(curto(V.B.nome), W - 300 * eb - (1 - eb) * -300, yB + 90, cabe(curto(V.B.nome), 48, 540), COR.texto, 'center');
       x.font = `34px ${PS}`; const twA = x.measureText(V.A.el).width + 24, twB = x.measureText(V.B.el).width + 24; tag(V.A.el, 300 - twA / 2, yA + 116, V.A.corEl, 34); tag(V.B.el, W - 300 - twB / 2, yB + 116, V.B.corEl, 34);
     }
     const ev = ease((t - 0.35) * 4);
@@ -195,7 +198,7 @@ const total = await pagina.evaluate(async (R) => {
     const q = await janela(i, perto ? 0.78 : 1, perto, i >= ko - 6);
     placar(q);
     if (i < ko) legenda(frase(tLuta));
-    else legenda(`${venc.nome.toUpperCase()} VENCE`, COR.acao, 50, PX);
+    else legenda(`${curto(venc.nome)} VENCE`, COR.acao, cabe(`${curto(venc.nome)} VENCE`, 50, W - 80), PX);
     if (i >= ko && i < ko + 6) { x.fillStyle = `rgba(255,255,255,${0.5 * (1 - (i - ko) / 6)})`; x.fillRect(0, JY, W, JH); }
     emitir();
     i += lento ? 1 : 2; tLuta += 1 / 30;
@@ -210,7 +213,7 @@ const total = await pagina.evaluate(async (R) => {
     x.fillStyle = `rgba(11,12,20,${0.6 * t})`; x.fillRect(0, JY, W, JH);
     x.globalAlpha = t; spr(vencSpr, W / 2, JY + 820, 16, 1);
     txt('VITÓRIA', W / 2, JY + 240, 110, COR.acao); x.globalAlpha = 1;
-    legenda(`${venc.nome.toUpperCase()} VENCE`, COR.acao, 50, PX);
+    legenda(`${curto(venc.nome)} VENCE`, COR.acao, cabe(`${curto(venc.nome)} VENCE`, 50, W - 80), PX);
     emitir();
   }
   // 4) final (2,2 s)
