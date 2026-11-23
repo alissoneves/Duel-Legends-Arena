@@ -3,6 +3,10 @@
 //   passo = estado do jogo (title, modes, shop, pass, profile, missions, album, options, ...)
 //         | luta:N    começa uma luta de teste com a lenda N e captura depois de 3 s
 //         | espera:MS espera MS milissegundos
+//         | btn:ID    aperta o botão ID (como onButton do jogo), sem capturar
+//         | js:CÓDIGO roda código na página (window.__dla tem save, G, state...), sem capturar
+//         | foto:NOME captura agora com esse nome
+// Save de teste: variável de ambiente DLA_SAVE com JSON (mistura com o padrão).
 // Abre o index.html da raiz (rode `node build.js` antes se mudou src/).
 import { createRequire } from 'node:module';
 import { pathToFileURL, fileURLToPath } from 'node:url';
@@ -39,15 +43,19 @@ const pagina = await navegador.newPage({ locale: 'pt-BR', viewport, deviceScaleF
 const erros = [];
 pagina.on('pageerror', e => erros.push(e.message));
 // pula o tutorial e o pedido de apelido
-await pagina.addInitScript(() => {
-  try { if (!localStorage.getItem('dla_proto')) localStorage.setItem('dla_proto', JSON.stringify({ nick: 'Teste', accAsked: true, tutAsked: true, howto: true, wins: 12, games: 20 })); } catch {}
-});
+const saveTeste = { nick: 'Teste', accAsked: true, tutAsked: true, tutDone: true, howto: true, wins: 12, games: 20, ...JSON.parse(process.env.DLA_SAVE || '{}') };
+await pagina.addInitScript(s => {
+  try { if (!localStorage.getItem('dla_proto')) localStorage.setItem('dla_proto', JSON.stringify(s)); } catch {}
+}, saveTeste);
 await pagina.goto(pathToFileURL(path.join(raiz, 'index.html')).href);
 await pagina.waitForTimeout(1500);
 
 const sufixo = celular ? '-celular' : '';
 for (const p of passos) {
   if (p.startsWith('espera:')) { await pagina.waitForTimeout(+p.slice(7)); continue; }
+  if (p.startsWith('btn:')) { await pagina.evaluate(id => window.__dla.onButton(id), p.slice(4)); await pagina.waitForTimeout(400); continue; }
+  if (p.startsWith('js:')) { await pagina.evaluate(c => (0, eval)(c), p.slice(3)); await pagina.waitForTimeout(200); continue; }
+  if (p.startsWith('foto:')) { await pagina.screenshot({ path: path.join(saida, `${p.slice(5)}${sufixo}.png`) }); continue; }
   if (p.startsWith('luta:')) {
     await pagina.evaluate(i => window.__dla.test(+i), p.slice(5));
     await pagina.waitForTimeout(3000);

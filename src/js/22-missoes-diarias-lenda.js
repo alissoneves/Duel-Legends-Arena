@@ -11,7 +11,7 @@ const MPOOL=[
  {k:'perf',n:[2,3],txt:n=>`Faça ${n} bloqueios perfeitos`,gd:90},
  {k:'dodge',n:[8,12],txt:n=>`Esquive ${n} vezes`,gd:70},
  {k:'ko',n:[4,6],txt:n=>`Derrube ${n} lendas`,gd:90},
- {k:'online',n:[1,2],txt:n=>`Jogue ${n} partida(s) online`,gd:100},
+ {k:'online',n:[1,2],txt:n=>`Jogue ${pl(n,'partida','partidas')} online`,gd:100},
  {k:'ffa',n:[1,1],txt:n=>`Vença um Todos contra Todos`,gd:120},
  {k:'team',n:[2,2],txt:n=>`Jogue 2 partidas em equipe (2x2, 3x3 ou 5x5)`,gd:80},
 ];

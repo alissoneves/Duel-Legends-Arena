@@ -17,4 +17,4 @@ function renderPass(){screenBg();const P=save.pass,lv=passLevel();text(`PASSE DE
  if(!P.premium){panel(70,188,340,40);{let gsum=0;for(let l=1;l<=PASS_LV;l++){const r=passReward(l,true);if(r.k==='gems')gsum+=r.n;}text(`Passe Premium: 15 visuais exclusivos + ${gsum} Gemas de volta ao completar`,W/2,202,8,'#ffffff','center',null,PS);}btn('passbuy',W/2-70,210,140,14,`ATIVAR · ${PASS_PRICE} GEMAS`,(save.gems||0)>=PASS_PRICE?'#ffb02e':'#3a3f66','#0b0c14',5);}
  else text('PREMIUM ATIVO! Pegue as recompensas da trilha de cima e de baixo.',W/2,204,9,'#ffb02e','center','#0b0c14',PS);
  if(shopMsg&&performance.now()-shopMsg.t<2200)text(shopMsg.txt,W/2,240,10,shopMsg.col,'center','#0b0c14',PS);
- btn('menu',8,248,60,16,'VOLTAR','#2e3358','#ffffff',6);btn('shop',W-88,248,80,16,'LOJA','#ffd23f','#0b0c14',6);renderModal();}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);btn('shop',W-88,244,80,20,'LOJA','#2e3358','#ffffff',7);renderModal();}

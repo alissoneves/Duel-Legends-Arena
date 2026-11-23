@@ -1,5 +1,5 @@
 // ---------- RENDER ----------
-function render(){buttons=[];ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0b0c14';ctx.fillRect(0,0,W,H);
+function render(){buttons=[];ctx.setTransform(K,0,0,K,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#0b0c14';ctx.fillRect(0,0,W,H);
  if(state==='title')renderTitle();else if(state==='play')renderPlay();else if(state==='draw')renderDraw();else if(state==='bracket')renderBracket();else if(state==='album')renderAlbum();else if(state==='modes')renderModes();else if(state==='howto')renderHowto();else if(state==='shop')renderShop();else if(state==='bag')renderBag();else if(state==='box')renderBox();else if(state==='pass')renderPass();else if(state==='online')renderOnline();else if(state==='lobby')renderLobby();else if(state==='room')renderRoom();else if(state==='queue')renderQueue();else if(state==='prep')renderPrep();else if(state==='options')renderOptions();else if(state==='rankLobby')renderRankLobby();else if(state==='leader')renderLeader();else if(state==='account')renderAccount();else if(state==='missions')renderMissions();else if(state==='borders')renderBorders();else if(state==='ach')renderAch();else if(state==='icons')renderIcons();else if(state==='profile')renderProfile();else if(state==='streak')renderStreak();else if(state==='seasonEnd')renderSeasonEnd();else{renderGame();if(G&&G.flashT>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(0.55,G.flashT*3)})`;ctx.fillRect(0,0,W,H);G.flashT-=1/60;}if(state==='countdown')renderCountdown();if(state==='result')renderResult();if(paused)renderPause();if(G&&G.tut&&(state==='fight'||state==='countdown'))drawTut();}drawAchToast();drawChal();}
 function logo(cx,y,s){const sc=s||1;
  // dado
@@ -17,15 +17,15 @@ function renderPlay(){screenBg();text('JOGAR',W/2,30,12,'#ffd23f','center','#0b0
  const C=[['modes','CONTRA BOTS','Duelo, duplas, trios, equipes,','todos x todos e torneio',['saci','iara','zeus']],['online','ONLINE','Salas com amigos, partida','rápida e ranqueada',['yeti','iara']]];
  C.forEach((c,i)=>{const x=40+i*208,y=58,w=192,h=168;panel(x,y,w,h);const n=c[4].length;c[4].forEach((id,k)=>drawSprite(id,x+w/2+(k-(n-1)/2)*44,y+76,2,k%2?-1:1));
   text(c[2],x+w/2,y+100,9,'#c9cbe6','center',null,PS);text(c[3],x+w/2,y+112,9,'#c9cbe6','center',null,PS);btn(c[0],x+12,y+126,w-24,30,c[1],'#ffd23f','#0b0c14',10);});
- btn('menu',W/2-48,242,96,22,'VOLTAR','#2e3358','#ffffff',7);}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);}
 function renderModes(){screenBg();text('CONTRA BOTS',W/2,30,12,'#ffd23f','center','#0b0c14');text('Seu lutador é sempre sorteado',W/2,44,10,'#c9cbe6','center','#0b0c14',PS);
  const M=[['m:1x1','DUELO 1x1','Você contra uma lenda','#ffd23f',['saci']],['m:2x2','DUPLAS 2x2','Você + 1 aliado bot','#7fc8ff',['saci','iara']],['m:3x3','TRIOS 3x3','Você + 2 aliados bots','#7fe0c8',['saci','iara','zeus']],
   ['m:5x5','EQUIPES 5x5','Batalha de 10 lendas','#b07aff',['saci','iara','zeus','yeti','saci']],['m:ffa','TODOS x TODOS','6 lendas, só 1 sobrevive','#ff6a3d',['zeus','yeti','iara']],['tour','TORNEIO','16 vagas, mata-mata','#ff8a3d',['zeus']]];
- M.forEach((m,i)=>{const x=24+(i%3)*148,y=58+Math.floor(i/3)*92,w=136,h=82;panel(x,y,w,h);ctx.strokeStyle=m[3];ctx.lineWidth=1;ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);
+ M.forEach((m,i)=>{const x=24+(i%3)*148,y=58+Math.floor(i/3)*92,w=136,h=82;panel(x,y,w,h);
   const n=m[4].length;m[4].forEach((id,k)=>drawSprite(id,x+w/2+(k-(n-1)/2)*Math.min(22,110/n),y+38,1,k%2?-1:1));
-  btn(m[0],x+8,y+44,w-16,18,m[1],m[3],'#0b0c14',m[1].length>11?6:7);text(m[2],x+w/2,y+74,9,'#ffe2d0','center',null,PS);});
- btn('menu',W/2-48,244,96,20,'VOLTAR','#2e3358','#ffffff',7);}
-function renderLeader(){screenBg();text('RANKING GLOBAL',W/2,22,12,'#ff8a3d','center','#0b0c14');text(`Temporada ${save.rank.season} · ${LB.total} jogadores com elo`,W/2,36,9,'#c9cbe6','center','#0b0c14',PS);
+  btn(m[0],x+8,y+44,w-16,18,m[1],i===0?'#ffd23f':'#2e3358',i===0?'#0b0c14':'#ffffff',m[1].length>11?6:7);text(m[2],x+w/2,y+74,9,'#ffe2d0','center',null,PS);});
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);}
+function renderLeader(){screenBg();text('RANKING GLOBAL',W/2,22,12,'#ffd23f','center','#0b0c14');text(`Temporada ${save.rank.season} · ${LB.total} jogadores com elo`,W/2,36,9,'#c9cbe6','center','#0b0c14',PS);
  panel(40,44,400,174);
  if(LB.loading)text('Carregando…',W/2,130,10,'#c9cbe6','center',null,PS);
  else if(LB.err)text(LB.err,W/2,130,9,'#ff9a9a','center',null,PS);
@@ -38,12 +38,12 @@ function renderLeader(){screenBg();text('RANKING GLOBAL',W/2,22,12,'#ff8a3d','ce
  const pages=Math.max(1,Math.ceil(LB.list.length/10));text(`${LB.page+1}/${pages}`,W/2,232,8,'#c9cbe6','center',null,PS);
  btn('ldp',W/2-60,224,26,14,'<','#2e3358','#ffffff',7);btn('ldn',W/2+34,224,26,14,'>','#2e3358','#ffffff',7);
  const R=save.rank;text(LB.me&&LB.me.pos?`Você: ${LB.me.pos}º de ${LB.total} · ${rankLabel(R)}`:R.tier<0?`Termine a colocação (${R.placed}/5) para entrar no ranking`:`Você: ${rankLabel(R)}`,W/2,252,9,'#ffd23f','center','#0b0c14',PS);
- btn('ldback',8,244,60,18,'VOLTAR','#2e3358','#ffffff',6);btn('ldr',W-82,244,74,18,'ATUALIZAR','#4fd1ff','#0b0c14',6);}
-function renderRankLobby(){screenBg();const R=save.rank;text('RANQUEADA ONLINE',W/2,24,12,'#ff8a3d','center','#0b0c14');text(`Temporada ${R.season} · Etapa ${R.split}`,W/2,38,9,'#c9cbe6','center','#0b0c14',PS);
+ btn('ldback',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);btn('ldr',W-88,244,80,20,'ATUALIZAR','#2e3358','#ffffff',7);}
+function renderRankLobby(){screenBg();const R=save.rank;text('RANQUEADA ONLINE',W/2,24,12,'#ffd23f','center','#0b0c14');text(`Temporada ${R.season} · Etapa ${R.split}`,W/2,38,9,'#c9cbe6','center','#0b0c14',PS);
  panel(140,48,200,120);emblem(W/2,92,34,R);text(R.tier<0?'SEM ELO':rankName(R).toUpperCase(),W/2,138,10,rankCol(R),'center','#0b0c14');
  if(R.tier<0)text(`Partidas de colocação: ${R.placed}/5`,W/2,152,9,'#ffe2d0','center',null,PS);else if(R.tier<7){bar(170,146,140,5,R.lp/100,rankCol(R));text(`${R.lp}/100 PDL`,W/2,162,8,'#ffffff','center',null,PS);}else text(`${R.lp} PDL${apexOf(R)<9?' · '+(apexOf(R)===7?200:500)+' para '+TIERS[apexOf(R)+1].n:''}`,W/2,156,9,'#ffffff','center',null,PS);
  // escada de elos
  for(let i=0;i<TIERS.length;i++){const x=24+i*48,cur=R.tier>=0&&apexOf(R)===i;emblem(x,196,cur?12:9,{tier:i<7?i:7,lp:i===8?200:i===9?500:0,div:0});text(TIERS[i].n.replace('Grão-Mestre','Grão-M.'),x,216,7,cur?TIERS[i].col:'#6a6f98','center',null,PS);}
  text('1x1 contra pessoas · itens com teto · a cada 100 PDL sobe uma divisão',W/2,230,8,'#c9cbe6','center',null,PS);
- btn('rankgo',W/2-70,238,140,22,'PROCURAR PARTIDA','#ffd23f','#0b0c14',7);btn('leader',W-84,238,76,22,'RANKING','#4fd1ff','#0b0c14',7);btn('online',8,244,60,18,'VOLTAR','#2e3358','#ffffff',6);text(NET.status==='on'?'online':NET.status==='connecting'?'conectando…':'desconectado',W-8,14,8,NET.status==='on'?'#46d160':'#ff9a9a','right','#0b0c14',PS);if(NET.err&&performance.now()-(NET.errT||0)<4000)text(NET.err,W/2,44,8,'#ff9a9a','center','#0b0c14',PS);
+ btn('rankgo',W/2-70,238,140,22,'PROCURAR PARTIDA','#ffd23f','#0b0c14',7);btn('leader',W-88,244,80,20,'RANKING','#2e3358','#ffffff',7);btn('online',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);text(NET.status==='on'?'online':NET.status==='connecting'?'conectando…':'desconectado',W-8,14,8,NET.status==='on'?'#46d160':'#ff9a9a','right','#0b0c14',PS);if(NET.err&&performance.now()-(NET.errT||0)<4000)text(NET.err,W/2,44,8,'#ff9a9a','center','#0b0c14',PS);
  if(R.shield>0&&R.tier>0)text(`Proteção de rebaixamento: ${R.shield}`,W-8,28,8,'#bfeaff','right',null,PS);}

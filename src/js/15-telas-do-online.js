@@ -1,18 +1,18 @@
 // ---------- TELAS DO ONLINE ----------
 let lobbyPage=0,createMode='1x1';
 const QBOT_WAIT=20;
-function onlineHeader(t){screenBg();text(t,W/2,22,12,'#4fd1ff','center','#0b0c14');text(`${save.nick||'Jogador'} · ${NET.status==='on'?`online · ${NET.ping}ms${NET.online?` · ${NET.online} jogando`:''}`:NET.status==='connecting'?'conectando…':'desconectado'}`,W-8,14,8,NET.status==='on'?'#46d160':'#ff9a9a','right','#0b0c14',PS);
+function onlineHeader(t){screenBg();text(t,W/2,22,12,'#ffd23f','center','#0b0c14');text(`${save.nick||'Jogador'} · ${NET.status==='on'?`online · ${NET.ping}ms${NET.online?` · ${NET.online} jogando`:''}`:NET.status==='connecting'?'conectando…':'desconectado'}`,W-8,14,8,NET.status==='on'?'#46d160':'#ff9a9a','right','#0b0c14',PS);
  if(NET.err&&performance.now()-(NET.errT||0)<4000)text(NET.err,W/2,240,9,'#ff9a9a','center','#0b0c14',PS);}
 function renderOnline(){onlineHeader('ONLINE');
  if(NET.status!=='on'){text(NET.status==='connecting'?'Conectando ao servidor…':'Você está desconectado.',W/2,90,10,'#ffffff','center',null,PS);if(NET.err)text(NET.err,W/2,108,8,'#ff9a9a','center',null,PS);
-  if(NET.status!=='connecting')btn('netconn',W/2-60,124,120,22,'CONECTAR','#4fd1ff','#0b0c14',8);text('Servidor: '+serverUrl(),W/2,164,7,'#8a8fb8','center',null,PS);btn('netsrv',W/2-60,172,120,14,'TROCAR SERVIDOR','#2e3358','#ffffff',5);}
+  if(NET.status!=='connecting')btn('netconn',W/2-60,124,120,22,'CONECTAR','#ffd23f','#0b0c14',8);text('Servidor: '+serverUrl(),W/2,164,7,'#8a8fb8','center',null,PS);btn('netsrv',W/2-60,172,120,14,'TROCAR SERVIDOR','#2e3358','#ffffff',5);}
  else{panel(40,50,400,170);btn('quickmatch',52,64,120,40,'PARTIDA RÁPIDA','#ffd23f','#0b0c14',6);text('1x1 casual',112,116,8,'#c9cbe6','center',null,PS);
-  btn('ranked',180,64,120,40,'RANQUEADA','#ff8a3d','#0b0c14',7);text(rankLabel(save.rank),240,116,8,rankCol(save.rank),'center',null,PS);text('1x1 valendo elo',240,127,7,'#8a8fb8','center',null,PS);
-  btn('lobby',308,64,120,40,'SALAS','#4fd1ff','#0b0c14',8);text('Até 10 pessoas, com senha',368,116,8,'#c9cbe6','center',null,PS);
+  btn('ranked',180,64,120,40,'RANQUEADA','#2e3358','#ffffff',7);text(rankLabel(save.rank),240,116,8,rankCol(save.rank),'center',null,PS);text('1x1 valendo elo',240,127,7,'#8a8fb8','center',null,PS);
+  btn('lobby',308,64,120,40,'SALAS','#2e3358','#ffffff',8);text('Até 10 pessoas, com senha',368,116,8,'#c9cbe6','center',null,PS);
   btn(save.nick&&!NET.canRename?'icons':'netnick',52,150,116,18,save.nick&&!NET.canRename?'MEU ÍCONE':'ESCOLHER NOME','#2e3358','#ffffff',6);btn('account',182,150,116,18,save.user?'CONTA: '+save.user.slice(0,8):'CRIAR CONTA','#7a5af0','#ffffff',6);btn('netsrv',312,150,116,18,'SERVIDOR','#2e3358','#ffffff',6);
   const RV=(save.rivals||[]).slice(0,3);if(RV.length){text('ÚLTIMOS RIVAIS · toque para desafiar',W/2,184,6,'#ffd23f','center');RV.forEach((r,i)=>{const x=W/2-RV.length*64+i*128+4;btn('rival:'+i,x,190,120,18,r.n.slice(0,14),r.w?'#1c3a26':'#3a1c22','#ffffff',6);});}
   else text('Itens valem online com o mesmo teto dos modos normais. Chat só com mensagens prontas.',W/2,196,8,'#8a8fb8','center',null,PS);}
- btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);renderModal();}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);renderModal();}
 function renderQueue(){onlineHeader(NET.rankQ?'RANQUEADA':'PARTIDA RÁPIDA');if(NET.rankQ)text(`${rankLabel(save.rank)} · procurando rival do seu nível`,W/2,80,9,rankCol(save.rank),'center',null,PS);text('Procurando outro jogador'+'.'.repeat(1+Math.floor(time*2)%3),W/2,110,11,'#ffffff','center',null,PS);if(NET.online)text(`${NET.online} ${NET.online===1?'pessoa':'pessoas'} online agora`,W/2,126,9,'#46d160','center',null,PS);
  if(!NET.rankQ&&NET.qT){const left=Math.ceil(QBOT_WAIT-(performance.now()-NET.qT)/1000);if(left<=0){NET.qT=0;netSend({t:'unqueue'});NET.queued=false;newPick('1x1');pick.qbot=true;NET.err='Ninguém apareceu. Treine contra um bot enquanto isso!';NET.errT=performance.now();return;}text(`Sem rival em ${left}s, você luta contra um bot`,W/2,232,8,'#c9cbe6','center',null,PS);}drawSprite('saci',W/2,170,2,Math.sin(time*3)>0?1:-1);btn('unqueue',W/2-50,200,100,18,'CANCELAR','#2e3358','#ffffff',6);}
 function renderLobby(){onlineHeader('SALAS');const R=NET.rooms||[];panel(10,32,330,204);
@@ -21,8 +21,8 @@ function renderLobby(){onlineHeader('SALAS');const R=NET.rooms||[];panel(10,32,3
   if(r.status==='lobby'&&r.players<r.max)btn('join:'+r.id,276,y+3,56,16,'ENTRAR','#46d160','#0b0c14',6);else text(r.status==='lobby'?'CHEIA':'JOGANDO',304,y+14,6,'#ff8a3d','center');});
  panel(348,32,122,204);text('CRIAR SALA',409,44,7,'#ffd23f','center');[['1x1','1x1'],['2x2','2x2'],['3x3','3x3'],['5x5','5x5'],['ffa','TODOS']].forEach((m,i)=>btn('cmode:'+m[0],354+(i%2)*56,52+Math.floor(i/2)*20,54,17,m[1],createMode===m[0]?'#ffd23f':'#2e3358',createMode===m[0]?'#0b0c14':'#ffffff',6));
  btn('createroom',354,116,110,20,'CRIAR','#46d160','#0b0c14',7);btn('createlock',354,140,110,16,'CRIAR COM SENHA','#2e3358','#ffffff',5);text(`Até ${{'1x1':2,'2x2':4,'3x3':6,'5x5':10,ffa:8}[createMode]} pessoas`,409,168,7,'#ffd23f','center',null,PS);text('Vagas sem gente viram bots',409,180,7,'#8a8fb8','center',null,PS);
- btn('netlist',354,192,110,16,'ATUALIZAR','#2e3358','#ffffff',6);btn('joincode',354,212,110,18,'ENTRAR COM CÓDIGO','#4fd1ff','#0b0c14',5);
- btn('online',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);renderModal();}
+ btn('netlist',354,192,110,16,'ATUALIZAR','#2e3358','#ffffff',6);btn('joincode',354,212,110,18,'ENTRAR COM CÓDIGO','#2e3358','#ffffff',5);
+ btn('online',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);renderModal();}
 // convite: abre o compartilhamento do celular (ou o WhatsApp) com o código da sala
 const GAME_URL='https://alissoneves.github.io/Duel-Legends-Arena/';   // página própria do jogo (GitHub Pages)
 function gameUrl(){if(GAME_URL)return GAME_URL;try{const r=document.referrer;if(/itch\.io/.test(r)){const u=new URL(r);return u.origin+u.pathname;}}catch(e){}return location.protocol.startsWith('http')&&!/itch\.zone|hwcdn/.test(location.host)?location.origin+location.pathname:'';}
@@ -51,7 +51,7 @@ let boxAnim=null;
 function boxOpen(){if(!(save.boxes>0)||boxAnim)return;save.boxes--;const KB=Object.keys(BASES),r=rollOdds(BOX_ODDS),win=newItem(KB[Math.floor(Math.random()*KB.length)],r);save.inv.push(win);let icon=null;{const left=ICON_BOX.map(idOf).filter(id=>id&&!iconOwned(id));if(left.length&&Math.random()<0.5){icon=left[Math.floor(Math.random()*left.length)];giveIcon(icon);}}persist();
  const strip=[];for(let i=0;i<46;i++){strip.push(i===38?win:{b:KB[Math.floor(Math.random()*KB.length)],r:rollOdds([0.42,0.28,0.16,0.08,0.04,0.02]),up:0});}
  boxAnim={strip,win,icon,t0:performance.now(),dur:5.2,done:false,lastIdx:-1,target:38+rnd(-0.32,0.32)};sfx('reveal');}
-function renderBox(){screenBg();text('CAIXA DA SORTE',W/2,22,12,'#ffd23f','center','#0b0c14');text(`Você tem ${save.boxes||0} caixa(s) · ganhe subindo de elo na ranqueada`,W/2,36,9,'#c9cbe6','center','#0b0c14',PS);
+function renderBox(){screenBg();text('CAIXA DA SORTE',W/2,22,12,'#ffd23f','center','#0b0c14');text(`Você tem ${pl(save.boxes||0,'caixa','caixas')} · ganhe subindo de elo na ranqueada`,W/2,36,9,'#c9cbe6','center','#0b0c14',PS);
  const cx=W/2,y=62,cw=44,ch=54;panel(16,y-6,W-32,ch+12);
  if(boxAnim){const A=boxAnim,el=(performance.now()-A.t0)/1000,k=Math.min(1,el/A.dur),e=1-Math.pow(1-k,4),pos=e*A.target;
   ctx.save();ctx.beginPath();ctx.rect(18,y-4,W-36,ch+8);ctx.clip();
@@ -68,7 +68,7 @@ function renderBox(){screenBg();text('CAIXA DA SORTE',W/2,22,12,'#ffd23f','cente
   panel(W/2-110,130,220,92);text('CHANCES',W/2,140,6,'#ffd23f','center');RARI.forEach((R,i)=>{const yy=152+i*11;text(R.n,W/2-96,yy,9,R.col,'left',null,PS);const pc=BOX_ODDS[i]*100;text((pc<1?pc.toFixed(1):pc.toFixed(pc%1?1:0)).replace('.',',')+'%',W/2+96,yy,9,'#ffffff','right',null,PS);ctx.fillStyle=R.col;ctx.fillRect(W/2-24,yy-5,Math.max(1,BOX_ODDS[i]*110),4);});
   if(boxAnim&&boxAnim.icon&&(performance.now()-boxAnim.t0)/1000>boxAnim.dur){const nm=(CHARS.find(c=>c.id===boxAnim.icon)||{}).name;ctx.fillStyle='#0b0c14';ctx.fillRect(W/2-112,108,224,20);ctx.fillStyle='#ff7ad9';ctx.fillRect(W/2-110,110,220,16);text('BÔNUS: ícone de perfil '+nm+'!',W/2,121,7,'#0b0c14','center');}
   btn('boxopen',W/2-70,228,140,22,save.boxes>0?'GIRAR!':'SEM CAIXAS',save.boxes>0?'#ffd23f':'#3a3f66',save.boxes>0?'#0b0c14':'#8a8fb8',9);}
- btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);}
 // ---- PREPARAÇÃO (equipar e PRONTO) ----
 function prepPlayers(){const L=[{n:'Você',c:pick.me,me:true,team:0}];if(pick.allies)pick.allies.forEach(c=>L.push({n:'Aliado',c,team:0}));const fs=pick.foes||[pick.foe];fs.forEach(c=>L.push({n:pick.mode==='ffa'?'Rival':'Bot',c,team:1}));return L;}
 function enterPrep(next){prepInfo={t0:performance.now(),ready:false,next,players:prepPlayers().map((q,i)=>Object.assign(q,{at:q.me?1e9:rnd(1.2,5.5)+i*0.25}))};prepSlot=null;state='prep';}

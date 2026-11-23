@@ -7,7 +7,10 @@ window.addEventListener('unhandledrejection',e=>{const r=e.reason;errPush('Promi
 const W=480,H=270;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 ctx.imageSmoothingEnabled=false;
-function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';}
+// K = pixels reais por pixel do jogo. Inteiro quando possível (pixels iguais); fracionário só se o inteiro encolher a tela mais de 15%.
+let K=1;
+function fit(){const dpr=window.devicePixelRatio||1,dMax=Math.min(innerWidth/W,innerHeight/H)*dpr,kI=Math.floor(dMax);let d=kI>=1&&kI/dMax>=0.85?kI:dMax;d=Math.max(1,Math.min(6,d));
+ const bw=Math.round(W*d),bh=Math.round(H*d);if(cv.width!==bw||cv.height!==bh){cv.width=bw;cv.height=bh;}K=bw/W;ctx.imageSmoothingEnabled=false;cv.style.width=(bw/dpr)+'px';cv.style.height=(bh/dpr)+'px';}
 addEventListener('resize',fit);fit();
 const PX='"Press Start 2P", monospace', PS='"Pixelify Sans", sans-serif';
 const rnd=(a,b)=>a+Math.random()*(b-a), clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t;

@@ -39,7 +39,7 @@ function renderIcons(){screenBg();text('ÍCONE DE PERFIL',W/2,20,12,'#ffd23f','c
   ctx.fillStyle=on?'#ffd23f':'#0b0c14';ctx.fillRect(x-2,y-2,44,44);ctx.fillStyle=own?'#23264a':'#141626';ctx.fillRect(x,y,40,40);ctx.save();ctx.beginPath();ctx.rect(x,y,40,40);ctx.clip();drawSprite(id,x+20,y+38,1.6,1,false,own?1:0.25);ctx.restore();
   if(!own){text('?',x+20,y+26,12,'#6a6f98','center');}text(n.length>9?n.slice(0,8)+'…':n,x+20,y+50,6,own?'#ffffff':'#6a6f98','center',null,PS);text(own?(on?'EM USO':''):iconSrc(n),x+20,y+57,5,on?'#ffd23f':'#8a8fb8','center',null,PS);
   if(own)buttons.push({id:'ico:'+id,x,y,w:40,h:40});});
- btn('profile',8,248,60,16,'VOLTAR','#2e3358','#ffffff',6);}
+ btn('profile',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);}
 function renderBorders(){screenBg();text('BORDAS DE ELO',W/2,20,12,'#ffd23f','center','#0b0c14');text('A cor vem do elo · as gemas vêm da divisão (IV → I) · Mestre e acima são animadas',W/2,33,7,'#c9cbe6','center',null,PS);
  // vitrine: cada elo com a divisão I (e IV de Ferro a Diamante em miniatura)
  for(let t=0;t<10;t++){const col=t%5,row=Math.floor(t/5),x=34+col*86,y=40+row*84;const sel=BRD.sel===t;
@@ -50,6 +50,6 @@ function renderBorders(){screenBg();text('BORDAS DE ELO',W/2,20,12,'#ffd23f','ce
  let x=42;const opts=[['elo',cur?'Elo atual: '+frameName(cur.t,cur.d):'Elo atual (sem elo)']].concat(bs.map(b=>['s'+b.s,`T${b.s}: ${frameName(b.t,b.d)}`]));
  opts.forEach(([k,lab])=>{const on=(save.frame||'elo')===k;ctx.font=`6px ${PX}`;const w=Math.min(140,ctx.measureText(lab).width+12);if(x+w>446)return;btn('frm:'+k,x,224,w,14,lab,on?'#ffd23f':'#2e3358',on?'#0b0c14':'#ffffff',5);x+=w+6;});
  const se=seasonInfo();text(`Temporada ${se.n} termina em ${se.left}. Você ganha a borda do maior elo que alcançar${R.peakName?` (até agora: ${R.peakName})`:''}.`,W/2,252,7,'#8ef0a0','center',null,PS);
- btn('profile',8,256,60,12,'VOLTAR','#2e3358','#ffffff',5);}
+ btn('profile',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);}
 // temporadas de 3 meses: T1 = dez/2026 a fev/2027 (o servidor confirma)
 function seasonInfo(){const n=save.rank.season||1,end=NET.seasonEnd||Date.UTC(2027,2,1,3);const d=Math.max(0,end-nowT());return {n,left:d>DAY?Math.ceil(d/DAY)+' dias':Math.ceil(d/3600000)+'h'};}

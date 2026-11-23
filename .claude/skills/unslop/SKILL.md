@@ -137,3 +137,12 @@ Duel Legends Arena: jogo web em canvas 480×270 (pixel art, escalado com `image-
 - Textos passam por `tr()`: mudou um texto, atualize `src/js/16a-idiomas.js` (inglês e espanhol).
 - Cores de significado já existentes: elemento (`ELCOL` em `01-elementos.js`), raridade das lendas (`RAR` em `03-personagens.js`) e dos itens (`RARI` em `08-itens-loja-e.js`), moedas GD (amarelo), Pó (roxo), Gemas (azul). Não gaste essas cores em botões comuns.
 - Mudança visual não muda a versão online, mas publicar segue a skill `publicar-versao`.
+- **Padrões já fixados** (siga em telas novas):
+  - Título da tela: amarelo `#ffd23f`, 12 px, centralizado, com contorno.
+  - Botão comum: `#2e3358` com texto branco. Ação principal: amarelo `#ffd23f` com texto escuro, uma por tela. Prêmio pronto para resgatar: verde `#8ef0a0`. Destrutivo: vermelho escuro.
+  - VOLTAR sempre em `btn(id,8,244,80,20,'VOLTAR','#2e3358','#ffffff',7)`; botão de navegação do canto direito em `W-88,244,80,20`.
+  - Plural com `pl(n,'dia','dias')` (em `19-texto.js`), nunca `dia(s)`. Se mudar o texto, ajuste o padrão em `16a-idiomas.js`.
+  - Assinatura: o dado do sorteio (logo e botão JOGAR).
+  - Tela inicial: JOGAR é a única ação grande; o resto fica na barra de abas (`tab()` + ícones 8×8 de `ICONS`/`icon()` em `18-ui-botoes.js`). Ícone novo entra em `ICONS`, no mesmo estilo (1 cor, 8×8, desenhado em 2×).
+  - Resolução: o canvas desenha em `K` pixels reais por pixel do jogo (`fit()` em `00-inicio.js`; `render()` aplica `setTransform(K…)`). Continue desenhando em coordenadas 480×270; quem ler pixels do canvas (`createImageBitmap`, `getImageData`) multiplica por `K`.
+  - Sprites passam por `finishSprite()` (luz de cima à esquerda) em `03-personagens.js`; o original fica em `SPR[id].raw` para comparar.

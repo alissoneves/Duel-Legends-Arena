@@ -1,4 +1,5 @@
 // ---------- TEXTO ----------
+function pl(n,um,varios){return `${n} ${n===1?um:varios}`;}
 function text(s,x,y,size,col,align,outline,font){s=tr(s);ctx.font=`${size}px ${font||PX}`;ctx.textAlign=align||'left';ctx.textBaseline='alphabetic';
  if(outline){ctx.fillStyle=outline;for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,-1],[1,-1],[-1,1]])ctx.fillText(s,Math.round(x)+dx,Math.round(y)+dy);}
  ctx.fillStyle=col;ctx.fillText(s,Math.round(x),Math.round(y));}

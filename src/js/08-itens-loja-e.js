@@ -79,7 +79,7 @@ function renderShopOld(){screenBg();text('LOJA',W/2,22,12,'#ffd23f','center','#0
  btn('buypo:1',360,130,102,20,'1 por 150 GD',save.gd>=150?'#c77dff':'#3a3f66','#0b0c14',6);btn('buypo:5',360,156,102,20,'5 por 650 GD',save.gd>=650?'#c77dff':'#3a3f66','#0b0c14',6);
  btn('reroll',360,190,102,20,'NOVAS OFERTAS 40',save.gd>=40?'#2e3358':'#1d2140','#ffffff',5);text(`Ofertas novas a cada 3 partidas (${3-(save.shop.n||0)} restantes)`,W/2,236,8,'#8a8fb8','center',null,PS);
  if(shopMsg&&performance.now()-shopMsg.t<2200)text(shopMsg.txt,W/2,226,10,shopMsg.col,'center','#0b0c14',PS);
- btn('menu',8,246,70,18,'VOLTAR','#2e3358','#ffffff',6);btn('bag',W-108,246,100,18,'MOCHILA','#2e3358','#ffffff',6);}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);btn('bag',W-108,246,100,18,'MOCHILA','#2e3358','#ffffff',6);}
 // ---- MOCHILA E FORJA ----
 function bagList(){let L=save.inv.slice();if(bagFilter!=='all')L=L.filter(it=>BASES[it.b].slot===bagFilter);return L.sort((a,b)=>itemPower(b)-itemPower(a));}
 function renderBag(){screenBg();text('MOCHILA E FORJA',W/2,20,11,'#ffd23f','center','#0b0c14');gdBar();
@@ -102,5 +102,5 @@ function renderBag(){screenBg();text('MOCHILA E FORJA',W/2,20,11,'#ffd23f','cent
    const can=save.po>=po&&save.gd>=gd;btn('bup',300,184,162,20,'MELHORAR',can?'#c77dff':'#3a3f66',can?'#0b0c14':'#8a8fb8',7);}
   btn('bsell',300,210,162,16,`DESMANCHAR: +${dismPo(it)} PÓ`,'#5a2a6a','#ffffff',5);}
  if(bagMsg&&performance.now()-bagMsg.t<2600){const k=Math.min(1,(performance.now()-bagMsg.t)/150);ctx.globalAlpha=k;text(bagMsg.txt,381,252,10,bagMsg.col,'center','#0b0c14',PS);ctx.globalAlpha=1;}
- btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);btn('shop',150,248,90,16,'LOJA','#ffd23f','#0b0c14',6);btn('box',246,248,40,16,`CX ${save.boxes||0}`,save.boxes>0?'#ff8a3d':'#2e3358',save.boxes>0?'#0b0c14':'#ffffff',6);renderModal();}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);btn('shop',96,244,80,20,'LOJA','#2e3358','#ffffff',7);btn('box',184,244,112,20,save.boxes>1?`ABRIR CAIXA x${save.boxes}`:save.boxes>0?'ABRIR CAIXA':'CAIXA DA SORTE',save.boxes>0?'#8ef0a0':'#2e3358',save.boxes>0?'#0b0c14':'#ffffff',6);renderModal();}
 

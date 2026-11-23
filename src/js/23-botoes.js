@@ -45,7 +45,7 @@ function onButton(id){sfx('beep');
  if(id==='menu'&&state==='shop'&&prepInfo&&bagBack==='prep'){state='bag';return;}
  if(id==='menu'&&state==='bag'&&bagBack==='prep'&&prepInfo){const el=(performance.now()-prepInfo.t0)/1000;prepInfo.t0=performance.now()-Math.min(el,15)*1000;state='prep';return;}
  if(id==='modes'){if(!save.tutAsked&&!(save.games>0)){save.tutAsked=true;persist();modal={title:'PRIMEIRA VEZ NA ARENA?',lines:['Faça o tutorial rápido (1 minuto) e aprenda','a andar, atacar, esquivar, bloquear e usar o especial.','Vencendo, você ganha 100 GD!'],btns:[['mod:tut','FAZER TUTORIAL','#ffd23f'],['mod:skiptut','PULAR','#c9cbe6']]};return;}if(!save.howto){save.howto=true;persist();howPage=0;howNext='modes';state='howto';return;}state='modes';return;}
- if(id==='howto'){howPage=0;howNext='title';state='howto';return;}
+ if(id==='howto'){howPage=0;howNext=state==='options'?'options':'title';state='howto';return;}
  if(id==='hprev'){howPage=Math.max(0,howPage-1);return;}if(id==='hnext'){if(howPage<2)howPage++;else state=howNext;return;}if(id==='hclose'){state=howNext;return;}
  if(id==='options'){state='options';return;}
  if(id==='shop'){prevState=state==='prep'?prevState:state;state='shop';return;}

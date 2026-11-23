@@ -94,7 +94,16 @@ function buildProc(p){const Wd=16,Hd=20;const Gd=[];for(let y=0;y<Hd;y++)Gd.push
  for(let y=0;y<Hd;y++)for(let x=0;x<Wd;x++){const ch=O[y][x];if(ch==='.')continue;g.fillStyle=pal[ch]||'#ff00ff';g.fillRect(x,y,1,1);wg.fillRect(x,y,1,1);}
  return {img:c,white:wc,w:Wd,h:Hd};}
 
-const SPR={};CHARS.forEach(c=>SPR[c.id]=c.hand?buildSprite(c.id):buildProc(c.spr));
+// acabamento: luz vinda de cima à esquerda. Pixels na borda de baixo/direita da forma escurecem, os da borda de cima clareiam.
+function finishSprite(sp){try{const g=sp.img.getContext('2d'),w=sp.w,h=sp.h,rc=document.createElement('canvas');rc.width=w;rc.height=h;rc.getContext('2d').drawImage(sp.img,0,0);sp.raw=rc;const d=g.getImageData(0,0,w,h),p=d.data,o=new Uint8ClampedArray(p);
+ const at=(x,y)=>x<0||y<0||x>=w||y>=h?0:o[(y*w+x)*4+3];const dark=(x,y)=>{const i=(y*w+x)*4;return o[i+3]>0&&o[i]+o[i+1]+o[i+2]<120;};
+ const edge=(x,y)=>!at(x,y)||dark(x,y)&&(!at(x+1,y)||!at(x-1,y)||!at(x,y+1)||!at(x,y-1));
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if(!o[i+3]||dark(x,y))continue;let f=1,l=0;
+  if(edge(x,y+1))f*=0.72;else if(edge(x+1,y))f*=0.84;
+  if(edge(x,y-1)&&f===1)l=0.16;
+  for(let c=0;c<3;c++)p[i+c]=Math.round(o[i+c]*f+(255-o[i+c]*f)*l);}
+ g.putImageData(d,0,0);}catch(e){}return sp;}
+const SPR={};CHARS.forEach(c=>SPR[c.id]=finishSprite(c.hand?buildSprite(c.id):buildProc(c.spr)));
 
 // nome curto para lugares apertados: "Nerojor, The Knight" vira "Nerojor"
 function shortN(c,n){const s=(c&&c.name)||'';if(s.length<=n)return s;const b=s.split(',')[0];return b.length<=n?b:s.slice(0,n);}

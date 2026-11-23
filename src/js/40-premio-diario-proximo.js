@@ -25,7 +25,7 @@ function renderStreak(){screenBg();const I=streakInfo();text('PRÊMIO DIÁRIO',W
   btn('usefix',W/2-60,198,120,16,save.useFixed===false?'USAR NAS PARTIDAS':'VOLTAR AO SORTEIO',save.useFixed===false?'#4fd1ff':'#2e3358',save.useFixed===false?'#0b0c14':'#ffffff',5);text('vale contra bots e na partida casual',W/2-60,226,7,'#8a8fb8','left',null,PS);}
  else text('Volte amanhã para o próximo prêmio!',W/2,180,10,'#8ef0a0','center',null,PS);
  if(SK.msg&&!(SK.spinT&&!SK.done))text(SK.msg,W/2,240,9,'#8ef0a0','center',null,PS);
- btn('menu',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);}
 // ---- próximo objetivo (menu principal) ----
 function nextGoal(){const d=dayIdx(),M=missToday();
  if(streakInfo().can)return ['streak',`Prêmio diário: resgate o dia ${streakInfo().n}`];
@@ -59,6 +59,6 @@ function renderSeasonEnd(){screenBg();const L=SE.data||(save.rank&&save.rank.las
  const pos=save.lastPos&&save.lastPos.s===L.s?save.lastPos:null;
  text(`Vitórias ${L.w||0} · Derrotas ${L.l||0}${pos?` · ${pos.pos}º no ranking`:''}`,W/2,202,9,'#8ef0a0','center',null,PS);
  text('A borda fica no seu perfil para sempre. A nova temporada começa com 5 partidas de colocação.',W/2,232,7,'#8a8fb8','center',null,PS);
- btn('seshare',W/2-150,244,140,20,'COPIAR RESULTADO','#4fd1ff','#0b0c14',6);btn('seok',W/2+10,244,140,20,'NOVA TEMPORADA!','#ffd23f','#0b0c14',7);}
+ btn('seshare',W/2-150,244,140,20,'COPIAR RESULTADO','#2e3358','#ffffff',6);btn('seok',W/2+10,244,140,20,'NOVA TEMPORADA!','#ffd23f','#0b0c14',7);}
 function seasonShare(){const L=SE.data||{};const pos=save.lastPos&&save.lastPos.s===L.s?` · ${save.lastPos.pos}º no ranking`:'';
  const t=`🏆 Temporada ${L.s} do Duel Legends Arena: ${L.peakName||'sem elo'}${pos}! Vitórias ${L.w||0}.\n${GAME_URL}`;try{navigator.clipboard.writeText(t);NET.err='Resultado copiado! Cole onde quiser.';NET.errT=performance.now();}catch(e){}}

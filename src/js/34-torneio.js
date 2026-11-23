@@ -51,4 +51,4 @@ function renderAlbum(){const bg=ARENAS[6];bg.bg=bg.bg||buildArena(bg);ctx.drawIm
    [['ATQ',c.atk,'#ff6a3d'],['DEF',c.def,'#9aa3c7'],['VEL',c.vel,'#ffd23f'],['ESP',c.esp,'#4fc3ff'],['ESQ',c.esq,'#8ef0a0']].forEach((s2,i)=>{const yy=py+100+i*9;text(s2[0],px+4,yy+6,6,'#c9cbe6');bar(px+28,yy+1,48,5,(s2[1]-40)/60,s2[2]);text(String(s2[1]),px+96,yy+6,6,'#ffffff','right');});
    c.pw.forEach((p,i)=>{p=tr(p);text(`${'ABC'[i]} ${p.length>17?p.slice(0,16)+'…':p}`,px+4,py+158+i*10,8,'#ffe2d0','left',null,PS);});
    const m=save.mastery[c.id]||0,gi=gemOf(m);text(`${GEMS[gi]} · ${m} pts`,px+50,py+196,9,GEMCOL[gi],'center',null,PS);if(gi>0)text(`+${gi*10}% no sorteio`,px+50,py+207,8,'#8ef0a0','center',null,PS);}}
- btn('menu',374,248,100,16,'VOLTAR','#2e3358','#ffffff',7);}
+ btn('menu',374,246,48,20,'VOLTAR','#2e3358','#ffffff',6);btn('bag',426,246,48,20,'MOCHILA','#2e3358','#ffffff',6);}

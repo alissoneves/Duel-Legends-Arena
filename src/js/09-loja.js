@@ -9,7 +9,7 @@ function buyItem(b,r,price){if(save.gd<price){shopMsg=msgSet('GD insuficiente','
 function shopHeader(){screenBg();text('LOJA',W/2,18,12,'#ffd23f','center','#0b0c14');text(`GD ${save.gd}`,W-8,14,9,'#ffd23f','right','#0b0c14',PS);text(`Pó ${save.po}`,W-8,25,9,'#c77dff','right','#0b0c14',PS);text(`Gemas ${save.gems||0}`,W-8,36,9,'#4fd1ff','right','#0b0c14',PS);
  [['destaques','DESTAQUES'],['catalogo','CATÁLOGO'],['visuais','VISUAIS'],['gemas','GEMAS']].forEach((t,i)=>btn('stab:'+t[0],10+i*84,26,80,15,t[1],shopTab===t[0]?'#ffd23f':'#2e3358',shopTab===t[0]?'#0b0c14':'#ffffff',6));}
 function renderShop(){shopHeader();
- if(shopTab==='destaques'){text(`PROMOÇÕES DA SEMANA · terminam em ${daysLeft()} dia(s)`,12,54,7,'#ff8a3d','left');
+ if(shopTab==='destaques'){text(`PROMOÇÕES DA SEMANA · terminam em ${pl(daysLeft(),'dia','dias')}`,12,54,7,'#ff8a3d','left');
   weeklyPromos().forEach((o,i)=>{const x=12+i*112,y=60,w=106,h=124,R=RARI[o.r],it={b:o.b,r:o.r,up:0},got=(save.promos||{})[o.k];panel(x,y,w,h);
    ctx.fillStyle='#e0393e';ctx.fillRect(x+w-38,y,38,14);text(`-${Math.round(o.off*100)}%`,x+w-19,y+11,7,'#ffffff','center');
    drawIcon(o.b,x+(w-32)/2,y+18,4,R.col);text(tr(BASES[o.b].names[o.r]),x+w/2,y+62,8,'#ffffff','center',null,PS);text(R.n+' · '+SLOTS.find(q=>q.id===BASES[o.b].slot).n,x+w/2,y+72,7,R.col,'center',null,PS);
@@ -29,4 +29,4 @@ function renderShop(){shopHeader();
    const own=save.inv.filter(x=>x.b===it.b&&x.r===it.r).length;if(own)text(`Você tem ${own}`,405,180,7,'#46d160','center',null,PS);btn('cbuy',348,188,114,22,`COMPRAR ${R.price} GD`,save.gd>=R.price?'#ffd23f':'#3a3f66',save.gd>=R.price?'#0b0c14':'#8a8fb8',6);}}
  else if(shopTab==='visuais')renderCosShop();else renderGems();
  if(shopMsg&&performance.now()-shopMsg.t<2200)text(shopMsg.txt,W/2,256,10,shopMsg.col,'center','#0b0c14',PS);
- btn('menu',8,248,60,16,'VOLTAR','#2e3358','#ffffff',6);btn('bag',W-78,248,70,16,'MOCHILA','#2e3358','#ffffff',6);renderModal();}
+ btn('menu',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);btn('bag',W-88,244,80,20,'MOCHILA','#2e3358','#ffffff',7);renderModal();}

@@ -17,10 +17,10 @@ function accDoLogout(){save.user=null;save.ident=null;save.rank=null;rankInit();
 function renderAccount(){onlineHeader('CONTA');panel(60,44,360,180);
  if(save.user){text('Você está na conta',W/2,72,9,'#c9cbe6','center',null,PS);text(save.user,W/2,92,14,'#ffd23f','center','#0b0c14');text(`${save.nick||''} · ${rankLabel(save.rank)}`,W/2,110,9,rankCol(save.rank),'center',null,PS);
   text('Entre com este usuário em outro aparelho para jogar com o mesmo elo.',W/2,130,8,'#8a8fb8','center',null,PS);
-  btn('accpass',100,150,130,22,'TROCAR SENHA','#4fd1ff','#0b0c14',6);btn('accout',250,150,130,22,'SAIR','#ff6a6a','#0b0c14',7);btn('accdel',100,178,130,14,'EXCLUIR CONTA','#5a2a36','#ff9a9a',5);btn('privacy',250,178,130,14,'PRIVACIDADE','#2e3358','#ffffff',5);}
+  btn('accpass',100,150,130,22,'TROCAR SENHA','#2e3358','#ffffff',6);btn('accout',250,150,130,22,'SAIR','#ff6a6a','#0b0c14',7);btn('accdel',100,178,130,14,'EXCLUIR CONTA','#5a2a36','#ff9a9a',5);btn('privacy',250,178,130,14,'PRIVACIDADE','#2e3358','#ffffff',5);}
  else{text('Crie uma conta para guardar seu elo',W/2,70,10,'#ffffff','center',null,PS);text('e jogar com ele em qualquer aparelho.',W/2,84,10,'#ffffff','center',null,PS);
   text('Sem conta, o elo fica preso a este aparelho.',W/2,102,8,'#8a8fb8','center',null,PS);
-  btn('accreg',100,120,130,26,'CRIAR CONTA','#ffd23f','#0b0c14',7);btn('acclog',250,120,130,26,'ENTRAR','#4fd1ff','#0b0c14',7);
+  btn('accreg',100,120,130,26,'CRIAR CONTA','#ffd23f','#0b0c14',7);btn('acclog',250,120,130,26,'ENTRAR','#2e3358','#ffffff',7);
   text('Não pedimos e-mail. Guarde bem sua senha: sem ela não dá para recuperar a conta.',W/2,160,7,'#8a8fb8','center',null,PS);btn('accdel',100,172,130,14,'APAGAR MEUS DADOS ONLINE','#5a2a36','#ff9a9a',5);btn('privacy',250,172,130,14,'PRIVACIDADE','#2e3358','#ffffff',5);}
  if(ACC.busy)text(ACC.pending?'Conectando ao servidor… (pode levar até 1 minuto)':'Aguarde…',W/2,200,9,'#c9cbe6','center',null,PS);else if(ACC.err)text(ACC.err,W/2,200,8,'#ff9a9a','center',null,PS);else if(ACC.msg)text(ACC.msg,W/2,200,8,'#8ef0a0','center',null,PS);
- btn('accback',8,248,70,16,'VOLTAR','#2e3358','#ffffff',6);renderModal();}
+ btn('accback',8,244,80,20,'VOLTAR','#2e3358','#ffffff',7);renderModal();}
