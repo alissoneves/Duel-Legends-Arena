@@ -1,6 +1,7 @@
 // Gera vídeos verticais (1080x1920, 30 fps, sem áudio) para o Instagram a partir do próprio jogo.
 //
 // Confronto:  node video.mjs confronto <lendaA> <lendaB> [--arena N] [--seed S] [--saida arq.mp4]
+// Lenda do Dia: some --vence-a 1 --final ../../insta/lenda_NNN.jpg (a lenda vence e o vídeo termina no card)
 // Recurso:    node video.mjs recurso <lendaA> <lendaB> --titulo "DUELO 1x1" --sub "Você contra uma lenda"
 //                 --frases "Esquive|Bloqueie na hora certa|Guarde o especial" [--arena N] [--seed S] [--saida arq.mp4]
 // Lenda = id (c12, saci, iara...) ou nome ("Curupira"). Sem --saida, grava em tmp/.
@@ -58,10 +59,11 @@ await pagina.waitForTimeout(800);
 
 // ---------- 1. captura da luta ----------
 console.log('Capturando a luta...');
-const info = await pagina.evaluate(async ({ a, b, arena }) => {
+const info = await pagina.evaluate(async ({ a, b, arena, venceA }) => {
   window.__frozen = true;
   const D = window.__dla, cv = document.getElementById('c');
   const r = D.gravar(a, b, arena == null ? null : +arena);
+  if (venceA) { D.G.p.aiDiff = 1.3; D.G.b.aiDiff = 0.75; } // Lenda do Dia: o bot da lenda joga melhor que o rival
   const G = () => D.G;
   const lenda = f => ({ id: f.def.id, nome: f.def.name, el: f.def.el, rar: f.def.rar, corEl: D.ELCOL[f.def.el] || '#c9cbe6', corRar: (D.RAR[f.def.rar] || {}).col || '#c9cbe6', spr: D.SPR[f.def.id].img.toDataURL() });
   const A = lenda(G().p), B = lenda(G().b);
@@ -84,9 +86,11 @@ const info = await pagina.evaluate(async ({ a, b, arena }) => {
   const logo = cv.toDataURL('image/png');
   window.__V = { quadros, ko, venceu, A, B, arena: r.arena, K: cv.width / 480, logo };
   return { ko, n: quadros.length, venceu, A: A.nome, B: B.nome, arena: r.arena, segundos: Math.round(i / 60) };
-}, { a: lendaA, b: lendaB, arena: opt.arena });
+}, { a: lendaA, b: lendaB, arena: opt.arena, venceA: !!opt['vence-a'] });
 if (info.erro) { console.error(info.erro); await navegador.close(); process.exit(1); }
 console.log(`${info.A} x ${info.B} em ${info.arena}: nocaute aos ${info.segundos}s, vence ${info.venceu === 'A' ? info.A : info.B}`);
+// --vence-a 1: a lenda A precisa vencer (Lenda do Dia); se perder, pede outra semente
+if (opt['vence-a'] && info.venceu !== 'A') { console.error(`${info.A} perdeu nesta semente. Tente outra --seed.`); await navegador.close(); process.exit(2); }
 
 // ---------- 2. montagem ----------
 const roteiro = {
@@ -94,6 +98,8 @@ const roteiro = {
   titulo: opt.titulo || '',
   sub: opt.sub || '',
   frases: (opt.frases || '').split('|').map(s => s.trim()).filter(Boolean),
+  // --final arq.jpg: termina no card da lenda (1080x1350) em vez do logo; o último quadro serve de capa
+  final: opt.final ? 'data:image/jpeg;base64,' + fs.readFileSync(path.resolve(opt.final)).toString('base64') : null,
 };
 const total = await pagina.evaluate(async (R) => {
   const V = window.__V, W = 1080, H = 1920, FPS = 30;
@@ -216,7 +222,19 @@ const total = await pagina.evaluate(async (R) => {
     legenda(`${curto(venc.nome)} VENCE`, COR.acao, cabe(`${curto(venc.nome)} VENCE`, 50, W - 80), PX);
     emitir();
   }
-  // 4) final (2,2 s)
+  // 4) final: card da lenda (2,6 s), pronto para virar capa
+  if (R.final) {
+    const card = await carregar(R.final);
+    const cw = W, ch = card.height * W / card.width, cy = Math.round((H - ch) / 2);
+    for (let f = 0; f < 78; f++) {
+      const t = ease(f / 10);
+      x.fillStyle = COR.fundo; x.fillRect(0, 0, W, H);
+      x.globalAlpha = t; x.imageSmoothingEnabled = true; x.drawImage(card, 0, cy, cw, ch);
+      txt('JOGUE GRÁTIS · LINK NA BIO', W / 2, cy + ch + 120, 34, COR.acao, 'center', PX, false);
+      x.globalAlpha = 1;
+      emitir();
+    }
+  } else
   for (let f = 0; f < 66; f++) {
     const t = ease(f / 12);
     x.fillStyle = COR.fundo; x.fillRect(0, 0, W, H);
