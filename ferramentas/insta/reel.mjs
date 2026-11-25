@@ -19,7 +19,8 @@ const raiz = path.resolve(aqui, '../..');
 const args = process.argv.slice(2), opt = {}, pos = [];
 for (let i = 0; i < args.length; i++) { if (args[i].startsWith('--')) opt[args[i].slice(2)] = args[i + 1], i++; else pos.push(args[i]); }
 const [lendaA, lendaB] = pos;
-if (!lendaA || !lendaB || !opt.card || !opt.saida) { console.error('Uso: node reel.mjs <lenda> <rival> --n N --raridade R --golpes "a|b|c" --card card.jpg --saida arq.mp4'); process.exit(1); }
+const modo = opt.modo || 'lenda';
+if (!lendaA || !lendaB || !opt.saida || (modo === 'lenda' && !opt.card)) { console.error('Uso: node reel.mjs <lenda> <rival> --n N --raridade R --golpes "a|b|c" --card card.jpg --saida arq.mp4'); process.exit(1); }
 const seed = opt.seed != null ? +opt.seed : 1;
 const saida = path.resolve(opt.saida);
 const fontes = Object.fromEntries(['Boldonse-Regular', 'BricolageGrotesque-Bold', 'LilitaOne-Regular'].map(f => [f, 'data:font/ttf;base64,' + fs.readFileSync(path.join(aqui, 'fontes', f + '.ttf')).toString('base64')]));
@@ -41,11 +42,11 @@ await pagina.waitForFunction(() => window.__dla && document.fonts && document.fo
 await pagina.waitForTimeout(800);
 
 // ---------- 1. captura ----------
-const info = await pagina.evaluate(async ({ a, b, arena }) => {
+const info = await pagina.evaluate(async ({ a, b, arena, modo }) => {
   window.__frozen = true;
   const D = window.__dla, cv = document.getElementById('c');
   const r = D.gravar(a, b, arena == null ? null : +arena);
-  D.G.p.aiDiff = 1.3; D.G.b.aiDiff = 0.75;
+  if (modo === 'lenda') { D.G.p.aiDiff = 1.3; D.G.b.aiDiff = 0.75; }
   const lenda = f => ({ nome: f.def.name, el: f.def.el, corEl: D.ELCOL[f.def.el] || '#c9cbe6', corRar: (D.RAR[f.def.rar] || {}).col || '#c9cbe6', spr: D.SPR[f.def.id].img.toDataURL(), hpMax: f.maxHp || f.hpMax || 1000 });
   const A = lenda(D.G.p), B = lenda(D.G.b);
   const MAX = 60 * 9, DEPOIS = 100, LIMITE = 60 * 150, quadros = [];
@@ -62,15 +63,17 @@ const info = await pagina.evaluate(async ({ a, b, arena }) => {
   if (ko < 0) return { erro: 'Sem nocaute em 150 s.' };
   const venceu = D.G.winner === D.G.p ? 'A' : 'B';
   A.hpMax = Math.max(A.hpMax, ...quadros.map(q => q.hpA)); B.hpMax = Math.max(B.hpMax, ...quadros.map(q => q.hpB));
-  window.__V = { quadros, ko, venceu, A, B, arena: r.arena, K: cv.width / 480 };
+  const ctx = D.ctx; ctx.setTransform(cv.width / 480, 0, 0, cv.width / 480, 0, 0); ctx.clearRect(0, 0, 480, 270); D.logo(240, 60, 2);
+  const logo = cv.toDataURL('image/png');
+  window.__V = { quadros, ko, venceu, A, B, arena: r.arena, K: cv.width / 480, logo };
   return { ko, venceu, A: A.nome, B: B.nome, arena: r.arena, s: Math.round(i / 60) };
-}, { a: lendaA, b: lendaB, arena: opt.arena });
+}, { a: lendaA, b: lendaB, arena: opt.arena, modo });
 if (info.erro) { console.error(info.erro); await navegador.close(); process.exit(1); }
 console.log(`${info.A} x ${info.B} em ${info.arena}: K.O. aos ${info.s}s, vence ${info.venceu === 'A' ? info.A : info.B}`);
-if (info.venceu !== 'A') { console.error(`${info.A} perdeu nesta semente.`); await navegador.close(); process.exit(2); }
+if (modo === 'lenda' && info.venceu !== 'A') { console.error(`${info.A} perdeu nesta semente.`); await navegador.close(); process.exit(2); }
 
 // ---------- 2. montagem ----------
-const R = { n: opt.n || '', rar: opt.raridade || '', golpes: (opt.golpes || '').split('|').filter(Boolean), card: 'data:image/jpeg;base64,' + fs.readFileSync(path.resolve(opt.card)).toString('base64'), fontes };
+const R = { modo, n: opt.n || '', rar: opt.raridade || '', titulo: opt.titulo || 'QUEM VENCE?', golpes: (opt.golpes || '').split('|').filter(Boolean), golpesB: (opt.golpesB || '').split('|').filter(Boolean), card: opt.card ? 'data:image/jpeg;base64,' + fs.readFileSync(path.resolve(opt.card)).toString('base64') : null, fontes };
 const res = await pagina.evaluate(async (R) => {
   for (const [nome, url] of Object.entries(R.fontes)) { const ff = new FontFace(nome, `url(${url})`); await ff.load(); document.fonts.add(ff); }
   const V = window.__V, W = 1080, H = 1920;
@@ -78,7 +81,8 @@ const res = await pagina.evaluate(async (R) => {
   const LIL = '"LilitaOne-Regular"', BIG = '"Boldonse-Regular"', SANS = '"BricolageGrotesque-Bold"', PX = '"Press Start 2P", monospace';
   const AM = '#ffd23f', ESC = '#07080f', BR = '#ffffff';
   const load = s => new Promise(r => { const im = new Image(); im.onload = () => r(im); im.src = s; });
-  const sprA = await load(V.A.spr), sprB = await load(V.B.spr), card = await load(R.card);
+  const sprA = await load(V.A.spr), sprB = await load(V.B.spr), card = R.card ? await load(R.card) : null, logo = await load(V.logo);
+  const VA = V.venceu === 'A', vencL = VA ? V.A : V.B, vencS = VA ? sprA : sprB;
   let cacheI = -1, cacheB = null;
   const quadro = async i => { i = Math.max(0, Math.min(V.quadros.length - 1, i | 0)); if (i !== cacheI) { cacheB && cacheB.close(); cacheB = await createImageBitmap(V.quadros[i].blob); cacheI = i; } return cacheB; };
   const cl = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -101,6 +105,19 @@ const res = await pagina.evaluate(async (R) => {
   const fundoCor = (cor, rot) => { x.fillStyle = ESC; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W / 2, 820, 50, W / 2, 820, 1100); g.addColorStop(0, cor); g.addColorStop(1, ESC); x.globalAlpha = 0.55; x.fillStyle = g; x.fillRect(0, 0, W, H); x.globalAlpha = 1; raios(W / 2, 820, cor, rot); };
   const pilula = (s, X, Y, tam, bg, fg = ESC, fonte = SANS) => { x.font = `${tam}px ${fonte}`; const w = x.measureText(s).width + tam * 1.1, h = tam * 1.6; x.fillStyle = bg; x.beginPath(); x.roundRect(X - w / 2, Y - h / 2, w, h, h / 2); x.fill(); texto(s, X, Y + 2, tam, fg, fonte); return w; };
 
+  // texto no estilo jogo mobile: Lilita One, extrusão 3D, contorno grosso, degradê e brilho
+  const GRAD = { ouro: ['#ffffff', '#fff3a6', '#ffd23f', '#ff9a1f'], fogo: ['#fff1e0', '#ffb36b', '#ff6a2b', '#e0262b'], gelo: ['#ffffff', '#d8f6ff', '#7fd8ff', '#2f8cff'], verde: ['#ffffff', '#dcffd0', '#7ce86a', '#23a84a'] };
+  const brawl = (s, X, Y, tam, cores = GRAD.ouro, rot = -0.05) => {
+    x.save(); x.translate(X, Y); x.rotate(rot); x.transform(1, 0, -0.1, 1, 0, 0);
+    x.font = `${tam}px ${LIL}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineJoin = 'round';
+    const lw = Math.max(8, tam * 0.2), ex = Math.max(6, tam * 0.13);
+    for (let d = ex; d > 0; d -= 2) { x.lineWidth = lw; x.strokeStyle = ESC; x.strokeText(s, 0, d); }
+    x.lineWidth = lw; x.strokeStyle = ESC; x.strokeText(s, 0, 0);
+    const g = x.createLinearGradient(0, -tam / 2, 0, tam / 2); g.addColorStop(0, cores[0]); g.addColorStop(0.45, cores[1]); g.addColorStop(0.55, cores[2]); g.addColorStop(1, cores[3]);
+    x.fillStyle = g; x.fillText(s, 0, 0);
+    const tw = x.measureText(s).width; x.fillStyle = 'rgba(255,255,255,0.5)'; x.beginPath(); x.rect(-tw / 2 - 10, -tam / 2, tw + 20, tam * 0.22); x.clip(); x.fillText(s, 0, 0);
+    x.restore();
+  };
   // ---- câmera 4:5 sobre o jogo ----
   const FX = 0, FY = 470, FW = 1080, FH = 1350, ASP = FH / FW;
   let cam = null, punch = 0, shake = 0;
@@ -162,7 +179,7 @@ const res = await pagina.evaluate(async (R) => {
     texto('VS', W / 2, Y + 20, 34, AM, BIG);
     x.restore();
   };
-  const faixaTopo = (alpha = 1) => { x.save(); x.globalAlpha = alpha; pilula(`LENDA DO DIA #${R.n}`, W / 2, 196, 30, AM, ESC, SANS); x.restore(); };
+  const faixaTopo = (alpha = 1) => { x.save(); x.globalAlpha = alpha; pilula(R.modo === 'lenda' ? `LENDA DO DIA #${R.n}` : R.titulo, W / 2, 196, 30, AM, ESC, SANS); x.restore(); };
 
   const ko = V.ko, n = V.quadros.length, ini = Math.max(0, ko - 60 * 7);
 
@@ -170,26 +187,42 @@ const res = await pagina.evaluate(async (R) => {
   ev.push({ f: 0, t: 'inicio' });
   for (let f = 0; f < 45; f++) {
     const t = f / 45;
-    shake = f >= 6 && f < 14 ? (14 - f) * 3 : 0;
+    shake = R.modo === 'confronto' ? (f >= 12 && f < 20 ? (20 - f) * 3 : 0) : (f >= 6 && f < 14 ? (14 - f) * 3 : 0);
     const ox = shake ? (rnd() - 0.5) * shake : 0, oy = shake ? (rnd() - 0.5) * shake : 0;
     x.save(); x.translate(ox, oy);
+    if (R.modo === 'confronto') {
+      // fundo dividido na diagonal com a cor de cada lenda
+      x.fillStyle = ESC; x.fillRect(0, 0, W, H);
+      const sl = eo(f / 6) * 0.5;
+      x.save(); x.globalAlpha = sl; x.fillStyle = V.A.corEl; x.beginPath(); x.moveTo(0, 0); x.lineTo(W, 0); x.lineTo(0, H); x.fill(); x.fillStyle = V.B.corEl; x.beginPath(); x.moveTo(W, 0); x.lineTo(W, H); x.lineTo(0, H); x.fill(); x.restore();
+      raios(W / 2, 960, '#ffffff', f * 0.01, 16, 0.07);
+      x.save(); x.globalAlpha = 0.3; x.strokeStyle = BR; x.lineWidth = 3; for (let k = 0; k < 14; k++) { const xx = (k * 157 + f * 70) % W, yy = (k * 271) % H; x.beginPath(); x.moveTo(xx, yy); x.lineTo(xx + 180, yy); x.stroke(); } x.restore();
+      const ea = eback(f / 8), eb = eback((f - 4) / 8);
+      spr(sprA, -300 + ea * 570, 860, 14, 1); spr(sprB, W + 300 - eb * 570, 1420, 14, -1);
+      const nA = curto(V.A.nome).toUpperCase(), nB = curto(V.B.nome).toUpperCase();
+      if (f >= 6) brawl(nA, 290 + (1 - eo((f - 6) / 6)) * -500, 950, cabe(nA, 74, 560, LIL), GRAD.ouro, -0.05);
+      if (f >= 10) brawl(nB, W - 290 + (1 - eo((f - 10) / 6)) * 500, 1510, cabe(nB, 74, 560, LIL), GRAD.gelo, -0.05);
+      if (f >= 12) { const e = eback((f - 12) / 7); x.save(); x.translate(W / 2, 1190); x.scale(e * 1.0, e * 1.0); brawl('VS', 0, 0, 230, GRAD.fogo, -0.08); x.restore(); }
+      if (f === 12) ev.push({ f: F, t: 'impacto' });
+    } else {
     fundoCor(V.A.corEl, f * 0.01);
-    // linhas de velocidade
-    x.save(); x.globalAlpha = 0.35; x.strokeStyle = BR; x.lineWidth = 3; for (let k = 0; k < 14; k++) { const yy = (k * 137 + f * 60) % H; const xx = (k * 311) % W; x.beginPath(); x.moveTo(xx, yy); x.lineTo(xx, yy + 160 + (k % 3) * 80); x.stroke(); } x.restore();
-    // sprite gigante batendo
-    const s = f < 6 ? 3 - 2 * eo(f / 6) : 1 + 0.02 * Math.sin(f / 3);
-    spr(sprA, W / 2, 1210, 26 * s, 1);
-    x.fillStyle = 'rgba(0,0,0,0.35)'; x.beginPath(); x.ellipse(W / 2, 1215, 260, 40, 0, 0, 7); x.fill();
-    // nome
-    const nm = curto(V.A.nome).toUpperCase(), tn = cabe(nm, 150, 980);
-    const en = eback((f - 6) / 9);
-    if (f >= 6) { x.save(); x.translate(W / 2, 1400); x.rotate(-0.05); x.scale(en, en); texto(nm, 0, 0, tn, AM, BIG, 'center', 22, ESC, 10); x.restore(); }
-    // tags
-    if (f >= 14) { const e2 = eo((f - 14) / 8); x.globalAlpha = e2; pilula(R.rar.toUpperCase(), W / 2 - 150, 1560 + (1 - e2) * 40, 34, V.A.corRar); pilula(V.A.el.toUpperCase(), W / 2 + 150, 1560 + (1 - e2) * 40, 34, V.A.corEl); x.globalAlpha = 1; }
+      // linhas de velocidade
+      x.save(); x.globalAlpha = 0.35; x.strokeStyle = BR; x.lineWidth = 3; for (let k = 0; k < 14; k++) { const yy = (k * 137 + f * 60) % H; const xx = (k * 311) % W; x.beginPath(); x.moveTo(xx, yy); x.lineTo(xx, yy + 160 + (k % 3) * 80); x.stroke(); } x.restore();
+      // sprite gigante batendo
+      const s = f < 6 ? 3 - 2 * eo(f / 6) : 1 + 0.02 * Math.sin(f / 3);
+      spr(sprA, W / 2, 1210, 26 * s, 1);
+      x.fillStyle = 'rgba(0,0,0,0.35)'; x.beginPath(); x.ellipse(W / 2, 1215, 260, 40, 0, 0, 7); x.fill();
+      // nome
+      const nm = curto(V.A.nome).toUpperCase(), tn = cabe(nm, 150, 980);
+      const en = eback((f - 6) / 9);
+      if (f >= 6) { x.save(); x.translate(W / 2, 1400); x.rotate(-0.05); x.scale(en, en); texto(nm, 0, 0, tn, AM, BIG, 'center', 22, ESC, 10); x.restore(); }
+      // tags
+      if (f >= 14) { const e2 = eo((f - 14) / 8); x.globalAlpha = e2; pilula(R.rar.toUpperCase(), W / 2 - 150, 1560 + (1 - e2) * 40, 34, V.A.corRar); pilula(V.A.el.toUpperCase(), W / 2 + 150, 1560 + (1 - e2) * 40, 34, V.A.corEl); x.globalAlpha = 1; }
+    }
     faixaTopo(eo(f / 8));
     if (f < 5) { x.fillStyle = `rgba(255,255,255,${1 - f / 5})`; x.fillRect(-50, -50, W + 100, H + 100); }
     x.restore();
-    if (f === 6) ev.push({ f: F, t: 'impacto' });
+    if (f === 6 && R.modo !== 'confronto') ev.push({ f: F, t: 'impacto' });
     // transição: corte diagonal nos 6 últimos quadros
     if (f >= 39) { const k = eo((f - 39) / 6); x.fillStyle = ESC; x.beginPath(); x.moveTo(-200, H); x.lineTo(-200 + (W + 600) * k, H); x.lineTo(-200 + (W + 600) * k + 400, 0); x.lineTo(-200, 0); x.closePath(); x.fill(); }
     emit();
@@ -198,14 +231,14 @@ const res = await pagina.evaluate(async (R) => {
 
   // ===== 2) LUTA =====
   const lentoIni = ko - 40;
-  let i = ini, prev = V.quadros[ini], combo = 0, ultHit = -99, comboShow = 0, golpe = 0, golpeT = -99, ft = 0;
+  let golpeB = 0, i = ini, prev = V.quadros[ini], combo = 0, ultHit = -99, comboShow = 0, golpe = 0, golpeT = -99, ft = 0;
   const callout = [];
   while (i < ko) {
     const q = V.quadros[i | 0];
     // golpes (diferença de vida entre os quadros pulados)
     const dA = prev.hpA - q.hpA, dB = prev.hpB - q.hpB;
     if (dB > 0.5) { punch = 1; shake = Math.min(22, 8 + dB / 6); if (F - ultHit < 18) combo++; else combo = 1; ultHit = F; ev.push({ f: F, t: 'hit', lado: 'B', d: dB }); if (combo >= 2) comboShow = 24; if (ft - golpeT > 60 && R.golpes.length && ft > 15) { callout.push({ s: R.golpes[golpe % R.golpes.length], k: golpe % R.golpes.length, f0: F }); golpe++; golpeT = ft; ev.push({ f: F, t: 'golpe' }); } }
-    if (dA > 0.5) { shake = Math.max(shake, 8); ev.push({ f: F, t: 'hit', lado: 'A', d: dA }); }
+    if (dA > 0.5) { shake = Math.max(shake, R.modo === 'confronto' ? 14 : 8); if (R.modo === 'confronto') punch = 0.7; ev.push({ f: F, t: 'hit', lado: 'A', d: dA }); if (R.modo === 'confronto' && ft - golpeT > 60 && R.golpesB.length && ft > 15) { callout.push({ s: R.golpesB[golpeB % R.golpesB.length], k: golpeB % R.golpesB.length, f0: F, b: 1 }); golpeB++; golpeT = ft; ev.push({ f: F, t: 'golpe' }); } }
     prev = q;
     // golpe especial em destaque a cada ~2,3 s
     const lento = i >= lentoIni;
@@ -233,7 +266,7 @@ const res = await pagina.evaluate(async (R) => {
       x.font = `${tam}px ${LIL}`;
       for (let d = 12; d > 0; d -= 2) { x.lineWidth = 18; x.strokeStyle = ESC; x.strokeText(s, 0, d); }
       x.lineWidth = 18; x.strokeStyle = ESC; x.strokeText(s, 0, 0);
-      const g = x.createLinearGradient(0, -tam / 2, 0, tam / 2); g.addColorStop(0, '#ffffff'); g.addColorStop(0.45, '#fff3a6'); g.addColorStop(0.55, '#ffd23f'); g.addColorStop(1, '#ff9a1f');
+      const g = x.createLinearGradient(0, -tam / 2, 0, tam / 2); const cc = co.b ? GRAD.gelo : GRAD.ouro; g.addColorStop(0, cc[0]); g.addColorStop(0.45, cc[1]); g.addColorStop(0.55, cc[2]); g.addColorStop(1, cc[3]);
       x.fillStyle = g; x.fillText(s, 0, 0);
       x.fillStyle = 'rgba(255,255,255,0.55)'; x.save(); x.beginPath(); x.rect(-tw / 2 - 10, -tam / 2, tw + 20, tam * 0.22); x.clip(); x.fillText(s, 0, 0); x.restore();
       x.restore();
@@ -252,7 +285,7 @@ const res = await pagina.evaluate(async (R) => {
     const congelado = f < 12;
     const idx = congelado ? ko : ko + (f - 12) * 0.5;
     const q = V.quadros[Math.min(n - 1, idx | 0)];
-    enquadrar(q, 1, [q.fx, q.fy], 0.25);
+    enquadrar(q, 1, VA ? [q.fx, q.fy] : [q.px, q.py], 0.25);
     shake = f < 10 ? 30 - f * 3 : 0;
     await desenharJogo(idx, { flash: f < 3 ? 0.9 - f * 0.3 : 0, escurece: congelado ? 0 : 0.25 });
     hud(q); faixaTopo();
@@ -265,13 +298,13 @@ const res = await pagina.evaluate(async (R) => {
   ev.push({ f: F, t: 'vitoria' });
   const qf = V.quadros[n - 1];
   for (let f = 0; f < 42; f++) {
-    enquadrar(qf, 1, [qf.px, qf.py], 0.2); shake = 0;
+    enquadrar(qf, 1, VA ? [qf.px, qf.py] : [qf.fx, qf.fy], 0.2); shake = 0;
     await desenharJogo(n - 1, { escurece: 0.55 * eo(f / 8) });
     hud(qf, 1 - eo(f / 10)); faixaTopo();
     raios(W / 2, 1100, AM, f * 0.02, 16, 0.16 * eo(f / 6));
-    const e = eo(f / 8); spr(sprA, W / 2, 1300 + (1 - e) * 200, 20 + Math.sin(f / 4) * 0.4, 1, e);
+    const e = eo(f / 8); spr(vencS, W / 2, 1300 + (1 - e) * 200, 20 + Math.sin(f / 4) * 0.4, 1, e);
     const ev2 = eback((f - 4) / 8); if (f >= 4) { x.save(); x.translate(W / 2, 760); x.scale(ev2, ev2); texto('VITÓRIA!', 0, 0, 130, AM, BIG, 'center', 22, ESC, 10); x.restore(); }
-    if (f >= 10) { x.globalAlpha = eo((f - 10) / 8); texto(curto(V.A.nome).toUpperCase() + ' VENCE', W / 2, 1420, cabe(curto(V.A.nome).toUpperCase() + ' VENCE', 60, 900, SANS), BR, SANS, 'center', 10); x.globalAlpha = 1; }
+    if (f >= 10) { x.globalAlpha = eo((f - 10) / 8); brawl(curto(vencL.nome).toUpperCase() + ' VENCE!', W / 2, 1430, cabe(curto(vencL.nome).toUpperCase() + ' VENCE!', 80, 900, LIL), GRAD.ouro, -0.04); x.globalAlpha = 1; }
     // transição para o card
     if (f >= 36) { const k = eo((f - 36) / 6); x.fillStyle = ESC; x.fillRect(0, 0, W, H * k); }
     emit();
@@ -279,6 +312,19 @@ const res = await pagina.evaluate(async (R) => {
 
   // ===== 5) CARD (2,8 s) — último quadro = capa =====
   ev.push({ f: F, t: 'card' });
+  if (!card) {
+    // final com o logo (capa): sprites das duas lendas + chamada
+    const lb = await (async () => { const t = document.createElement('canvas'); t.width = logo.width; t.height = logo.height; const g = t.getContext('2d'); g.drawImage(logo, 0, 0); const d = g.getImageData(0, 0, t.width, t.height).data; let x0 = t.width, y0 = t.height, x1 = 0, y1 = 0; for (let yy = 0; yy < t.height; yy++) for (let xx = 0; xx < t.width; xx++) if (d[(yy * t.width + xx) * 4 + 3] > 10) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (yy < y0) y0 = yy; if (yy > y1) y1 = yy; } return { x0, y0, w: x1 - x0 + 1, h: y1 - y0 + 1 }; })();
+    for (let f = 0; f < 84; f++) {
+      fundoCor(vencL.corEl, 0.3 + f * 0.004);
+      const e = eback(f / 10), lw = 940 * e, lh = lb.h * lw / lb.w;
+      x.save(); x.imageSmoothingEnabled = false; x.globalAlpha = cl(f / 4, 0, 1); x.drawImage(logo, lb.x0, lb.y0, lb.w, lb.h, (W - lw) / 2, 470 + (1 - e) * 60, lw, lh); x.restore();
+      const es = eo((f - 6) / 10); spr(sprA, W / 2 - 230, 1180 + (1 - es) * 80, 15, 1, es); spr(sprB, W / 2 + 230, 1180 + (1 - es) * 80, 15, -1, es);
+      if (f >= 10) brawl('110 LENDAS SORTEADAS', W / 2, 1300, cabe('110 LENDAS SORTEADAS', 70, 920, LIL), GRAD.ouro, -0.03);
+      if (f >= 14) { const pul = 1 + 0.03 * Math.sin(f / 4); x.save(); x.globalAlpha = eo((f - 14) / 10); x.translate(W / 2, 1440); x.scale(pul, pul); pilula('▶ JOGUE GRÁTIS · LINK NA BIO', 0, 0, 40, AM); x.restore(); }
+      emit();
+    }
+  } else {
   const ch = card.height * W / card.width, cy = Math.round((H - ch) / 2) - 40;
   for (let f = 0; f < 84; f++) {
     const e = eback(f / 12);
@@ -292,6 +338,7 @@ const res = await pagina.evaluate(async (R) => {
     const ep = eo((f - 14) / 10);
     if (f >= 14) { const pul = 1 + 0.03 * Math.sin(f / 4); x.save(); x.globalAlpha = ep; x.translate(W / 2, cy + ch + 95); x.scale(pul, pul); pilula('▶ JOGUE GRÁTIS · LINK NA BIO', 0, 0, 40, AM); x.restore(); }
     emit();
+  }
   }
   window.__OUT = out;
   return { total: out.length, ev, fps: 30 };
