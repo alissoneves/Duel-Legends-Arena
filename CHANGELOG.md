@@ -8,6 +8,7 @@
 | 1.3 | Contas com usuário e senha (scrypt), até 5 aparelhos | 1.3 |
 | 1.4 | Boas-vindas (Criar / Entrar / Sem conta), ranqueada exige conta | 1.3 |
 | 1.5 | Lenda da semana, missões diárias, herói de fim de semana, bordas de elo e temporadas, convite por código, conquistas, tutorial, replay vertical | 1.4 |
+| 2.5.5 | Celular: a tela não encolhe mais ao girar o aparelho (mede de novo depois da rotação; a resolução adaptativa só reduz a nitidez, nunca o tamanho) e, no modo paisagem, o jogo ocupa a altura toda | 2.2 |
 | 2.5.4 | Primeiros minutos: no primeiro acesso, JOGAR abre direto o tutorial jogável (sem avisos nem páginas antes) e o convite para criar conta só aparece depois da 1ª partida; caixa do tutorial cabe em qualquer idioma; funil anônimo (abriu, tutorial, 1ª luta, 5ª partida, voltou) enviado mesmo sem o online, com página /funil; erros de quem não entra no online também chegam; resolução adaptativa (baixa um degrau se o jogo ficar lento) | 2.2 |
 | 2.5.3 | Resposta visual nos botões: com o mouse em cima, o botão clareia e o cursor vira mãozinha (o que não é botão fica com o cursor normal); botão indisponível (Gemas) dá som de "não" e balança | 2.1 |
 | 2.5.2 | Correção: jogador novo podia ficar preso no sorteio (PREPARAR! não respondia) por causa de um aviso aberto que não aparecia na tela; agora os avisos aparecem em qualquer tela e, com aviso aberto, só os botões dele funcionam; botões clareiam por um instante ao serem tocados; subtítulo do sorteio 1x1 não encosta mais nos rótulos | 2.1 |
