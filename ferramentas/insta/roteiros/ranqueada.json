@@ -1,0 +1,48 @@
+{
+ "titulo": [
+  "RANQUEADA",
+  "ONLINE"
+ ],
+ "sub": "1x1 contra jogadores de verdade",
+ "cor": "#22b5a0",
+ "grad": "verde",
+ "cenas": [
+  {
+   "tela": "rankLobby",
+   "legenda": "SUBA DE ELO",
+   "foco": [
+    240,
+    110,
+    250
+   ],
+   "toque": [
+    240,
+    248
+   ],
+   "seg": 2.6
+  },
+  {
+   "tela": "rankLobby",
+   "legenda": "DO FERRO AO DESAFIANTE",
+   "foco": [
+    240,
+    200,
+    470
+   ],
+   "alto": 620,
+   "seg": 2.4
+  },
+  {
+   "tela": "borders",
+   "legenda": "BORDAS DE ELO",
+   "foco": [
+    245,
+    120,
+    450
+   ],
+   "alto": 900,
+   "seg": 2.6
+  }
+ ],
+ "fim": "ATÉ ONDE VOCÊ CHEGA?"
+}

@@ -1,0 +1,49 @@
+{
+ "titulo": [
+  "PERFIL E",
+  "CONQUISTAS"
+ ],
+ "sub": "Mostre quem você é",
+ "cor": "#e0393e",
+ "grad": "fogo",
+ "cenas": [
+  {
+   "tela": "profile",
+   "legenda": "SEU PERFIL",
+   "foco": [
+    240,
+    130,
+    470
+   ],
+   "alto": 760,
+   "seg": 2.6
+  },
+  {
+   "tela": "ach",
+   "legenda": "24 CONQUISTAS",
+   "foco": [
+    240,
+    140,
+    300
+   ],
+   "alto": 980,
+   "seg": 2.4
+  },
+  {
+   "tela": "icons",
+   "legenda": "ÍCONES DE LENDAS",
+   "foco": [
+    160,
+    120,
+    280
+   ],
+   "alto": 900,
+   "toque": [
+    40,
+    85
+   ],
+   "seg": 2.6
+  }
+ ],
+ "fim": "COMPLETE TUDO!"
+}

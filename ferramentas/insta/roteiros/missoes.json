@@ -1,0 +1,49 @@
+{
+ "titulo": [
+  "MISSÕES",
+  "E PASSE"
+ ],
+ "sub": "Todo dia tem recompensa",
+ "cor": "#2f8cff",
+ "grad": "gelo",
+ "cenas": [
+  {
+   "tela": "missions",
+   "legenda": "MISSÕES DIÁRIAS",
+   "foco": [
+    240,
+    95,
+    440
+   ],
+   "alto": 800,
+   "seg": 2.6
+  },
+  {
+   "tela": "missions",
+   "legenda": "ROLETA NO FIM DE SEMANA",
+   "foco": [
+    200,
+    205,
+    330
+   ],
+   "alto": 700,
+   "seg": 2.4
+  },
+  {
+   "tela": "pass",
+   "legenda": "PASSE DE TEMPORADA",
+   "foco": [
+    240,
+    100,
+    470
+   ],
+   "alto": 760,
+   "toque": [
+    459,
+    173
+   ],
+   "seg": 2.6
+  }
+ ],
+ "fim": "JOGUE E GANHE"
+}

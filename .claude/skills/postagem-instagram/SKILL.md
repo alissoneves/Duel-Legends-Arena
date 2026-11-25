@@ -9,7 +9,7 @@ O usuário posta à mão. O trabalho aqui é deixar pronto: calendário, legenda
 
 ## Estilo (não mude sem o usuário pedir)
 
-- O estilo é o das 3 primeiras postagens já publicadas (Lenda do Dia #1 Saci, #2 Iara, #3 Zeus).
+- Legendas: o estilo é o das 3 primeiras postagens já publicadas (Lenda do Dia #1 Saci, #2 Iara, #3 Zeus). Vídeos: siga o "Padrão de marketing" abaixo.
 - **Sem destaque especial para folclore**: nem no texto, nem nas hashtags, nem na escolha das lendas. Alterne origens (mitologias, folclore, criações originais).
 - **Legendas sempre pela ferramenta, nunca escritas à mão.** O teste `ferramentas/test/legenda.test.js` garante que ela reproduz o calendário.
 
@@ -48,7 +48,25 @@ node ferramentas/insta/legenda.js confronto "<A>" "<B>"
 
 Para gravar no calendário, gere o JSON com Node (`JSON.stringify(calendario, null, 1)`, como o arquivo atual) em vez de editar à mão: evita erro de aspas e de emoji.
 
-## Mídias
+## Padrão de marketing (aprovado pelo usuário em 25/11/2026)
+
+Todo vídeo novo (Lenda do Dia, confronto, recurso do jogo) segue este padrão. Referência visual: jogos mobile como Brawl Stars — pode melhorar sempre que fizer sentido, e cores das letras/artes podem mudar.
+
+- **Gancho em 1,5 s**: clarão, sprite gigante batendo na tela com tremor, nome/título entrando com mola. Nada de tela parada no começo.
+- **Tipografia**: títulos e chamadas em **Lilita One** no estilo jogo mobile (degradê, contorno preto grosso, extrusão 3D, brilho no topo, leve inclinação) — função `brawl()`; números/impacto (K.O., VS da lenda do dia) em Boldonse; textos pequenos em Bricolage Grotesque. Fontes em `ferramentas/insta/fontes/` (todas OFL).
+- **Luta**: janela 4:5 com cantos arredondados sobre o fundo desfocado da própria arena; HUD de jogo de luta (retratos, barras inclinadas com rastro branco, emblema VS); zoom e tremor em cada golpe; contador "N HITS"; nome do golpe com a tecla A/B/C na cor do card, no alto da janela (sem cobrir os lutadores); câmera lenta com barras de cinema antes do K.O.; K.O. congelado com clarão e raios; VITÓRIA.
+- **Final (= capa)**: Lenda do Dia termina no card (`capa_NNN.jpg` = último quadro, usado como `cover_url`); confronto e recurso terminam no logo + "▶ JOGUE GRÁTIS · LINK NA BIO".
+- **Som sempre**: chiptune com dinâmica (só baixo no gancho, música cheia na luta, subida antes do K.O., silêncio + estrondo no K.O., fanfarra, acorde final), soco por golpe, whoosh nos cortes, clique nos toques; volume normalizado (-14 LUFS).
+- Texto nunca cobre o que importa da imagem; respeite a área segura do Reels (~250 px no topo, ~360 px embaixo).
+
+Ferramentas (rode de dentro de `ferramentas/insta`, depois de `node build.js` na raiz):
+
+- Lenda do Dia: `node reel.mjs <Lenda> <Rival> --n 7 --raridade Raro --golpes "A|B|C" --card ../../insta/lenda_007.jpg --seed S --arena N --saida X.mp4` e depois `python3 som_pro.py X.mp4 <n>`. A lenda sempre vence; código 2 = perdeu nesta semente, tente outra. Capa: último quadro (`ffmpeg -sseof -0.2 ... capa_NNN.jpg`).
+- Confronto: `node reel.mjs <A> <B> --modo confronto --golpes "..." --golpesB "..." --seed S --saida gNN_a_vs_b.mp4` e `python3 som_pro.py gNN... <semente>`.
+- Recurso do jogo (loja, modos, ranqueada, missões...): roteiro JSON em `roteiros/` (telas do jogo, legenda de cada cena, foco do zoom, toque) → `node feature.mjs roteiros/X.json --saida NN_x.mp4` e `python3 som_feat.py NN_x.mp4 <semente>`. Usa perfil de demonstração (coleção, maestrias e elo preenchidos).
+- Confira 3 a 6 quadros (gancho, luta, K.O., final) antes de publicar.
+
+## Mídias (ferramentas antigas)
 
 - Vídeos (1080×1920, 30 fps, sem áudio, ~16 s): `ferramentas/insta/video.mjs`, gerados quadro a quadro pelo próprio jogo. Antes, `node build.js` na raiz e, na primeira vez, `npm i` dentro de `ferramentas/insta`. Rode de dentro de `ferramentas/insta`:
   - Confronto: `node video.mjs confronto Curupira Medusa --saida ../../insta/g21_curupira_vs_medusa.mp4`

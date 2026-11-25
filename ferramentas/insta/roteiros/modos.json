@@ -1,0 +1,69 @@
+{
+ "titulo": [
+  "MODOS",
+  "DE JOGO"
+ ],
+ "sub": "Sua lenda é sempre sorteada",
+ "cor": "#3d7bff",
+ "grad": "ouro",
+ "cenas": [
+  {
+   "tela": "play",
+   "legenda": "CONTRA BOTS OU ONLINE",
+   "foco": [
+    240,
+    130,
+    430
+   ],
+   "alto": 760,
+   "toque": [
+    135,
+    199
+   ],
+   "seg": 2.6
+  },
+  {
+   "tela": "modes",
+   "legenda": "DO 1x1 AO 5x5!",
+   "foco": [
+    240,
+    135,
+    460
+   ],
+   "alto": 820,
+   "toque": [
+    92,
+    110
+   ],
+   "seg": 2.6
+  },
+  {
+   "tela": "modes",
+   "legenda": "TORNEIO DE 16 VAGAS",
+   "foco": [
+    388,
+    180,
+    190
+   ],
+   "toque": [
+    388,
+    203
+   ],
+   "seg": 2.4
+  },
+  {
+   "tela": "lobby",
+   "legenda": "SALAS COM AMIGOS",
+   "foco": [
+    405,
+    120,
+    190
+   ],
+   "toque": [
+    408,
+    126
+   ],
+   "seg": 2.4
+  }
+ ]
+}

@@ -1,0 +1,67 @@
+{
+ "titulo": [
+  "LOJA",
+  "E FORJA"
+ ],
+ "sub": "Itens, Pó Mágico e Caixa da Sorte",
+ "cor": "#ff8a1f",
+ "grad": "ouro",
+ "cenas": [
+  {
+   "tela": "shop",
+   "legenda": "PROMOÇÕES DA SEMANA",
+   "foco": [
+    150,
+    120,
+    290
+   ],
+   "alto": 900,
+   "toque": [
+    65,
+    170
+   ],
+   "seg": 2.6
+  },
+  {
+   "tela": "shop",
+   "legenda": "PÓ MÁGICO: ITEM +10",
+   "foco": [
+    410,
+    110,
+    150
+   ],
+   "toque": [
+    410,
+    126
+   ],
+   "seg": 2.4
+  },
+  {
+   "tela": "bag",
+   "legenda": "MOCHILA E FORJA",
+   "foco": [
+    240,
+    135,
+    470
+   ],
+   "alto": 760,
+   "seg": 2.4
+  },
+  {
+   "tela": "box",
+   "legenda": "CAIXA DA SORTE",
+   "foco": [
+    240,
+    150,
+    300
+   ],
+   "alto": 980,
+   "toque": [
+    240,
+    247
+   ],
+   "seg": 2.6
+  }
+ ],
+ "fim": "EQUIPE SUA LENDA"
+}

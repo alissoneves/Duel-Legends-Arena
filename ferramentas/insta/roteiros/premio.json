@@ -1,0 +1,47 @@
+{
+ "titulo": [
+  "PRÊMIO",
+  "DIÁRIO"
+ ],
+ "sub": "Entre todo dia e ganhe",
+ "cor": "#22b14c",
+ "grad": "verde",
+ "cenas": [
+  {
+   "tela": "streak",
+   "legenda": "7 DIAS DE PRÊMIOS",
+   "foco": [
+    240,
+    100,
+    470
+   ],
+   "alto": 700,
+   "toque": [
+    240,
+    180
+   ],
+   "seg": 2.6
+  },
+  {
+   "tela": "streak",
+   "legenda": "DIA 7: LENDA POR 24H",
+   "foco": [
+    420,
+    100,
+    130
+   ],
+   "seg": 2.4
+  },
+  {
+   "tela": "title",
+   "legenda": "LENDA DA SEMANA",
+   "foco": [
+    418,
+    90,
+    130
+   ],
+   "seg": 2.6
+  }
+ ],
+ "fim": "VOLTE AMANHÃ!"
+}

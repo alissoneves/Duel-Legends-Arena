@@ -1,0 +1,47 @@
+{
+ "titulo": [
+  "COLEÇÃO E",
+  "MAESTRIAS"
+ ],
+ "sub": "110 lendas para descobrir",
+ "cor": "#8a4dff",
+ "grad": "roxo",
+ "cenas": [
+  {
+   "tela": "album",
+   "legenda": "110 LENDAS",
+   "foco": [
+    190,
+    135,
+    370
+   ],
+   "alto": 940,
+   "seg": 2.6
+  },
+  {
+   "tela": "album",
+   "legenda": "DESCUBRA TODAS!",
+   "foco": [
+    120,
+    90,
+    140
+   ],
+   "toque": [
+    110,
+    80
+   ],
+   "seg": 2.4
+  },
+  {
+   "tela": "profile",
+   "legenda": "MAESTRIA POR LENDA",
+   "foco": [
+    220,
+    130,
+    140
+   ],
+   "seg": 2.6
+  }
+ ],
+ "fim": "QUANTAS VOCÊ TEM?"
+}

@@ -1,0 +1,49 @@
+{
+ "titulo": [
+  "COMO",
+  "JOGAR"
+ ],
+ "sub": "Fácil de aprender, difícil de dominar",
+ "cor": "#ffb02e",
+ "grad": "ouro",
+ "cenas": [
+  {
+   "tela": "howto",
+   "legenda": "CONTROLES SIMPLES",
+   "foco": [
+    180,
+    125,
+    330
+   ],
+   "alto": 900,
+   "seg": 2.8
+  },
+  {
+   "tela": "howto",
+   "legenda": "JOGA NO CELULAR TAMBÉM",
+   "foco": [
+    240,
+    205,
+    300
+   ],
+   "alto": 560,
+   "seg": 2.4
+  },
+  {
+   "tela": "modes",
+   "legenda": "ESCOLHA O MODO",
+   "foco": [
+    240,
+    135,
+    460
+   ],
+   "alto": 820,
+   "toque": [
+    92,
+    110
+   ],
+   "seg": 2.4
+  }
+ ],
+ "fim": "BORA PRA ARENA?"
+}
