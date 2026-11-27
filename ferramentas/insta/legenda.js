@@ -10,7 +10,7 @@ const EMOJI = {
 };
 
 const TAGS_BASE = '#DuelLegendsArena #LendaDoDia #pixelart #indiegame #jogoindie #gamedevbrasil #jogobrasileiro';
-const TAGS = { base: TAGS_BASE, mito: `${TAGS_BASE} #mitologia #lendas`, br: `${TAGS_BASE} #culturabrasileira` };
+const TAGS = { base: TAGS_BASE, mito: `${TAGS_BASE} #mitologia #lendas`, br: TAGS_BASE } // sem destaque de folclore (pedido do usuário);
 const CHAMADA = { longa: 'Conta aqui nos comentários! 👇', curta: 'Conta aqui! 👇' };
 const TAGS_VIDEO = '#DuelLegendsArena #jogoindie #pixelart #gamedevbrasil #indiegame';
 
